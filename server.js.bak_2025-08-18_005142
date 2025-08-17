@@ -125,39 +125,3 @@ app.get('/after-login', (req, res) => {
     return res.redirect('/login.html');
   }
 });
-
-// --- Override: sauberer Login-Flow + Redirect ---
-app.post('/login', (req, res) => {
-  try {
-    const { username, password } = req.body || {};
-    const list = Array.isArray(global.users) ? global.users : [];
-    const hit = list.find(u =>
-      String(u.username).toLowerCase() === String(username || '').toLowerCase() &&
-      String(u.password) === String(password || '')
-    );
-    if (!hit) return res.status(401).send('Login fehlgeschlagen');
-
-    req.session.user = username;
-
-    const adminUser = (process.env.ADMIN_USER || 'admin').toLowerCase();
-    const next = (String(username).toLowerCase() === adminUser) ? '/status.html' : '/ibelsa.html';
-
-    // wenn der Client JSON erwartet (fetch), JSON mit Ziel zurückgeben
-    if ((req.headers.accept || '').includes('application/json')) {
-      return res.json({ ok: true, next });
-    }
-    // sonst klassische Weiterleitung
-    return res.redirect(303, next);
-  } catch (e) {
-    console.error('[login error]', e);
-    return res.redirect('/login.html');
-  }
-});
-
-// Fallback-Route, falls irgendwo noch /after-login aufgerufen wird
-app.get('/after-login', (req, res) => {
-  const u = req.session?.user ? String(req.session.user) : '';
-  const adminUser = (process.env.ADMIN_USER || 'admin').toLowerCase();
-  const next = (u && u.toLowerCase() === adminUser) ? '/status.html' : '/ibelsa.html';
-  return res.redirect(303, next);
-});
