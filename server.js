@@ -1,163 +1,88 @@
 const express = require('express');
-const path = require('path');
-const fs = require('fs');
 const session = require('express-session');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 require('dotenv').config();
 
-const app  = express();
+const app = express();
 const PORT = process.env.PORT || 3011;
 
 app.set('trust proxy', 1);
-
-// Parser
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-// Force / -> login.html
-app.get('/', (req,res) => res.redirect('/login.html'));
-// Force / -> login.html
-app.get('/', (req,res) => res.redirect('/login.html'));
 
-// Sessions (MemoryStore – für kleines Dashboard ok)
+// Sessions (Memory-Store reicht fürs Dev/klein)
 app.use(session({
   secret: process.env.SESSION_SECRET || 'change-me-please',
   resave: false,
   saveUninitialized: false,
-  cookie: { httpOnly: true, sameSite: 'lax', secure: false, maxAge: 60 * 60 * 1000 }
+  cookie: { httpOnly: true, sameSite: 'lax', secure: false, maxAge: 60*60*1000 }
 }));
 
-// Rate-Limit nur /login
-const loginLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000,
-  max: 50,
-  standardHeaders: true,
-  legacyHeaders: false
-});
+// Rate-Limit nur auf /login
+const loginLimiter = rateLimit({ windowMs: 5*60*1000, max: 50, standardHeaders: true, legacyHeaders: false });
 app.use('/login', loginLimiter);
 
-// Static-Files
+// Statische Dateien
 const publicDir = path.join(__dirname, 'public');
-app.get('/', (req, res) => res.redirect('/login.html'));
 app.use(express.static(publicDir));
 
-// Users laden
-const usersFile = path.join(__dirname, 'users.json');
-let users = [];
-try {
-  if (fs.existsSync(usersFile)) {
-    users = JSON.parse(fs.readFileSync(usersFile, 'utf8'));
-    if (!Array.isArray(users)) throw new Error('users.json muss ein Array sein');
-  } else {
-    console.warn('[WARN] users.json fehlt – Default-Nutzer aktiv (nur Test)');
-    users = [{ username: 'admin', password: 'admin' }];
-  }
-} catch (err) {
-  console.error('[ERROR] Fehler beim Laden der users.json:', err);
-  users = [{ username: 'admin', password: 'admin' }];
+// Hilfsfunktion: wohin nach Login?
+function destinationFor(user) {
+  const adminUser = (process.env.ADMIN_USER || 'admin').toLowerCase();
+  if (user && user.toLowerCase() === adminUser) return '/status.html';
+  return '/ibelsa.html';
 }
 
-// Login
-app.post('/login', (req, res) => {
-  const { username, password } = req.body;
-  const user = users.find(u => u.username === username && u.password === password);
-  if (user) {
-    req.session.user = { username };
-    return res.json({ success: true, message: 'Login erfolgreich' });
+// Root: wenn eingeloggt → ziel, sonst Login
+app.get('/', (req, res) => {
+  if (req.session && req.session.user) {
+    return res.redirect(destinationFor(req.session.user));
   }
-  res.status(401).json({ success: false, message: 'Ungültige Anmeldedaten' });
+  return res.redirect('/login.html');
 });
 
-// Status
-app.get('/status', (req, res) => {
-  if (req.session.user) {
-    res.json({ loggedIn: true, user: req.session.user });
-  } else {
-    res.json({ loggedIn: false });
+// GET /login zeigt Formular-Datei
+app.get('/login', (req, res) => res.redirect('/login.html'));
+
+// POST /login prüft Zugangsdaten
+app.post('/login', (req, res) => {
+  try {
+    const { username, password } = req.body || {};
+    const aUser = process.env.ADMIN_USER || 'admin';
+    const aPass = process.env.ADMIN_PASS || 'admin';
+
+    const iUser = process.env.IBELSA_USER || '';
+    const iPass = process.env.IBELSA_PASS || '';
+
+    let ok = false;
+    let who = '';
+
+    if (username === aUser && password === aPass) {
+      ok = true; who = aUser;
+    } else if (username === iUser && password === iPass) {
+      ok = true; who = iUser;
+    }
+
+    if (!ok) return res.status(401).redirect('/login.html?ok=false');
+
+    // Session setzen und weiterleiten
+    req.session.user = who;
+    return res.redirect(destinationFor(who));
+  } catch (e) {
+    console.error('[LOGIN]', e);
+    return res.status(500).redirect('/login.html?ok=error');
   }
 });
 
 // Logout
 app.post('/logout', (req, res) => {
-  req.session.destroy(() => {
-    res.json({ success: true, message: 'Logout erfolgreich' });
-  });
+  req.session?.destroy(() => res.redirect('/login.html?logged_out=1'));
 });
 
-// Start
+// Fallback 404 (optional)
+app.use((req, res) => res.status(404).send('Not found'));
+
 app.listen(PORT, () => {
   console.log(`Hotel-Dashboard läuft auf Port ${PORT}`);
-});
-
-// --- Force start page to login ---
-const startPage = path.join(__dirname, 'public', 'dash-login.html'); // oder 'login.html' falls anders benannt
-app.get('/', (_req, res) => res.sendFile(startPage));
-
-// Optional: explizite Routen für Status & Dashboard
-app.get('/status', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'status.html')));
-app.get('/dashboard', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'ibelsa.html')));
-
-// --- Backup-Route (Login-Seite sichern) ---
-app.get('/backup-login', (req, res) => {
-  try {
-    const src  = path.join(__dirname, 'public', 'login.html');
-    const dest = path.join(
-      __dirname, 'public',
-      `login_backup_${new Date().toISOString().replace(/[:.]/g,'-')}.html`
-    );
-    fs.copyFileSync(src, dest);
-    res.send(`Backup erstellt: ${path.basename(dest)}`);
-  } catch (err) {
-    console.error('[Backup]', err);
-    res.status(500).send('Backup fehlgeschlagen');
-  }
-});
-
-// ----- Nach Login je nach User weiterleiten -----
-app.get('/after-login', (req, res) => {
-  try {
-    const u = (req.session && req.session.user) ? String(req.session.user) : '';
-    const adminUser = process.env.ADMIN_USER || 'admin';
-    if (u && u.toLowerCase() === adminUser.toLowerCase()) {
-      return req.session.user = (req.body.username||req.body.user||''); res.redirect('/status.html');
-    }
-    return res.redirect('/after-login');
-  } catch (e) {
-    return res.redirect('/login.html');
-  }
-});
-
-// --- Override: sauberer Login-Flow + Redirect ---
-app.post('/login', (req, res) => {
-  try {
-    const { username, password } = req.body || {};
-    const list = Array.isArray(global.users) ? global.users : [];
-    const hit = list.find(u =>
-      String(u.username).toLowerCase() === String(username || '').toLowerCase() &&
-      String(u.password) === String(password || '')
-    );
-    if (!hit) return res.status(401).send('Login fehlgeschlagen');
-
-    req.session.user = username;
-
-    const adminUser = (process.env.ADMIN_USER || 'admin').toLowerCase();
-    const next = (String(username).toLowerCase() === adminUser) ? '/status.html' : '/ibelsa.html';
-
-    // wenn der Client JSON erwartet (fetch), JSON mit Ziel zurückgeben
-    if ((req.headers.accept || '').includes('application/json')) {
-      return res.json({ ok: true, next });
-    }
-    // sonst klassische Weiterleitung
-    return res.redirect(303, next);
-  } catch (e) {
-    console.error('[login error]', e);
-    return res.redirect('/login.html');
-  }
-});
-
-// Fallback-Route, falls irgendwo noch /after-login aufgerufen wird
-app.get('/after-login', (req, res) => {
-  const u = req.session?.user ? String(req.session.user) : '';
-  const adminUser = (process.env.ADMIN_USER || 'admin').toLowerCase();
-  const next = (u && u.toLowerCase() === adminUser) ? '/status.html' : '/ibelsa.html';
-  return res.redirect(303, next);
 });
