@@ -111,17 +111,3 @@ app.get('/backup-login', (req, res) => {
     res.status(500).send('Backup fehlgeschlagen');
   }
 });
-
-// ----- Nach Login je nach User weiterleiten -----
-app.get('/after-login', (req, res) => {
-  try {
-    const u = (req.session && req.session.user) ? String(req.session.user) : '';
-    const adminUser = process.env.ADMIN_USER || 'admin';
-    if (u && u.toLowerCase() === adminUser.toLowerCase()) {
-      return res.redirect('/status.html');
-    }
-    return res.redirect('/ibelsa.html');
-  } catch (e) {
-    return res.redirect('/login.html');
-  }
-});
