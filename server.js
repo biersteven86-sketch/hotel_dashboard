@@ -1,4 +1,3 @@
-// /home/steven/hotel_dashboard/web/server.js  (CommonJS-Version)
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -9,13 +8,13 @@ require('dotenv').config();
 const app  = express();
 const PORT = process.env.PORT || 3011;
 
-app.set('trust proxy', 1); // hinter Apache/Proxy sinnvoll:contentReference[oaicite:6]{index=6}
+app.set('trust proxy', 1);
 
-// Parser für Form-POST & JSON
+// Parser
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Sessions (einfacher Memory-Store)
+// Sessions (MemoryStore – für kleines Dashboard ok)
 app.use(session({
   secret: process.env.SESSION_SECRET || 'change-me-please',
   resave: false,
@@ -23,7 +22,7 @@ app.use(session({
   cookie: { httpOnly: true, sameSite: 'lax', secure: false, maxAge: 60 * 60 * 1000 }
 }));
 
-// Rate-Limit nur auf /login
+// Rate-Limit nur /login
 const loginLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 50,
@@ -33,10 +32,10 @@ const loginLimiter = rateLimit({
 app.use('/login', loginLimiter);
 
 // Static-Files
-const publicDir = path.join(__dirname, 'public'); // enthält login.html / ibelsa.html / index.html / status.html:contentReference[oaicite:7]{index=7}
+const publicDir = path.join(__dirname, 'public');
 app.use(express.static(publicDir));
 
-// Users laden (aus /web/users.json)
+// Users laden
 const usersFile = path.join(__dirname, 'users.json');
 let users = [];
 try {
@@ -45,58 +44,38 @@ try {
     if (!Array.isArray(users)) throw new Error('users.json muss ein Array sein');
   } else {
     console.warn('[WARN] users.json fehlt – Default-Nutzer aktiv (nur Test)');
-    users = [
-      { username: 'admin', password: 'test', redirect: '/index.html' },
-      { username: 'max',   password: 'test', redirect: '/ibelsa.html' }
-    ];
+    users = [{ username: 'admin', password: 'admin' }];
   }
-} catch (e) {
-  console.error('[ERROR] users.json:', e.message);
-  users = []; // blockiere Logins bei Fehler
+} catch (err) {
+  console.error('[ERROR] Fehler beim Laden der users.json:', err);
+  users = [{ username: 'admin', password: 'admin' }];
 }
 
-// Helper: Zielseite ermitteln (users.json > Sonderfall admin > Standard)
-function resolveTarget(user) {
-  // 1) Redirect aus users.json respektieren, falls vorhanden
-  const raw = (user && user.redirect) ? String(user.redirect).trim() : '';
-  if (raw) {
-    // Path härten: führenden Slash erzwingen
-    return raw.startsWith('/') ? raw : `/${raw}`;
-  }
-  // 2) Sonderfall admin (Fallback, falls kein redirect gesetzt)
-  const uname = String(user.username || '').trim().toLowerCase();
-  if (uname === 'admin') return '/index.html';
-  // 3) Standardziel
-  return '/ibelsa.html';
-}
-
-// Routes
-app.get('/', (_req, res) => res.sendFile(path.join(publicDir, 'login.html')));
-
+// Login
 app.post('/login', (req, res) => {
-  const { username, password } = req.body || {};
-  const user = users.find(u => String(u?.username) === String(username) && String(u?.password) === String(password));
-
-  if (!user) {
-    return res.status(401).send('Ungültige Zugangsdaten');
+  const { username, password } = req.body;
+  const user = users.find(u => u.username === username && u.password === password);
+  if (user) {
+    req.session.user = { username };
+    return res.json({ success: true, message: 'Login erfolgreich' });
   }
-
-  // Session minimal setzen (optional später erweitern)
-  req.session.user = { username: String(user.username) };
-
-  const target = resolveTarget(user);
-
-  console.log(`[LOGIN] user=${user.username} -> ${target}`);
-  return res.redirect(303, target); // PRG (POST → Redirect → GET)
+  res.status(401).json({ success: false, message: 'Ungültige Anmeldedaten' });
 });
 
-// optionaler Logout
-app.post('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
+// Status
+app.get('/status', (req, res) => {
+  if (req.session.user) {
+    res.json({ loggedIn: true, user: req.session.user });
+  } else {
+    res.json({ loggedIn: false });
+  }
+});
 
-// Fehler-Handler
-app.use((err, _req, res, _next) => {
-  console.error('[ERROR]', err);
-  res.status(500).send('Interner Serverfehler');
+// Logout
+app.post('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.json({ success: true, message: 'Logout erfolgreich' });
+  });
 });
 
 // Start
