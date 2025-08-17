@@ -10,11 +10,11 @@ const PORT = process.env.PORT || 3011;
 
 app.set('trust proxy', 1);
 
-// Parser
+// Parser für Form-POST & JSON
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Sessions (MemoryStore – für kleines Dashboard ok)
+// Sessions (einfacher Memory-Store, für kleine Dashboards ok)
 app.use(session({
   secret: process.env.SESSION_SECRET || 'change-me-please',
   resave: false,
@@ -22,7 +22,7 @@ app.use(session({
   cookie: { httpOnly: true, sameSite: 'lax', secure: false, maxAge: 60 * 60 * 1000 }
 }));
 
-// Rate-Limit nur /login
+// Rate-Limit nur auf /login
 const loginLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 50,
@@ -32,10 +32,10 @@ const loginLimiter = rateLimit({
 app.use('/login', loginLimiter);
 
 // Static-Files
-const publicDir = path.join(__dirname, 'public');
+const publicDir = path.join(__dirname, 'public'); 
 app.use(express.static(publicDir));
 
-// Users laden
+// Users laden (aus users.json im Projektordner)
 const usersFile = path.join(__dirname, 'users.json');
 let users = [];
 try {
@@ -51,7 +51,7 @@ try {
   users = [{ username: 'admin', password: 'admin' }];
 }
 
-// Login
+// Login-Route
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
   const user = users.find(u => u.username === username && u.password === password);
@@ -62,7 +62,7 @@ app.post('/login', (req, res) => {
   res.status(401).json({ success: false, message: 'Ungültige Anmeldedaten' });
 });
 
-// Status
+// Status-Route
 app.get('/status', (req, res) => {
   if (req.session.user) {
     res.json({ loggedIn: true, user: req.session.user });
@@ -71,7 +71,7 @@ app.get('/status', (req, res) => {
   }
 });
 
-// Logout
+// Logout-Route
 app.post('/logout', (req, res) => {
   req.session.destroy(() => {
     res.json({ success: true, message: 'Logout erfolgreich' });
@@ -82,11 +82,3 @@ app.post('/logout', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Hotel-Dashboard läuft auf Port ${PORT}`);
 });
-
-// --- Force start page to login ---
-const startPage = path.join(__dirname, 'public', 'dash-login.html'); // oder 'login.html' falls anders benannt
-app.get('/', (_req, res) => res.sendFile(startPage));
-
-// Optional: explizite Routen für Status & Dashboard
-app.get('/status', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'status.html')));
-app.get('/dashboard', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'ibelsa.html')));

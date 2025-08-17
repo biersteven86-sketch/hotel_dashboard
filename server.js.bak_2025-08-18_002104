@@ -82,11 +82,3 @@ app.post('/logout', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Hotel-Dashboard läuft auf Port ${PORT}`);
 });
-
-// --- Force start page to login ---
-const startPage = path.join(__dirname, 'public', 'dash-login.html'); // oder 'login.html' falls anders benannt
-app.get('/', (_req, res) => res.sendFile(startPage));
-
-// Optional: explizite Routen für Status & Dashboard
-app.get('/status', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'status.html')));
-app.get('/dashboard', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'ibelsa.html')));
