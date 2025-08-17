@@ -6,3 +6,7 @@ ibelsa_cookies
 login_backup*.html
 login_master_backup.html
 
+.env
+.env.*
+node_modules/
+__backups_tmp_do_not_commit/
