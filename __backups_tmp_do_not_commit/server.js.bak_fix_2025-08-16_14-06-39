@@ -1,0 +1,35 @@
+require("dotenv").config();
+const express = require("express");
+const path    = require("path");
+const app     = express();
+const PORT    = process.env.PORT || 3011;
+
+app.disable("x-powered-by");
+app.set("trust proxy", true);
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// statische Dateien aus ./public, aber ohne Auto-Index
+app.use(express.static(path.join(__dirname, "public"), { index: false }));
+
+// Root sofort auf /login weiterleiten
+app.get("/", (_req, res) => res.redirect(302, "/login"));
+
+// Login-Formular (liefert public/login.html)
+app.get("/login", (_req, res) => {
+  res.sendFile(path.join(__dirname, "public", "login.html"));
+});
+
+// Login-POST -> immer Redirect auf ibelsa.html
+app.post("/login", (req, res) => {
+  const { username, password } = req.body || {};
+  if (!username || !password) return res.redirect(302, "/login");
+  return res.redirect(303, "/ibelsa.html");
+});
+
+// Fallback: unbekannte Pfade -> 404 klare Meldung
+app.use((_req, res) => res.status(404).send("Not Found"));
+
+app.listen(PORT, "127.0.0.1", () => {
+  console.log("Hotel Dashboard läuft auf Port", PORT);
+});

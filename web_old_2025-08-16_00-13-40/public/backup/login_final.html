@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1:#0d47a1; --bg2:#1e88e5;
+      --card-top:#0d3f52; --card-bot:#0b2c3a;
+      --stroke:rgba(255,255,255,.12);
+      --white:#fff; --muted:#bcd0e3;
+      --green1:#2ecc71; --green2:#27ae60;
+      --input-bg:rgba(255,255,255,.09);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Poppins,system-ui,Arial,sans-serif; color:var(--white);
+      background:
+        radial-gradient(80vmin 50vmin at 50% 30%, rgba(255,255,255,.18), rgba(255,255,255,0) 60%),
+        radial-gradient(140vmin 90vmin at 50% 120%, rgba(0,0,0,.25), rgba(0,0,0,0) 60%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      display:flex; align-items:center; justify-content:center; padding:32px;
+    }
+
+    .card{
+      width: clamp(340px, 58vw, 860px);
+      background: linear-gradient(180deg, rgba(13,63,82,.95), rgba(11,44,58,.92));
+      border-radius: 22px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.35),
+                  inset 0 1px 0 rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.06);
+      padding: 28px 28px 26px;
+    }
+
+    .title-row{
+      display:flex; align-items:center; justify-content:center; margin-bottom:6px;
+    }
+    .title{
+      font-size: clamp(28px, 3.2vw, 44px); font-weight:800; letter-spacing:.3px;
+      background: linear-gradient(90deg, #b9f1ff, #7fe1ff, #b9f1ff);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      text-shadow: 0 1px 0 rgba(0,0,0,.25);
+    }
+    .subtitle{color:var(--muted); text-align:center; margin:2px 0 18px; font-size:14px}
+
+    .group{margin:10px 0}
+    label{display:block; font-size:12px; opacity:.9; margin:0 0 6px 2px}
+    .input-wrap{position:relative}
+    .input{
+      width:100%; height:46px;
+      padding:10px 14px; padding-right:48px;
+      border-radius:12px; border:1px solid var(--stroke);
+      background: var(--input-bg);
+      color:var(--white);
+      outline:none;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.03);
+    }
+    .input::placeholder{color:rgba(255,255,255,.55)}
+    .toggle{
+      position:absolute; right:8px; top:50%; transform:translateY(-50%);
+      width:34px; height:34px;
+      display:grid; place-items:center;
+      background: transparent;
+      cursor:pointer; user-select:none; font-size:18px; line-height:1;
+      border:none;
+    }
+    .toggle:hover{filter:brightness(1.05)}
+
+    .btn{
+      width:100%; height:50px; margin-top:14px;
+      border:0; border-radius:14px; cursor:pointer; font-weight:800; letter-spacing:.2px;
+      color:#fff;
+      background: linear-gradient(180deg, var(--green1), var(--green2));
+      box-shadow: 0 10px 20px rgba(39,174,96,.35), inset 0 1px 0 rgba(255,255,255,.25);
+    }
+
+    .footer{margin-top:12px; text-align:center; color:var(--muted); font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="title-row">
+      <h1 class="title">Hotel – Dashboard</h1>
+    </div>
+    <p class="subtitle">Anmelden – bitte Zugangsdaten eingeben.</p>
+
+    <form class="form" method="POST" action="/login" autocomplete="on">
+      <div class="group">
+        <label for="u">Benutzername</label>
+        <div class="input-wrap">
+          <input id="u" name="username" class="input" type="text" placeholder="Benutzername" required />
+        </div>
+      </div>
+
+      <div class="group">
+        <label for="p">Passwort</label>
+        <div class="input-wrap">
+          <input id="p" name="password" class="input" type="password" placeholder="Passwort" required />
+          <button type="button" class="toggle" id="pw-toggle" aria-label="Passwort anzeigen">🙈</button>
+        </div>
+      </div>
+
+      <button class="btn" type="submit">Login</button>
+    </form>
+
+    <div class="footer">© 2025 Hotel – Dashboard</div>
+  </div>
+
+  <script>
+    const pw = document.getElementById('p');
+    const btn = document.getElementById('pw-toggle');
+    btn.addEventListener('mouseenter', () => {
+      pw.type = 'text';
+      btn.textContent = '🙉';
+    });
+    btn.addEventListener('mouseleave', () => {
+      pw.type = 'password';
+      btn.textContent = '🙈';
+    });
+  </script>
+</body>
+</html>

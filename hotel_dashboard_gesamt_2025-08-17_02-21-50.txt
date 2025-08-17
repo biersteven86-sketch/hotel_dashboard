@@ -1,0 +1,704 @@
+### HOTEL DASHBOARD – GESAMTREPORT
+So 17. Aug 02:21:50 CEST 2025
+
+## 1) Projektstruktur (ohne node_modules)
+.
+├── _backup
+│   └── web_2025-08-16_01-49-44.tgz
+├── data
+│   └── incoming
+│       └── checkedin_2025-08-11T23-25-59.json
+├── diagnose_2025-08-15_18-09-10.log
+├── ecosystem.config.js
+├── hotel_dashboard_gesamt_2025-08-17_02-21-50.txt
+├── .htpasswd
+├── login_master_backup.html
+├── network_info.txt
+├── restart_hotel.sh
+├── scripts
+│   └── update_status.sh
+├── server.js
+├── verzeichnis.txt
+├── web
+│   ├── _backup
+│   │   └── web_backup_2025-08-16_14-33-25.tar.gz
+│   ├── config
+│   ├── ecosystem.config.js
+│   ├── .env
+│   ├── ibelsa_cookies
+│   ├── lib
+│   │   └── ibelsa.js
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── public
+│   │   ├── dash-login.html
+│   │   ├── ibelsa.html
+│   │   ├── index.html
+│   │   ├── login.html
+│   │   └── status.html
+│   ├── routes
+│   ├── server.js
+│   ├── server.js.backup_2025-08-16_14-23-47
+│   ├── server.js.backup_2025-08-16_14-51-19
+│   ├── server.js.backup_2025-08-16_15-31-30
+│   ├── server.js.backup_2025-08-16_15-55-01
+│   ├── server.js.bak_2025-08-16_01-59-03
+│   ├── server.js.bak_2025-08-16_02-01-17
+│   ├── server.js.bak_2025-08-16_02-05-46
+│   ├── server.js.bak_2025-08-16_02-11-13
+│   ├── server.js.bak_2025-08-16_02-15-50
+│   ├── server.js.bak_2025-08-16_02-19-35
+│   ├── server.js.bak_2025-08-16_03-41-34
+│   ├── server.js.bak_2025-08-16_03-53-40
+│   ├── server.js.bak_2025-08-16_03-59-59
+│   ├── server.js.bak_2025-08-16_14-08-32
+│   ├── server.js.bak_2025-08-16_15-50-46
+│   ├── server.js.bak_2025-08-16_16-20-41
+│   ├── server.js.bak_2025-08-16_16-53-45
+│   ├── server.js.bak_2025-08-16_17-00-39
+│   ├── server.js.bak_2025-08-16_17-04-42
+│   ├── server.js.bak_2025-08-16_17-09-18
+│   ├── server.js.bak_2025-08-16_17-33-04
+│   ├── server.js.bak_2025-08-16_17-48-32
+│   ├── server.js.bak_2025-08-16_17-51-57
+│   ├── server.js.bak_2025-08-16_17-54-46
+│   ├── server.js.bak_2025-08-16_18-01-47
+│   ├── server.js.bak_2025-08-16_18-16-40
+│   ├── server.js.bak_2025-08-16_18-19-51
+│   ├── server.js.bak_2025-08-16_18-40-58
+│   ├── server.js.bak_2025-08-16_18-46-36
+│   ├── server.js.bak_2025-08-16_18-48-00
+│   ├── server.js.bak_2025-08-16_19-09-17
+│   ├── server.js.bak_2025-08-16_20-14-18
+│   ├── server.js.bak_dbg_2025-08-16_14-22-11
+│   ├── server.js.bak_fix_2025-08-16_14-06-39
+│   ├── server.js.bak_routes_2025-08-16_14-26-07
+│   ├── server.js.bak_top_2025-08-16_14-28-49
+│   ├── server.js.defekt_2025-08-16_18-35-04
+│   ├── server.js.hotfix_2025-08-16_13-21-48
+│   ├── server.js.hotfix_2025-08-16_13-24-41
+│   ├── server.js.pre_fix_2025-08-16_183128
+│   ├── server.js.pre_multiuser_2025-08-16_182521
+│   ├── server.js.pre_restore_2025-08-16_03-21-14
+│   ├── terminbuffet.js
+│   ├── terminbuffet.last
+│   └── users.json
+├── web_backup_2025-08-16_00-13-40.tar.gz
+└── web_old_2025-08-16_00-13-40
+    ├── .env
+    ├── Formular
+    ├── lib
+    │   └── ibelsa.js
+    ├── package.json
+    ├── package-lock.json
+    ├── public
+    │   ├── backup
+    │   │   ├── login_2025-08-15_023247.html
+    │   │   ├── login_card_2025-08-15_015432.html
+    │   │   └── login_final.html
+    │   ├── hotel-dashboard-bg.jpg
+    │   ├── ibelsa.html
+    │   ├── index.html
+    │   ├── login_backup_2025-08-13-0634.html
+    │   ├── login_backup_2025-08-13-065610.html
+    │   ├── login_backup_2025-08-13-070217.html
+    │   ├── login_backup_2025-08-13-071351.html
+    │   ├── login_backup_2025-08-13-071525.html
+    │   ├── login_backup_2025-08-13-0744.html
+    │   ├── login_backup_2025-08-15_000453.html
+    │   ├── login_backup_2025-08-15_022448.html
+    │   ├── login_backup.html
+    │   ├── login.html
+    │   └── theme.css
+    ├── Redirect
+    ├── routes
+    │   └── auth.js
+    ├── server_backup_2025-08-15_20-32-01.js
+    ├── server_backup_2025-08-15_20-46-16.js
+    ├── server_backup_2025-08-15_20-49-35.js
+    ├── server_backup_2025-08-15_205531.js
+    ├── server_backup_2025-08-15_20-58-30.js
+    ├── server_backup_2025-08-15_21-09-46.js
+    ├── server_backup_2025-08-15_22-30-12.js
+    ├── server_backup_2025-08-15_22-38-44.js
+    ├── server_backup_2025-08-15_22-40-28.js
+    ├── server_backup_2025-08-15_225432.js
+    ├── server_backup_2025-08-15_23-00-29.js
+    ├── server_backup_2025-08-15_23-03-33.js
+    ├── server_backup_2025-08-15_23-05-15.js
+    ├── server_backup_2025-08-15_23-16-41.js
+    ├── server_backup_2025-08-15_23-26-23.js
+    ├── server_backup_2025-08-15_23-31-15.js
+    ├── server_backup_2025-08-15_23-33-51.js
+    └── web_dateien.txt
+
+16 directories, 113 files
+
+## 2) Wichtige Dateien
+----- /home/steven/hotel_dashboard/server.js
+// /home/steven/hotel_dashboard/web/server.js
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+import session from 'express-session';
+import rateLimit from 'express-rate-limit';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = path.dirname(__filename);
+
+const app  = express();
+const PORT = process.env.PORT || 3011;
+
+app.set('trust proxy', 1); // hinter Apache/Proxy:contentReference[oaicite:5]{index=5}
+
+app.use(express.urlencoded({ extended: true })); // für Form-POSTs
+app.use(express.json());
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'change-me-please',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { httpOnly:true, sameSite:'lax', secure:false, maxAge: 60*60*1000 }
+}));
+
+const loginLimiter = rateLimit({ windowMs: 5*60*1000, max: 50, standardHeaders: true, legacyHeaders: false });
+app.use('/login', loginLimiter);
+
+const publicDir = path.join(__dirname, 'public'); // enthält login.html, ibelsa.html, index.html:contentReference[oaicite:6]{index=6}
+app.use(express.static(publicDir));
+
+// users.json laden
+const usersFile = path.join(__dirname, 'users.json');
+let users = [];
+try {
+  if (fs.existsSync(usersFile)) {
+    users = JSON.parse(fs.readFileSync(usersFile, 'utf8'));
+    if (!Array.isArray(users)) throw new Error('users.json muss Array sein');
+  } else {
+    console.warn('[WARN] users.json fehlt – Default-Users aktiv');
+    users = [
+      { username: 'admin', password: 'test' },
+      { username: 'max',   password: 'test' }
+    ];
+  }
+} catch (e) {
+  console.error('[ERROR] users.json:', e.message);
+  users = []; // blockiere Logins bei Fehler
+}
+
+// GET / → login.html
+app.get('/', (_req, res) => res.sendFile(path.join(publicDir, 'login.html')));
+
+// POST /login → prüfe & leite weiter
+app.post('/login', (req, res) => {
+  const { username, password } = req.body ?? {};
+  const user = users.find(u => String(u?.username) === String(username) && String(u?.password) === String(password));
+
+  if (!user) {
+    return res.status(401).send('Ungültige Zugangsdaten');
+  }
+
+  req.session.user = { username: String(user.username) };
+
+  // Weiterleitungslogik (Standard: ibelsa.html, admin → index.html)
+  let target = 'ibelsa.html';
+  const uname = String(user.username || '').trim().toLowerCase();
+
+  // --- TEMP: Debug (bei dir wieder entfernen) ---
+  console.log('[DEBUG] matched user =', user);
+  console.log('[DEBUG] uname=', uname, 'isAdmin?', uname === 'admin');
+  // ---------------------------------------------
+
+  if (uname === 'admin') {
+    target = 'index.html';
+  }
+
+  console.log(`[LOGIN] user=${user.username} -> ${target}`);
+  return res.redirect(303, '/' + target); // PRG
+});
+
+app.post('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
+
+app.use((err, _req, res, _next) => {
+  console.error('[ERROR]', err);
+  res.status(500).send('Interner Serverfehler');
+});
+
+app.listen(PORT, () => {
+  console.log(`Hotel-Dashboard läuft auf Port ${PORT}`);
+});
+
+----- /home/steven/hotel_dashboard/ecosystem.config.js
+module.exports = {
+  apps: [{
+    name: "hotel-web",
+    script: "/home/steven/hotel_dashboard/server.js",
+    cwd: "/home/steven/hotel_dashboard",
+    env: { PORT: 3011 }
+  }]
+};
+
+----- /home/steven/hotel_dashboard/web/server.js
+// /home/steven/hotel_dashboard/web/server.js  (CommonJS-Version)
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
+const session = require('express-session');
+const rateLimit = require('express-rate-limit');
+require('dotenv').config();
+
+const app  = express();
+const PORT = process.env.PORT || 3011;
+
+app.set('trust proxy', 1); // hinter Apache/Proxy sinnvoll:contentReference[oaicite:6]{index=6}
+
+// Parser für Form-POST & JSON
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// Sessions (einfacher Memory-Store)
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'change-me-please',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { httpOnly: true, sameSite: 'lax', secure: false, maxAge: 60 * 60 * 1000 }
+}));
+
+// Rate-Limit nur auf /login
+const loginLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 50,
+  standardHeaders: true,
+  legacyHeaders: false
+});
+app.use('/login', loginLimiter);
+
+// Static-Files
+const publicDir = path.join(__dirname, 'public'); // enthält login.html / ibelsa.html / index.html / status.html:contentReference[oaicite:7]{index=7}
+app.use(express.static(publicDir));
+
+// Users laden (aus /web/users.json)
+const usersFile = path.join(__dirname, 'users.json');
+let users = [];
+try {
+  if (fs.existsSync(usersFile)) {
+    users = JSON.parse(fs.readFileSync(usersFile, 'utf8'));
+    if (!Array.isArray(users)) throw new Error('users.json muss ein Array sein');
+  } else {
+    console.warn('[WARN] users.json fehlt – Default-Nutzer aktiv (nur Test)');
+    users = [
+      { username: 'admin', password: 'test', redirect: '/index.html' },
+      { username: 'max',   password: 'test', redirect: '/ibelsa.html' }
+    ];
+  }
+} catch (e) {
+  console.error('[ERROR] users.json:', e.message);
+  users = []; // blockiere Logins bei Fehler
+}
+
+// Helper: Zielseite ermitteln (users.json > Sonderfall admin > Standard)
+function resolveTarget(user) {
+  // 1) Redirect aus users.json respektieren, falls vorhanden
+  const raw = (user && user.redirect) ? String(user.redirect).trim() : '';
+  if (raw) {
+    // Path härten: führenden Slash erzwingen
+    return raw.startsWith('/') ? raw : `/${raw}`;
+  }
+  // 2) Sonderfall admin (Fallback, falls kein redirect gesetzt)
+  const uname = String(user.username || '').trim().toLowerCase();
+  if (uname === 'admin') return '/index.html';
+  // 3) Standardziel
+  return '/ibelsa.html';
+}
+
+// Routes
+app.get('/', (_req, res) => res.sendFile(path.join(publicDir, 'login.html')));
+
+app.post('/login', (req, res) => {
+  const { username, password } = req.body || {};
+  const user = users.find(u => String(u?.username) === String(username) && String(u?.password) === String(password));
+
+  if (!user) {
+    return res.status(401).send('Ungültige Zugangsdaten');
+  }
+
+  // Session minimal setzen (optional später erweitern)
+  req.session.user = { username: String(user.username) };
+
+  const target = resolveTarget(user);
+
+  console.log(`[LOGIN] user=${user.username} -> ${target}`);
+  return res.redirect(303, target); // PRG (POST → Redirect → GET)
+});
+
+// optionaler Logout
+app.post('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
+
+// Fehler-Handler
+app.use((err, _req, res, _next) => {
+  console.error('[ERROR]', err);
+  res.status(500).send('Interner Serverfehler');
+});
+
+// Start
+app.listen(PORT, () => {
+  console.log(`Hotel-Dashboard läuft auf Port ${PORT}`);
+});
+
+----- /home/steven/hotel_dashboard/web/package.json
+{
+  "name": "web",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2"
+  },
+  "directories": {
+    "lib": "lib"
+  }
+}
+
+----- /home/steven/hotel_dashboard/web/.env
+SESSION_SECRET=dbfb7c16ef3a50eeac9bc249a895e522ed14a4467531ab04
+PORT=3011
+DASH_USER=admin
+DASH_PASS=Rottweil.12
+DASH_SECRET=WkRencsleW4i1Z5tYvWeUaKYafwBZjPJ
+DASH_TTL=60
+DASH_ALWAYS_PROMPT=0
+IBELSA_USER=info@myhome-rottweil.de
+IBELSA_PASS=Rottweil.12
+ADMIN_USER=admin
+ADMIN_PASS=Rottweil.12
+
+----- /etc/nginx/sites-available/hotel-dashboard
+server {
+  listen 80;
+  server_name hotel-dashboard.de www.hotel-dashboard.de;
+
+  # Nur die Startseite umleiten (testweise 302; später gern 301)
+  location = / { return 302 /login.html; }
+
+  # Alles andere an die Node-App
+  location / {
+    proxy_pass http://127.0.0.1:3011;
+    proxy_http_version 1.1;
+    proxy_set_header Host               $host;
+    proxy_set_header X-Real-IP          $remote_addr;
+    proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto  $scheme;
+    proxy_set_header Connection         "";
+  }
+}
+
+----- /etc/nginx/sites-enabled/hotel-dashboard
+server {
+  listen 80;
+  server_name hotel-dashboard.de www.hotel-dashboard.de;
+
+  # Nur die Startseite umleiten (testweise 302; später gern 301)
+  location = / { return 302 /login.html; }
+
+  # Alles andere an die Node-App
+  location / {
+    proxy_pass http://127.0.0.1:3011;
+    proxy_http_version 1.1;
+    proxy_set_header Host               $host;
+    proxy_set_header X-Real-IP          $remote_addr;
+    proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto  $scheme;
+    proxy_set_header Connection         "";
+  }
+}
+
+----- /etc/nginx/sites-available/hotel-dechpot
+server {
+  listen 80;
+  server_name hotel-dachboard.de www.hotel-dachboard.de;
+
+  location = / { return 302 /login.html; }
+
+  location / {
+    proxy_pass http://127.0.0.1:3011;
+    proxy_http_version 1.1;
+    proxy_set_header Host               $host;
+    proxy_set_header X-Real-IP          $remote_addr;
+    proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto  $scheme;
+    proxy_set_header Connection         "";
+  }
+}
+
+----- /etc/nginx/sites-enabled/hotel-dechpot
+server {
+  listen 80;
+  server_name hotel-dachboard.de www.hotel-dachboard.de;
+
+  location = / { return 302 /login.html; }
+
+  location / {
+    proxy_pass http://127.0.0.1:3011;
+    proxy_http_version 1.1;
+    proxy_set_header Host               $host;
+    proxy_set_header X-Real-IP          $remote_addr;
+    proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto  $scheme;
+    proxy_set_header Connection         "";
+  }
+}
+
+----- /etc/apache2/sites-enabled/000-default-le-ssl.conf
+<VirtualHost *:443>
+    ServerName hotel-dashboard.de
+    ServerAlias www.hotel-dashboard.de
+
+    # TLS (Pfad so belassen wie bei dir vorhanden)
+    SSLEngine on
+    SSLCertificateFile /etc/letsencrypt/live/hotel-dashboard.de/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/hotel-dashboard.de/privkey.pem
+
+    # Root auf Login-Seite umleiten
+    RedirectMatch ^/$ /login.html
+
+
+    # Proxy: alles an Node/Express auf Port 3011
+    ProxyPreserveHost On
+    RequestHeader set X-Forwarded-Proto "https"
+    ProxyPass        / http://127.0.0.1:3011/ retry=0 timeout=60 keepalive=On
+    ProxyPassReverse / http://127.0.0.1:3011/
+
+    # Caching ausschalten (Server- und Browser-seitig) – wichtig für sofort sichtbare Änderungen
+    FileETag None
+    Header always unset ETag
+
+    # HTML & JSON niemals cachen
+    <LocationMatch ".*">
+        Header always set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+        Header always set Pragma "no-cache"
+        Header always set Expires "0"
+    </LocationMatch>
+
+    # Optional: HSTS (wenn TLS fest genutzt wird; ansonsten auskommentieren)
+    # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+    ErrorLog  ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+
+
+## 3) Node/PM2
+v18.20.8
+10.8.2
+web@1.0.0 /home/steven/hotel_dashboard/web
+├── cookie-parser@1.4.7
+├── dotenv@17.2.1
+├── express-session@1.18.2
+└── express@5.1.0
+
+┌────┬──────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name         │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼──────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ [1m[36m0[39m[22m  │ hotel-web    │ default     │ 1.0.0   │ [7m[1mfork[22m[27m    │ 2856582  │ 2s     │ 1363 │ [32m[1monline[22m[39m    │ 0%       │ 60.0mb   │ [1msteven[22m   │ [90mdisabled[39m │
+└────┴──────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+
+## 4) Netzwerk/Ports
+tcp   LISTEN 0      128          0.0.0.0:2222       0.0.0.0:*                                                
+tcp   LISTEN 0      511          0.0.0.0:80         0.0.0.0:*                                                
+tcp   LISTEN 0      5            0.0.0.0:8080       0.0.0.0:*    users:(("python3",pid=678,fd=3))            
+tcp   LISTEN 0      511                *:3011             *:*                                                
+tcp   LISTEN 0      128             [::]:2222          [::]:*                                                
+    inet 127.0.0.1/8 scope host lo
+    inet 172.15.0.73/23 brd 172.15.1.255 scope global dynamic noprefixroute eth0
+HTTP/1.1 302 Moved Temporarily
+Server: nginx/1.22.1
+Date: Sun, 17 Aug 2025 00:21:54 GMT
+Content-Type: text/html
+Content-Length: 145
+Location: http://www.hotel-dashboard.de/login.html
+Connection: keep-alive
+
+HTTP/1.1 200 OK
+Server: nginx/1.22.1
+Date: Sun, 17 Aug 2025 00:21:54 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 6594
+Connection: keep-alive
+X-Powered-By: Express
+Accept-Ranges: bytes
+Cache-Control: public, max-age=0
+Last-Modified: Sat, 16 Aug 2025 22:24:50 GMT
+ETag: W/"19c2-198b4fc4b86"
+
+
+## 5) Nginx/Apache Status
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/lib/systemd/system/nginx.service; enabled; preset: enabled)
+     Active: active (running) since Sat 2025-08-16 23:51:24 CEST; 2h 30min ago
+       Docs: man:nginx(8)
+    Process: 2853173 ExecReload=/usr/sbin/nginx -g daemon on; master_process on; -s reload (code=exited, status=0/SUCCESS)
+   Main PID: 2697609 (nginx)
+      Tasks: 5 (limit: 3914)
+        CPU: 2.399s
+     CGroup: /system.slice/nginx.service
+             ├─2697609 "nginx: master process /usr/sbin/nginx -g daemon on; master_process on;"
+             ├─2853174 "nginx: worker process"
+             ├─2853175 "nginx: worker process"
+             ├─2853176 "nginx: worker process"
+             └─2853177 "nginx: worker process"
+
+Aug 17 01:30:38 raspberrypi1 nginx[2806741]: 2025/08/17 01:30:38 [warn] 2806741#2806741: conflicting server name "hotel-dashboard.de" on 0.0.0.0:80, ignored
+Aug 17 01:30:38 raspberrypi1 nginx[2806741]: 2025/08/17 01:30:38 [warn] 2806741#2806741: conflicting server name "www.hotel-dashboard.de" on 0.0.0.0:80, ignored
+Aug 17 01:30:38 raspberrypi1 nginx[2806741]: 2025/08/17 01:30:38 [notice] 2806741#2806741: signal process started
+Aug 17 01:30:38 raspberrypi1 systemd[1]: Reloaded nginx.service - A high performance web server and a reverse proxy server.
+Aug 17 01:45:38 raspberrypi1 systemd[1]: Reloading nginx.service - A high performance web server and a reverse proxy server...
+Aug 17 01:45:38 raspberrypi1 nginx[2821478]: 2025/08/17 01:45:38 [notice] 2821478#2821478: signal process started
+Aug 17 01:45:38 raspberrypi1 systemd[1]: Reloaded nginx.service - A high performance web server and a reverse proxy server.
+Aug 17 02:18:22 raspberrypi1 systemd[1]: Reloading nginx.service - A high performance web server and a reverse proxy server...
+Aug 17 02:18:22 raspberrypi1 nginx[2853173]: 2025/08/17 02:18:22 [notice] 2853173#2853173: signal process started
+Aug 17 02:18:22 raspberrypi1 systemd[1]: Reloaded nginx.service - A high performance web server and a reverse proxy server.
+○ apache2.service - The Apache HTTP Server
+     Loaded: loaded (/lib/systemd/system/apache2.service; disabled; preset: enabled)
+     Active: inactive (dead) since Sat 2025-08-16 23:32:43 CEST; 2h 49min ago
+   Duration: 22h 14min 25.549s
+       Docs: https://httpd.apache.org/docs/2.4/
+   Main PID: 1972537 (code=exited, status=0/SUCCESS)
+        CPU: 1min 56.661s
+
+Aug 16 23:32:43 raspberrypi1 systemd[1]: Stopping apache2.service - The Apache HTTP Server...
+Aug 16 23:32:43 raspberrypi1 systemd[1]: apache2.service: Deactivated successfully.
+Aug 16 23:32:43 raspberrypi1 systemd[1]: Stopped apache2.service - The Apache HTTP Server.
+Aug 16 23:32:43 raspberrypi1 systemd[1]: apache2.service: Consumed 1min 56.661s CPU time.
+Aug 17 01:16:27 raspberrypi1 systemd[1]: apache2.service: Unit cannot be reloaded because it is inactive.
+Aug 17 01:28:06 raspberrypi1 systemd[1]: apache2.service: Unit cannot be reloaded because it is inactive.
+Aug 17 01:43:42 raspberrypi1 systemd[1]: apache2.service: Unit cannot be reloaded because it is inactive.
+Notice: journal has been rotated since unit was started, output may be incomplete.
+
+## 6) Nginx Logs (letzte 80 Zeilen)
+37.24.48.127 - - [17/Aug/2025:02:13:06 +0200] "POST /login HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:13:09 +0200] "GET /login?nocache=1755389589 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:13:14 +0200] "GET /login?nocache=1755389594 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:13:19 +0200] "GET /login?nocache=1755389599 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:13:24 +0200] "GET /login?nocache=1755389604 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:13:29 +0200] "GET /login?nocache=1755389609 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:13:34 +0200] "GET /login?nocache=1755389614 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:13:39 +0200] "GET /login?nocache=1755389619 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:13:44 +0200] "GET /login?nocache=1755389624 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:13:49 +0200] "GET /login?nocache=1755389629 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:13:54 +0200] "GET /login?nocache=1755389634 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:13:59 +0200] "GET /login?nocache=1755389639 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:14:04 +0200] "GET /login?nocache=1755389644 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:14:06 +0200] "GET /login HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:14:06 +0200] "POST /login HTTP/1.1" 301 169 "-" "curl/7.88.1"
+147.185.132.14 - - [17/Aug/2025:02:14:09 +0200] "GET / HTTP/1.1" 302 145 "-" "Hello from Palo Alto Networks, find out more about our scans in https://docs-cortex.paloaltonetworks.com/r/1/Cortex-Xpanse/Scanning-activity"
+147.185.132.14 - - [17/Aug/2025:02:14:09 +0200] "GET /login.html HTTP/1.1" 200 2719 "-" "Hello from Palo Alto Networks, find out more about our scans in https://docs-cortex.paloaltonetworks.com/r/1/Cortex-Xpanse/Scanning-activity"
+37.24.48.127 - - [17/Aug/2025:02:14:09 +0200] "GET /login?nocache=1755389649 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:14:15 +0200] "GET /login?nocache=1755389655 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:14:20 +0200] "GET /login?nocache=1755389660 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:14:25 +0200] "GET /login?nocache=1755389665 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:14:30 +0200] "GET /login?nocache=1755389670 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:14:35 +0200] "GET /login?nocache=1755389675 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:14:40 +0200] "GET /login?nocache=1755389680 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:14:45 +0200] "GET /login?nocache=1755389685 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:14:50 +0200] "GET /login?nocache=1755389690 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:14:55 +0200] "GET /login?nocache=1755389695 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:15:00 +0200] "GET /login?nocache=1755389700 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:15:05 +0200] "GET /login?nocache=1755389705 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:15:07 +0200] "GET /login HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:15:07 +0200] "POST /login HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:15:10 +0200] "GET /login?nocache=1755389710 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:15:15 +0200] "GET /login?nocache=1755389715 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:15:20 +0200] "GET /login?nocache=1755389720 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:15:25 +0200] "GET /login?nocache=1755389725 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:15:30 +0200] "GET /login?nocache=1755389730 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:15:36 +0200] "GET /login?nocache=1755389735 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:15:41 +0200] "GET /login?nocache=1755389741 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:15:46 +0200] "GET /login?nocache=1755389746 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:15:51 +0200] "GET /login?nocache=1755389751 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:15:56 +0200] "GET /login?nocache=1755389756 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:16:01 +0200] "GET /login?nocache=1755389761 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:16:06 +0200] "GET /login?nocache=1755389766 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:16:07 +0200] "GET /login HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:16:07 +0200] "POST /login HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:16:11 +0200] "GET /login?nocache=1755389771 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:16:16 +0200] "GET /login?nocache=1755389776 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:16:21 +0200] "GET /login?nocache=1755389781 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:16:26 +0200] "GET /login?nocache=1755389786 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:16:31 +0200] "GET /login?nocache=1755389791 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:16:36 +0200] "GET /login?nocache=1755389796 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:16:41 +0200] "GET /login?nocache=1755389801 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:16:46 +0200] "GET /login?nocache=1755389806 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+185.244.104.2 - - [17/Aug/2025:02:16:47 +0200] "PROPFIND / HTTP/1.1" 302 145 "http://37.24.48.127:443/" "-"
+37.24.48.127 - - [17/Aug/2025:02:16:51 +0200] "GET /login?nocache=1755389811 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:16:56 +0200] "GET /login?nocache=1755389816 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:17:01 +0200] "GET /login?nocache=1755389821 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:17:07 +0200] "GET /login?nocache=1755389826 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:17:07 +0200] "GET /login HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:17:07 +0200] "POST /login HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:17:12 +0200] "GET /login?nocache=1755389832 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:17:17 +0200] "GET /login?nocache=1755389837 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:17:22 +0200] "GET /login?nocache=1755389842 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:17:27 +0200] "GET /login?nocache=1755389847 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:17:32 +0200] "GET /login?nocache=1755389852 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:17:37 +0200] "GET /login?nocache=1755389857 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:17:42 +0200] "GET /login?nocache=1755389862 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:17:47 +0200] "GET /login?nocache=1755389867 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:17:52 +0200] "GET /login?nocache=1755389872 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:17:57 +0200] "GET /login?nocache=1755389877 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:18:02 +0200] "GET /login?nocache=1755389882 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:18:07 +0200] "GET /login?nocache=1755389887 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:18:07 +0200] "GET /login HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:18:08 +0200] "POST /login HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:18:12 +0200] "GET /login?nocache=1755389892 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+37.24.48.127 - - [17/Aug/2025:02:18:17 +0200] "GET /login?nocache=1755389897 HTTP/1.1" 301 169 "-" "curl/7.88.1"
+127.0.0.1 - - [17/Aug/2025:02:18:33 +0200] "HEAD / HTTP/1.1" 302 0 "-" "curl/7.88.1"
+127.0.0.1 - - [17/Aug/2025:02:18:33 +0200] "HEAD /login.html HTTP/1.1" 200 0 "-" "curl/7.88.1"
+127.0.0.1 - - [17/Aug/2025:02:21:54 +0200] "HEAD / HTTP/1.1" 302 0 "-" "curl/7.88.1"
+127.0.0.1 - - [17/Aug/2025:02:21:54 +0200] "HEAD /login.html HTTP/1.1" 200 0 "-" "curl/7.88.1"
+
+## 7) Login-Redirect Tests (direkt zur Node-App auf 3011)
+HTTP/1.1 303 See Other
+X-Powered-By: Express
+RateLimit-Policy: 50;w=300
+RateLimit-Limit: 50
+RateLimit-Remaining: 32
+RateLimit-Reset: 14
+Location: /status.html
+Vary: Accept
+Content-Type: text/plain; charset=utf-8
+Content-Length: 38
+Set-Cookie: connect.sid=s%3AN_E62mlvpcEffTWOzq7Wu73-X7ShF3g8.%2F3V62cuIRvdD7yvyw%2FVyFnCF7OQv2rY1%2Bp2nsJ5kc8g; Path=/; Expires=Sun, 17 Aug 2025 01:21:54 GMT; HttpOnly; SameSite=Lax
+Date: Sun, 17 Aug 2025 00:21:54 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+See Other. Redirecting to /status.html
+HTTP/1.1 303 See Other
+X-Powered-By: Express
+RateLimit-Policy: 50;w=300
+RateLimit-Limit: 50
+RateLimit-Remaining: 31
+RateLimit-Reset: 13
+Location: /ibelsa.html
+Vary: Accept
+Content-Type: text/plain; charset=utf-8
+Content-Length: 38
+Set-Cookie: connect.sid=s%3A36MqGwBn1p9nfsvaiLV6ki_29or_BwhO.ELANIFtCDjVtRYfHoZG8jF9v6aMTx5E7bGQVRom9Mqo; Path=/; Expires=Sun, 17 Aug 2025 01:21:54 GMT; HttpOnly; SameSite=Lax
+Date: Sun, 17 Aug 2025 00:21:54 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+See Other. Redirecting to /ibelsa.html

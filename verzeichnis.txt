@@ -1,0 +1,127 @@
+.
+├── _backup
+│   └── web_2025-08-16_01-49-44.tgz
+├── data
+│   └── incoming
+│       └── checkedin_2025-08-11T23-25-59.json
+├── ecosystem.config.js
+├── .htpasswd
+├── login_master_backup.html
+├── network_info.txt
+├── restart_hotel.sh
+├── scripts
+│   └── update_status.sh
+├── server.js
+├── verzeichnis.txt
+├── web
+│   ├── _backup
+│   ├── config
+│   ├── ecosystem.config.js
+│   ├── .env
+│   ├── ibelsa_cookies
+│   ├── lib
+│   │   └── ibelsa.js
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── public
+│   │   ├── dash-login.html
+│   │   ├── ibelsa.html
+│   │   ├── index.html
+│   │   ├── login.html
+│   │   └── status.html
+│   ├── routes
+│   ├── server.js
+│   ├── server.js.backup_2025-08-16_14-23-47
+│   ├── server.js.backup_2025-08-16_14-51-19
+│   ├── server.js.backup_2025-08-16_15-31-30
+│   ├── server.js.backup_2025-08-16_15-55-01
+│   ├── server.js.bak_2025-08-16_01-59-03
+│   ├── server.js.bak_2025-08-16_02-01-17
+│   ├── server.js.bak_2025-08-16_02-05-46
+│   ├── server.js.bak_2025-08-16_02-11-13
+│   ├── server.js.bak_2025-08-16_02-15-50
+│   ├── server.js.bak_2025-08-16_02-19-35
+│   ├── server.js.bak_2025-08-16_03-41-34
+│   ├── server.js.bak_2025-08-16_03-53-40
+│   ├── server.js.bak_2025-08-16_03-59-59
+│   ├── server.js.bak_2025-08-16_14-08-32
+│   ├── server.js.bak_2025-08-16_15-50-46
+│   ├── server.js.bak_2025-08-16_16-20-41
+│   ├── server.js.bak_2025-08-16_16-53-45
+│   ├── server.js.bak_2025-08-16_17-00-39
+│   ├── server.js.bak_2025-08-16_17-04-42
+│   ├── server.js.bak_2025-08-16_17-09-18
+│   ├── server.js.bak_2025-08-16_17-33-04
+│   ├── server.js.bak_2025-08-16_17-48-32
+│   ├── server.js.bak_2025-08-16_17-51-57
+│   ├── server.js.bak_2025-08-16_17-54-46
+│   ├── server.js.bak_2025-08-16_18-01-47
+│   ├── server.js.bak_2025-08-16_18-16-40
+│   ├── server.js.bak_2025-08-16_18-19-51
+│   ├── server.js.bak_2025-08-16_18-40-58
+│   ├── server.js.bak_2025-08-16_18-46-36
+│   ├── server.js.bak_2025-08-16_18-48-00
+│   ├── server.js.bak_2025-08-16_19-09-17
+│   ├── server.js.bak_2025-08-16_20-14-18
+│   ├── server.js.bak_dbg_2025-08-16_14-22-11
+│   ├── server.js.bak_fix_2025-08-16_14-06-39
+│   ├── server.js.bak_routes_2025-08-16_14-26-07
+│   ├── server.js.bak_top_2025-08-16_14-28-49
+│   ├── server.js.defekt_2025-08-16_18-35-04
+│   ├── server.js.hotfix_2025-08-16_13-21-48
+│   ├── server.js.hotfix_2025-08-16_13-24-41
+│   ├── server.js.pre_fix_2025-08-16_183128
+│   ├── server.js.pre_multiuser_2025-08-16_182521
+│   ├── server.js.pre_restore_2025-08-16_03-21-14
+│   ├── terminbuffet.js
+│   ├── terminbuffet.last
+│   └── users.json
+└── web_old_2025-08-16_00-13-40
+    ├── .env
+    ├── Formular
+    ├── lib
+    │   └── ibelsa.js
+    ├── package.json
+    ├── package-lock.json
+    ├── public
+    │   ├── backup
+    │   │   ├── login_2025-08-15_023247.html
+    │   │   ├── login_card_2025-08-15_015432.html
+    │   │   └── login_final.html
+    │   ├── hotel-dashboard-bg.jpg
+    │   ├── ibelsa.html
+    │   ├── index.html
+    │   ├── login_backup_2025-08-13-0634.html
+    │   ├── login_backup_2025-08-13-065610.html
+    │   ├── login_backup_2025-08-13-070217.html
+    │   ├── login_backup_2025-08-13-071351.html
+    │   ├── login_backup_2025-08-13-071525.html
+    │   ├── login_backup_2025-08-13-0744.html
+    │   ├── login_backup_2025-08-15_000453.html
+    │   ├── login_backup_2025-08-15_022448.html
+    │   ├── login_backup.html
+    │   ├── login.html
+    │   └── theme.css
+    ├── Redirect
+    ├── routes
+    │   └── auth.js
+    ├── server_backup_2025-08-15_20-32-01.js
+    ├── server_backup_2025-08-15_20-46-16.js
+    ├── server_backup_2025-08-15_20-49-35.js
+    ├── server_backup_2025-08-15_205531.js
+    ├── server_backup_2025-08-15_20-58-30.js
+    ├── server_backup_2025-08-15_21-09-46.js
+    ├── server_backup_2025-08-15_22-30-12.js
+    ├── server_backup_2025-08-15_22-38-44.js
+    ├── server_backup_2025-08-15_22-40-28.js
+    ├── server_backup_2025-08-15_225432.js
+    ├── server_backup_2025-08-15_23-00-29.js
+    ├── server_backup_2025-08-15_23-03-33.js
+    ├── server_backup_2025-08-15_23-05-15.js
+    ├── server_backup_2025-08-15_23-16-41.js
+    ├── server_backup_2025-08-15_23-26-23.js
+    ├── server_backup_2025-08-15_23-31-15.js
+    ├── server_backup_2025-08-15_23-33-51.js
+    └── web_dateien.txt
+
+16 directories, 109 files

@@ -1,0 +1,42 @@
+/* hotel-dashboard minimal server */
+require("dotenv").config();
+const express = require("express");
+const session = require("express-session");
+const path    = require("path");
+
+const app  = express();
+const PORT = process.env.PORT || 3011;
+
+app.disable("x-powered-by");
+app.set("trust proxy", true);
+app.set("case sensitive routing", false);
+app.set("strict routing", false);
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(session({
+  secret: process.env.SESSION_SECRET || "hotel-dashboard-session",
+  resave: false,
+  saveUninitialized: false,
+  cookie: { sameSite: "lax" }
+}));
+
+// statische Dateien; Root -> /login.html
+app.use(express.static(path.join(__dirname, "public"), { index: false }));
+app.get("/", (_req, res) => res.sendFile(path.join(__dirname, "public", "login.html")));
+app.get("/login", (_req, res) => res.sendFile(path.join(__dirname, "public", "login.html")));
+
+// WICHTIG: POST /login existiert wirklich
+app.post("/login", (req, res) => {
+  const { username, password } = req.body || {};
+  if (!username || !password) return res.redirect("/login.html");
+  try { req.session.user = { name: username, at: Date.now() }; } catch {}
+  return res.redirect(303, "/ibelsa.html");
+});
+
+// Healthcheck
+app.get("/healthz", (_req, res) => res.json({ ok: true }));
+
+app.listen(PORT, "127.0.0.1", () => {
+  console.log("Hotel Dashboard läuft auf Port", PORT);
+});

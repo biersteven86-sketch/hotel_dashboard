@@ -1,0 +1,381 @@
+{
+  "success": true,
+  "totalCount": 15,
+  "data": [
+    {
+      "land": "ES",
+      "anrede": "",
+      "nachname": "Mikail",
+      "guest_id": 24545536,
+      "vorname": "Zaidan",
+      "e-mail-adresse": "zmikai.125839@guest.booking.com",
+      "anreisedatum": "2025-08-11",
+      "abreisedatum": "2025-08-12",
+      "interne-buchungs-id": "20214438",
+      "externe-buchungs-id": "68480673",
+      "externe-buchungs-id2": "6798753334",
+      "room_id": 50230,
+      "room_name": "208",
+      "room_stays": [
+        {
+          "room_id": 50230,
+          "room_name": "208",
+          "starts_at": "2025-08-11",
+          "ends_at": "2025-08-12"
+        }
+      ],
+      "roomreservation_id": 22148740,
+      "mainreservation_id": 13703023
+    },
+    {
+      "land": "DE",
+      "anrede": "Herr",
+      "nachname": "Böttcher",
+      "guest_id": 24528372,
+      "vorname": "Rainer",
+      "e-mail-adresse": "rainernwm@yahoo.de",
+      "anreisedatum": "2025-08-11",
+      "abreisedatum": "2025-08-12",
+      "interne-buchungs-id": "20214431",
+      "externe-buchungs-id": "68463055",
+      "externe-buchungs-id2": "88439727",
+      "room_id": 50856,
+      "room_name": "Parkplatz 6 Metzgergasse 8 & 10",
+      "room_stays": [
+        {
+          "room_id": 50856,
+          "room_name": "Parkplatz 6 Metzgergasse 8 & 10",
+          "starts_at": "2025-08-11",
+          "ends_at": "2025-08-12"
+        }
+      ],
+      "roomreservation_id": 22148289,
+      "mainreservation_id": 13695662
+    },
+    {
+      "land": "BE",
+      "anrede": "Herr",
+      "nachname": "Assarrakh",
+      "guest_id": 24544935,
+      "vorname": "Zohairr",
+      "e-mail-adresse": "",
+      "anreisedatum": "2025-08-11",
+      "abreisedatum": "2025-08-12",
+      "interne-buchungs-id": "20214437",
+      "externe-buchungs-id": "",
+      "externe-buchungs-id2": "",
+      "room_id": 50108,
+      "room_name": "203",
+      "room_stays": [
+        {
+          "room_id": 50108,
+          "room_name": "203",
+          "starts_at": "2025-08-11",
+          "ends_at": "2025-08-12"
+        }
+      ],
+      "roomreservation_id": 22148231,
+      "mainreservation_id": 13702599
+    },
+    {
+      "land": "DE",
+      "anrede": "Herr",
+      "nachname": "Böttcher",
+      "guest_id": 24528372,
+      "vorname": "Rainer",
+      "e-mail-adresse": "rainernwm@yahoo.de",
+      "anreisedatum": "2025-08-11",
+      "abreisedatum": "2025-08-12",
+      "interne-buchungs-id": "20214431",
+      "externe-buchungs-id": "68463055",
+      "externe-buchungs-id2": "88439727",
+      "room_id": 50224,
+      "room_name": "303 140cm",
+      "room_stays": [
+        {
+          "room_id": 50224,
+          "room_name": "303 140cm",
+          "starts_at": "2025-08-11",
+          "ends_at": "2025-08-12"
+        }
+      ],
+      "roomreservation_id": 22137539,
+      "mainreservation_id": 13695662
+    },
+    {
+      "land": "DE",
+      "anrede": "Herr",
+      "nachname": "Leonhardt",
+      "guest_id": 24491126,
+      "vorname": "Marliese und Hans",
+      "e-mail-adresse": "mleonh.722745@guest.booking.com",
+      "anreisedatum": "2025-08-11",
+      "abreisedatum": "2025-08-12",
+      "interne-buchungs-id": "20214418",
+      "externe-buchungs-id": "68389463",
+      "externe-buchungs-id2": "5141145590",
+      "room_id": 50229,
+      "room_name": "206",
+      "room_stays": [
+        {
+          "room_id": 50229,
+          "room_name": "206",
+          "starts_at": "2025-08-11",
+          "ends_at": "2025-08-12"
+        }
+      ],
+      "roomreservation_id": 22098282,
+      "mainreservation_id": 13668401
+    },
+    {
+      "land": "DE",
+      "anrede": "Herr",
+      "nachname": "Janz",
+      "guest_id": 24398097,
+      "vorname": "Klaus",
+      "e-mail-adresse": "kjanz.611942@guest.booking.com",
+      "anreisedatum": "2025-08-11",
+      "abreisedatum": "2025-08-12",
+      "interne-buchungs-id": "20214361",
+      "externe-buchungs-id": "68285152",
+      "externe-buchungs-id2": "5161071303",
+      "room_id": 50234,
+      "room_name": "306",
+      "room_stays": [
+        {
+          "room_id": 50234,
+          "room_name": "306",
+          "starts_at": "2025-08-11",
+          "ends_at": "2025-08-12"
+        }
+      ],
+      "roomreservation_id": 22032338,
+      "mainreservation_id": 13625053
+    },
+    {
+      "land": "CH",
+      "anrede": "",
+      "nachname": "Jörg",
+      "guest_id": 24374900,
+      "vorname": "Lämmli",
+      "e-mail-adresse": "ljorg.237689@guest.booking.com",
+      "anreisedatum": "2025-08-11",
+      "abreisedatum": "2025-08-15",
+      "interne-buchungs-id": "20214344",
+      "externe-buchungs-id": "68238087",
+      "externe-buchungs-id2": "6789208168",
+      "room_id": 50852,
+      "room_name": "Parkplatz 2",
+      "room_stays": [
+        {
+          "room_id": 50852,
+          "room_name": "Parkplatz 2",
+          "starts_at": "2025-08-11",
+          "ends_at": "2025-08-15"
+        }
+      ],
+      "roomreservation_id": 22010944,
+      "mainreservation_id": 13608253
+    },
+    {
+      "land": "CH",
+      "anrede": "Herr",
+      "nachname": "Furrer",
+      "guest_id": 24374984,
+      "vorname": "Hans-Gerold",
+      "e-mail-adresse": "furrer.l.h@gmx.ch",
+      "anreisedatum": "2025-08-11",
+      "abreisedatum": "2025-08-15",
+      "interne-buchungs-id": "20214345",
+      "externe-buchungs-id": "68238229",
+      "externe-buchungs-id2": "88214676",
+      "room_id": 50851,
+      "room_name": "Parkplatz 1",
+      "room_stays": [
+        {
+          "room_id": 50851,
+          "room_name": "Parkplatz 1",
+          "starts_at": "2025-08-11",
+          "ends_at": "2025-08-15"
+        }
+      ],
+      "roomreservation_id": 22009626,
+      "mainreservation_id": 13608309
+    },
+    {
+      "land": "CH",
+      "anrede": "Herr",
+      "nachname": "Furrer",
+      "guest_id": 24374984,
+      "vorname": "Hans-Gerold",
+      "e-mail-adresse": "furrer.l.h@gmx.ch",
+      "anreisedatum": "2025-08-11",
+      "abreisedatum": "2025-08-15",
+      "interne-buchungs-id": "20214345",
+      "externe-buchungs-id": "68238229",
+      "externe-buchungs-id2": "88214676",
+      "room_id": 50225,
+      "room_name": "207",
+      "room_stays": [
+        {
+          "room_id": 50225,
+          "room_name": "207",
+          "starts_at": "2025-08-11",
+          "ends_at": "2025-08-15"
+        }
+      ],
+      "roomreservation_id": 22009543,
+      "mainreservation_id": 13608309
+    },
+    {
+      "land": "",
+      "anrede": "",
+      "nachname": "Furrer",
+      "guest_id": 24374985,
+      "vorname": "Elizabeth Anne",
+      "e-mail-adresse": "",
+      "anreisedatum": "2025-08-11",
+      "abreisedatum": "2025-08-15",
+      "interne-buchungs-id": "20214345",
+      "externe-buchungs-id": "68238229",
+      "externe-buchungs-id2": "88214676",
+      "room_id": 50225,
+      "room_name": "207",
+      "room_stays": [
+        {
+          "room_id": 50225,
+          "room_name": "207",
+          "starts_at": "2025-08-11",
+          "ends_at": "2025-08-15"
+        }
+      ],
+      "roomreservation_id": 22009543,
+      "mainreservation_id": 13608309
+    },
+    {
+      "land": "CH",
+      "anrede": "",
+      "nachname": "Jörg",
+      "guest_id": 24374900,
+      "vorname": "Lämmli",
+      "e-mail-adresse": "ljorg.237689@guest.booking.com",
+      "anreisedatum": "2025-08-11",
+      "abreisedatum": "2025-08-15",
+      "interne-buchungs-id": "20214344",
+      "externe-buchungs-id": "68238087",
+      "externe-buchungs-id2": "6789208168",
+      "room_id": 50228,
+      "room_name": "205",
+      "room_stays": [
+        {
+          "room_id": 50228,
+          "room_name": "205",
+          "starts_at": "2025-08-11",
+          "ends_at": "2025-08-15"
+        }
+      ],
+      "roomreservation_id": 22009452,
+      "mainreservation_id": 13608253
+    },
+    {
+      "land": "DE",
+      "anrede": "Herr",
+      "nachname": "Grabowski",
+      "guest_id": 24079919,
+      "vorname": "Christian",
+      "e-mail-adresse": "christian.grabowski@sv-bw.de",
+      "anreisedatum": "2025-08-10",
+      "abreisedatum": "2025-08-13",
+      "interne-buchungs-id": "20214205",
+      "externe-buchungs-id": "67825228",
+      "externe-buchungs-id2": "311987762",
+      "room_id": 50857,
+      "room_name": "Parkplatz 7 Metzgergasse 8 & 10",
+      "room_stays": [
+        {
+          "room_id": 50857,
+          "room_name": "Parkplatz 7 Metzgergasse 8 & 10",
+          "starts_at": "2025-08-10",
+          "ends_at": "2025-08-13"
+        }
+      ],
+      "roomreservation_id": 21765928,
+      "mainreservation_id": 13446888
+    },
+    {
+      "land": "DE",
+      "anrede": "Herr",
+      "nachname": "Grabowski",
+      "guest_id": 24079919,
+      "vorname": "Christian",
+      "e-mail-adresse": "christian.grabowski@sv-bw.de",
+      "anreisedatum": "2025-08-10",
+      "abreisedatum": "2025-08-13",
+      "interne-buchungs-id": "20214205",
+      "externe-buchungs-id": "67825228",
+      "externe-buchungs-id2": "311987762",
+      "room_id": 76144,
+      "room_name": "6",
+      "room_stays": [
+        {
+          "room_id": 76144,
+          "room_name": "6",
+          "starts_at": "2025-08-10",
+          "ends_at": "2025-08-13"
+        }
+      ],
+      "roomreservation_id": 21757033,
+      "mainreservation_id": 13446888
+    },
+    {
+      "land": "DE",
+      "anrede": "Herr",
+      "nachname": "Bader",
+      "guest_id": 7635108,
+      "vorname": "Patrick",
+      "e-mail-adresse": "patrick.bader@bca.com",
+      "anreisedatum": "2025-08-11",
+      "abreisedatum": "2025-08-12",
+      "interne-buchungs-id": "20213832",
+      "externe-buchungs-id": "",
+      "externe-buchungs-id2": "",
+      "room_id": 50109,
+      "room_name": "305 160cm",
+      "room_stays": [
+        {
+          "room_id": 50109,
+          "room_name": "305 160cm",
+          "starts_at": "2025-08-11",
+          "ends_at": "2025-08-12"
+        }
+      ],
+      "roomreservation_id": 21034073,
+      "mainreservation_id": 12976377
+    },
+    {
+      "land": "DE",
+      "anrede": "Herr",
+      "nachname": "Bader",
+      "guest_id": 7635108,
+      "vorname": "Patrick",
+      "e-mail-adresse": "patrick.bader@bca.com",
+      "anreisedatum": "2025-08-11",
+      "abreisedatum": "2025-08-12",
+      "interne-buchungs-id": "20213832",
+      "externe-buchungs-id": "",
+      "externe-buchungs-id2": "",
+      "room_id": 50853,
+      "room_name": "Parkplatz 3",
+      "room_stays": [
+        {
+          "room_id": 50853,
+          "room_name": "Parkplatz 3",
+          "starts_at": "2025-08-11",
+          "ends_at": "2025-08-12"
+        }
+      ],
+      "roomreservation_id": 21034074,
+      "mainreservation_id": 12976377
+    }
+  ]
+}

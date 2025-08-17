@@ -1,0 +1,110 @@
+require("dotenv").config();
+const express = require("express");
+const path    = require("path");
+const crypto  = require("crypto");
+
+const app  = express();
+const PORT = process.env.PORT || 3011;
+
+app.disable("x-powered-by");
+app.set("trust proxy", true);
+app.use(express.urlencoded({extended:true}));
+app.use(express.json());
+
+// === Dashboard-Login → admin => /index.html, sonst => /ibelsa.html (auto-insert) ===
+app.post(/dash-login, express.urlencoded({extended:true}), (req, res) => {
+  const u = (req.body?.username||"").toLowerCase();
+  if (u === "admin") return res.redirect(302, "/index.html");
+  return res.redirect(302, "/ibelsa.html");
+});
+// === end auto-insert ===
+
+/* --- kleine Helfer --- */
+const sendFile = p => path.join(__dirname,"public",p);
+const parseCookies = (req)=>{
+  const h=req.headers.cookie||""; const out={};
+  h.split(";").map(v=>v.trim()).filter(Boolean).forEach(kv=>{
+    const i=kv.indexOf("="); if(i>0) out[kv.slice(0,i)]=decodeURIComponent(kv.slice(i+1));
+  });
+  return out;
+};
+const setCookie = (res, name, val, opts={})=>{
+  const parts = [`${name}=${encodeURIComponent(val)}`, "Path=/", "HttpOnly", "SameSite=Lax"];
+  if (opts.maxAge) parts.push(`Max-Age=${opts.maxAge}`);
+  if (opts.secure) parts.push("Secure");
+  res.setHeader("Set-Cookie", parts.join("; "));
+};
+
+/* --- Credentials aus ENV --- */
+const DASH_USER   = process.env.DASH_USER   || "admin";
+const DASH_PASS   = process.env.DASH_PASS   || "Rottweil.12";
+const IBELSA_USER = process.env.IBELSA_USER || "info@myhome-rottweil.de";
+const IBELSA_PASS = process.env.IBELSA_PASS || "Rottweil.12";
+
+/* --- Guards --- */
+/* Status: 10 Minuten Auto-Timeout (Cookie mit Max-Age=600) */
+function requireDash(req,res,next){
+  const c = parseCookies(req);
+  if (c.dash_sid === "ok") return next();
+  res.status(401).sendFile(sendFile("login.html"));
+}
+/* Ibelsa: kein Auto-Timeout (Session-Cookie) – Logout möglich */
+function requireIbelsa(req,res,next){
+  const c = parseCookies(req);
+  if (c.ibelsa_sid === "ok") return next();
+  res.status(401).sendFile(sendFile("login.html"));
+}
+
+/* --- Statisch ausliefern --- */
+app.use(express.static(path.join(__dirname,"public"), { index:false }));
+
+/* Root -> Login */
+app.get("/", (_req,res)=> res.redirect(302,"/login"));
+
+/* Login-Form (eine Seite für beide Ziele) */
+app.get("/login", (_req,res)=> res.sendFile(sendFile("login.html")));
+
+/* Login-POST: entscheidet anhand Benutzer, wohin es geht */
+app.post("/login", (req,res)=>{
+  const { username="", password="", target="" } = req.body || {};
+  // Admin -> Status-Dashboard
+  if (username===DASH_USER && password===DASH_PASS) {
+    setCookie(res,"dash_sid","ok",{ maxAge:600, secure:false }); // 10 Min
+    return res.redirect(302,"/status.html");
+  }
+  // Business -> Ibelsa
+  if (username===IBELSA_USER && password===IBELSA_PASS) {
+    setCookie(res,"ibelsa_sid","ok",{ /* kein Max-Age = bis Logout/Browserende */ secure:false });
+    return res.redirect(302,"/ibelsa.html");
+  }
+  // optional: explizites Zielfeld (falls mehrere Logins)
+  if (target==="status" && password===DASH_PASS) {
+    setCookie(res,"dash_sid","ok",{ maxAge:600, secure:false });
+    return res.redirect(302,"/status.html");
+  }
+  if (target==="ibelsa" && password===IBELSA_PASS) {
+    setCookie(res,"ibelsa_sid","ok",{ secure:false });
+    return res.redirect(302,"/ibelsa.html");
+  }
+  res.status(401).sendFile(sendFile("login.html"));
+});
+
+/* Logout getrennt */
+app.get("/dash-logout",  (_req,res)=>{ setCookie(res,"dash_sid","",{maxAge=1});  res.redirect(302,"/login"); });
+app.get("/ibelsa-logout",(_req,res)=>{ setCookie(res,"ibelsa_sid","",{maxAge=1}); res.redirect(302,"/login"); });
+
+/* Geschützte Ressourcen */
+app.get("/status.html", requireDash,   (_req,res)=> res.sendFile(sendFile("status.html")));
+app.get("/status.json", requireDash,   async (_req,res)=>{
+  // hier können deine echten Checks rein; Stub:
+  res.json({ ok:true, pm2:"ok", portguard:"ok", watchdog:"ok" });
+});
+app.get("/ibelsa.html", requireIbelsa, (_req,res)=> res.sendFile(sendFile("ibelsa.html")));
+
+/* Health */
+app.get("/healthz", (_req,res)=> res.json({ ok:true }));
+
+/* 404 */
+app.use((_req,res)=> res.status(404).send("Not Found"));
+
+app.listen(PORT,"127.0.0.1", ()=> console.log("Hotel Dashboard läuft auf Port", PORT));

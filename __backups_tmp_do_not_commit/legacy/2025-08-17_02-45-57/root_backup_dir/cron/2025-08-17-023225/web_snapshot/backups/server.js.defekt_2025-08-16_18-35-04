@@ -1,0 +1,59 @@
+require("dotenv").config();
+const express = require("express");
+const path = require("path");
+const fs = require("fs");
+
+const app = express();
+const PORT = process.env.PORT || 3011;
+const WEB = __dirname;
+const PUB = path.join(__dirname, "public");
+
+app.disable("x-powered-by");
+app.set("trust proxy", true);
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// Root -> Login
+app.get("/", (_req, res) => res.redirect(302, "/login"));
+
+// Login-Form ausliefern
+app.get("/login", (_req, res) => res.sendFile(path.join(PUB, "login.html")));
+
+// Nutzer-Liste laden
+function loadUsers() {
+  try {
+    const raw = fs.readFileSync(path.join(WEB, "users.json"), "utf8");
+    const list = JSON.parse(raw);
+    return Array.isArray(list) ? list : (list.users || []);
+  } catch (_e) {
+    return [];
+  }
+}
+
+// Login verarbeiten: admin -> /index.html, sonst -> /ibelsa.html
+app.post("/login", (req, res) => {
+  const { username, password } = req.body || {};
+  const u = String(username || "").toLowerCase();
+  const p = String(password || "");
+  const hit = loadUsers().find(
+    x => String(x.user).toLowerCase() === u && String(x.pass) === p
+  );
+  if (!hit) return res.redirect(302, "/login");
+  if ((hit.role || "").toLowerCase() === "dashboard") {
+    return res.redirect(302, "/index.html");
+  }
+  return res.redirect(302, "/ibelsa.html");
+});
+
+// Healthcheck
+app.get("/healthz", (_req, res) => res.json({ ok: true }));
+
+// Statische Dateien zuletzt (ohne Auto-Index)
+app.use(express.static(PUB, { index: false }));
+
+// 404
+app.use((_req, res) => res.status(404).send("Not Found"));
+
+app.listen(PORT, "127.0.0.1", () => {
+  console.log("Hotel Dashboard läuft auf Port", PORT);
+});

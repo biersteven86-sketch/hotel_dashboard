@@ -1,0 +1,63 @@
+/* Hotel-Dashboard minimal server: static, login, ibelsa mock, catch-all */
+require("dotenv").config();
+const express = require("express");
+const session = require("express-session");
+const path    = require("path");
+
+const app  = express();
+const PORT = process.env.PORT || 3011;
+
+app.disable("x-powered-by");
+app.set("trust proxy", true);
+app.set("case sensitive routing", false);
+app.set("strict routing", false);
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(session({
+  secret: process.env.SESSION_SECRET || "hotel-dashboard-session",
+  resave: false,
+  saveUninitialized: false,
+  cookie: { sameSite: "lax" }
+}));
+
+// Static (wir steuern / & /login selbst)
+app.use(express.static(path.join(__dirname, "public"), { index: false }));
+
+// Seiten
+app.get("/", (_req,res)=>res.sendFile(path.join(__dirname,"public","index.html")));
+app.get("/login", (_req,res)=>res.sendFile(path.join(__dirname,"public","login.html")));
+
+// Login -> immer weiter zu /ibelsa.html (Form postet auf /login)
+app.post("/login", (req,res)=>{
+  const { username, password } = req.body || {};
+  if (!username || !password) return res.redirect("/login");
+  try { req.session.user = { name: username, at: Date.now() }; } catch {}
+  return res.redirect(303, "/ibelsa.html");
+});
+
+// *** MOCK-ENDPUNKT für ibelsa.html ***
+// Deine ibelsa.html ruft fetch("/ibelsa") auf – hier liefern wir Testdaten zurück.
+// Sobald gewünscht, ersetzen wir das durch echten Aufruf via lib/ibelsa.js
+app.get("/ibelsa", (_req,res)=>{
+  res.json({
+    date: new Date().toISOString().slice(0,10),
+    guests: [
+      { room: "101", name: "Müller, Anna", status: "Checked-in", nights: 2 },
+      { room: "203", name: "Schmidt, Tom", status: "Checked-in", nights: 1 },
+      { room: "305", name: "Yılmaz, Efe", status: "Arriving",   nights: 3 }
+    ]
+  });
+});
+
+// Health
+app.get("/healthz", (_req,res)=>res.json({ ok:true }));
+
+// Catch-all (unbekannte GET-Routen gehen auf index.html, keine 404-Flut)
+app.get("*", (req,res,next)=>{
+  if (req.method !== "GET") return next();
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// Start
+app.listen(PORT, "127.0.0.1", ()=>console.log("Hotel-Dashboard läuft auf Port", PORT));

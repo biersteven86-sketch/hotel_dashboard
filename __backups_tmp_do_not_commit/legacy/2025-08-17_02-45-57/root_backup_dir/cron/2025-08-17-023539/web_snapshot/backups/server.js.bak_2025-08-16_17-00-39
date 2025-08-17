@@ -1,0 +1,94 @@
+require("dotenv").config();
+const express = require("express");
+const path    = require("path");
+const app     = express();
+const PORT    = process.env.PORT || 3011;
+
+app.disable("x-powered-by");
+app.set("trust proxy", true);
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// === BasicAuth & Status (auto-insert) ===
+const { exec } = require("child_process");
+const DASH_USER = process.env.DASH_USER || "admin";
+const DASH_PASS = process.env.DASH_PASS || "rottweil.12";
+const BASIC_EXPECT = Buffer.from(`${DASH_USER}:${DASH_PASS}`).toString("base64");
+function requireDashAuth(req, res, next){
+  const h = req.headers["authorization"] || "";
+  if (h.startsWith("Basic ") && h.slice(6).trim() === BASIC_EXPECT) return next();
+  res.set("WWW-Authenticate", "Basic realm=\"Hotel Dashboard Status\"");
+  return res.status(401).send("Auth required");
+}
+
+// Status.html (statisch) nur mit Auth ausliefern:
+app.use("/status.html", requireDashAuth);
+
+// JSON-Status mit wichtigsten Checks:
+app.get("/status.json", requireDashAuth, async (_req, res) => {
+  const run = (cmd) => new Promise((resolve) => exec(cmd, { timeout: 3500 }, (e, out) => resolve((out||"").trim())));
+  try {
+    const pm2  = await run("pm2 jlist | jq -r \".[] | [.name, .pm_id, .pid, .monit.cpu, .monit.memory] | @tsv\" 2>/dev/null || pm2 list --no-color || true");
+    const ports= await run("ss -ltnp 2>/dev/null | sed -n \"1,80p\" || true");
+    const ufw  = await run("ufw status 2>/dev/null || true");
+    const appo = await run("tail -n 80 /home/steven/.pm2/logs/hotel-web-out.log 2>/dev/null || true");
+    const appe = await run("tail -n 80 /home/steven/.pm2/logs/hotel-web-error.log 2>/dev/null || true");
+    const aacc = await run("tail -n 60 /var/log/apache2/access.log 2>/dev/null || true");
+    const aerr = await run("tail -n 60 /var/log/apache2/error.log 2>/dev/null || true");
+    const wdog = await run("tail -n 80 /var/log/hotel-watchdog.log 2>/dev/null || true");
+    res.json({ ok:true, ts:new Date().toISOString(), pm2, ports, ufw, app_out:appo, app_err:appe, apache_access:aacc, apache_error:aerr, watchdog:wdog });
+  } catch (e) {
+    res.status(500).json({ ok:false, error:String(e) });
+  }
+});
+// === END BasicAuth & Status ===
+
+
+// Statisch aus ./public, aber ohne Auto-Index
+app.use(express.static(path.join(__dirname, "public"), { index: false }));
+
+// Root -> /login
+app.get("/", (_req, res) => res.redirect(302, "/login"));
+
+// Login-Form (liefert public/login.html)
+app.get("/login", (_req, res) => {
+  res.sendFile(path.join(__dirname, "public", "login.html"));
+});
+
+// DUMMY-LOGIN: akzeptiert jeden POST und leitet IMMER auf /ibelsa.html
+app.post("/login", (req, res) => {
+  console.log("[DummyLogin] body=", req.body);
+  return res.redirect(303, "/ibelsa.html");
+});
+
+// 404-Fallback
+app.use((_req, res) => res.status(404).send("Not Found"));
+
+// Nur auf Loopback hören
+app.listen(PORT, "127.0.0.1", () => {
+  console.log("Hotel Dashboard läuft auf Port", PORT);
+});
+
+// === status api ===
+const { execSync } = require("node:child_process");
+app.get("/api/status", (_req, res) => {
+  const run = (cmd) => {
+    try { return execSync(cmd, { encoding: "utf8", timeout: 3000 }); }
+    catch (e) { return (e.stdout||"") + (e.stderr||e.message); }
+  };
+  const payload = {
+    time: new Date().toISOString(),
+    pm2: run("pm2 jlist || true"),
+    ports: run("ss -lptn | head -n 1 && ss -lptn | egrep \":(3011|80 |443 )\" || true"),
+    ufw: run("sudo ufw status verbose || true"),
+    logs: {
+      app_out:  run("tail -n 50 /home/steven/.pm2/logs/hotel-web-out.log 2>/dev/null || true"),
+      app_err:  run("tail -n 50 /home/steven/.pm2/logs/hotel-web-error.log 2>/dev/null || true"),
+      apache:   run("sudo tail -n 50 /var/log/apache2/access.log 2>/dev/null || true"),
+      apache_e: run("sudo tail -n 30 /var/log/apache2/error.log 2>/dev/null || true"),
+      watchdog: run("sudo tail -n 30 /var/log/hotel-watchdog.log 2>/dev/null || true")
+    },
+    healthz: run("curl -s -o /dev/null -w \"%{http_code}\" http://127.0.0.1:3011/healthz || true")
+  };
+  res.json(payload);
+});

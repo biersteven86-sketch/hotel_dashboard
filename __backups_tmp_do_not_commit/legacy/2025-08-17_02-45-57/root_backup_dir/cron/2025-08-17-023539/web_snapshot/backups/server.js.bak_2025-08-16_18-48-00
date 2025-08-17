@@ -1,0 +1,101 @@
+require("dotenv").config();
+const express = require("express");
+const path = require("path");
+const fs = require("fs");
+const cookieParser = require("cookie-parser");
+
+const app  = express();
+const PORT = process.env.PORT || 3011;
+
+// ---- Settings / Basics
+app.disable("x-powered-by");
+app.set("trust proxy", true);
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cookieParser());
+
+// ---- Users laden
+const USERS_FILE = path.join(__dirname, "users.json");
+let USERS = {};
+try {
+  USERS = JSON.parse(fs.readFileSync(USERS_FILE, "utf8"));
+} catch (e) {
+  console.error("Konnte users.json nicht laden:", e.message);
+  USERS = {};
+}
+
+// ---- Helper: Login prüfen
+function requireLogin(req, res, next) {
+  const sid = req.cookies.dash_sid;
+  if (!sid) return res.redirect(302, "/login");
+  try {
+    const user = Buffer.from(sid, "base64").toString("utf8");
+    if (USERS[user]) {
+      req.user = user;
+      return next();
+    }
+  } catch (_) {}
+  res.clearCookie("dash_sid", { path: "/" });
+  return res.redirect(302, "/login");
+}
+
+// ---- Login-Form (einfach; nutzt vorhandene public/login.html, wenn vorhanden)
+app.get("/login", (_req, res) => {
+  const loginHtml = path.join(__dirname, "public", "login.html");
+  if (fs.existsSync(loginHtml)) return res.sendFile(loginHtml);
+  res.type("html").send(`<!doctype html>
+  <meta charset="utf-8">
+  <title>Hotel-Dashboard • Login</title>
+  <style>body{font-family:sans-serif;margin:40px}form{max-width:360px;padding:24px;border:1px solid #ddd;border-radius:8px}</style>
+  <h1>Hotel-Dashboard – Login</h1>
+  <form method="post" action="/login">
+    <label>Benutzer<br><input name="username" required autofocus></label><br><br>
+    <label>Passwort<br><input name="password" type="password" required></label><br><br>
+    <button type="submit">Einloggen</button>
+  </form>`);
+});
+
+// ---- Login-POST: gegen users.json prüfen und zu Zielseite leiten
+app.post("/login", (req, res) => {
+  const u = String(req.body.username || "").trim();
+  const p = String(req.body.password || "");
+  const entry = USERS[u];
+  if (!entry || entry.password !== p) {
+    return res.status(401).type("text").send("Login falsch");
+  }
+
+  // Cookie-Dauer: admin = 10 Minuten, andere = Session (bis Browser zu)
+  const cookieOpts = { httpOnly: true, path: "/" };
+  if (u.toLowerCase() === "admin") cookieOpts.maxAge = 10 * 60 * 1000;
+
+  res.cookie("dash_sid", Buffer.from(u, "utf8").toString("base64"), cookieOpts);
+  const target = entry.target || "/ibelsa.html";
+  return res.redirect(302, target);
+});
+
+// ---- Logout
+app.get("/dash-logout", (req, res) => {
+  res.clearCookie("dash_sid", { path: "/" });
+  res.redirect(302, "/login");
+});
+
+// ---- Geschützte Auslieferung für index/ibelsa (falls statische Dateien vorhanden)
+app.get("/index.html", requireLogin, (req, res) =>
+  res.sendFile(path.join(__dirname, "public", "index.html"))
+);
+app.get("/ibelsa.html", requireLogin, (req, res) =>
+  res.sendFile(path.join(__dirname, "public", "ibelsa.html"))
+);
+
+// ---- Healthcheck
+app.get("/healthz", (_req, res) => res.json({ ok: true }));
+
+// ---- Statische Files (kein Auto-Index)
+app.use(express.static(path.join(__dirname, "public"), { index: false }));
+
+// ---- 404
+app.use((_req, res) => res.status(404).send("Not Found"));
+
+app.listen(PORT, "127.0.0.1", () => {
+  console.log("Hotel Dashboard läuft auf Port", PORT);
+});

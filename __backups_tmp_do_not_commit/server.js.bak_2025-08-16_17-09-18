@@ -1,0 +1,78 @@
+require("dotenv").config({ path: __dirname + "/.env" });
+const express = require("express");
+const path    = require("path");
+const app     = express();
+const PORT    = process.env.PORT || 3011;
+
+app.disable("x-powered-by");
+app.set("trust proxy", true);
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// ---------- Simple Cookie-Auth (Session) ----------
+const DASH_USER = process.env.DASH_USER || "admin";
+const DASH_PASS = process.env.DASH_PASS || "Rottweil.12"; // Großes R!
+
+function hasSession(req){
+  const c = req.headers.cookie || "";
+  return /(?:^|;\s*)dash=ok(?:;|$)/.test(c);
+}
+function requireDashSession(req,res,next){
+  if (hasSession(req)) return next();
+  res.set("Cache-Control","no-store, no-cache, must-revalidate, max-age=0");
+  return res.status(401).sendFile(path.join(__dirname,"public","login.html"));
+}
+
+app.post("/dash-login", (req,res) => {
+  const { username, password } = req.body || {};
+  if (username === DASH_USER && password === DASH_PASS){
+    // 10 Minuten gültig
+    res.setHeader("Set-Cookie","dash=ok; Path=/; HttpOnly; Max-Age=600; SameSite=Lax");
+    return res.redirect(302, "/index.html");
+  }
+  return res.status(401).sendFile(path.join(__dirname,"public","login.html"));
+});
+
+app.get("/dash-logout", (_req,res) => {
+  res.setHeader("Set-Cookie", "dash=; Path=/; Max-Age=0; SameSite=Lax");
+  return res.redirect(302, "/login");
+});
+
+app.get("/login", (_req,res) => {
+  return res.sendFile(path.join(__dirname,"public","login.html"));
+});
+
+// ---------- Geschützte Inhalte ----------
+app.get("/index.html", requireDashSession, (_req,res) => {
+  return res.sendFile(path.join(__dirname,"public","index.html"));
+});
+
+// Beispiel-/Fallback-Status (falls dein bestehender /status.json-Handler fehlt):
+// → Wenn du bereits einen eigenen Handler hattest, kann der hier stattdessen hin.
+app.get("/status.json", requireDashSession, async (_req,res) => {
+  try {
+    // Minimaler Demo-Status – passe gern an deine echten Checks an:
+    res.json({
+      ok: true,
+      portguard: { running: true },
+      watchdog:  { active:  true },
+      ibelsa:    { ok: false, msg: "noch nicht konfiguriert" },
+      load:      { label: "normal" }
+    });
+  } catch (e){
+    res.status(500).json({ ok:false, error:String(e) });
+  }
+});
+
+// ---------- Statische Dateien (nach Auth-Routen) ----------
+app.use(express.static(path.join(__dirname, "public"), { index: false }));
+
+// Root → Login
+app.get("/", (_req,res) => res.redirect(302,"/login"));
+
+// 404
+app.use((_req,res) => res.status(404).send("Not Found"));
+
+app.listen(PORT, "127.0.0.1", () => {
+  console.log("Hotel Dashboard läuft auf Port", PORT);
+});

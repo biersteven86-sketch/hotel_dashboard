@@ -1,0 +1,64 @@
+require('dotenv').config();
+const express = require('express');
+const path = require('path');const app  = express();
+const PORT = process.env.PORT || 3011;app.disable('x-powered-by');
+app.set('trust proxy', true);
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());const DASH_USER   = process.env.DASH_USER || 'admin';
+const DASH_PASS   = process.env.DASH_PASS || 'Rottweil.12';
+const DASH_TTL    = parseInt(process.env.DASH_TTL || '60', 10);
+const ALWAYS_PROMPT = process.env.DASH_ALWAYS_PROMPT === '1';function parseCookie(req){
+  const h = req.headers.cookie || '';
+  const kv = h.split(';').map(s => s.trim()).filter(Boolean).map(s => {
+    const i = s.indexOf('=');
+    return i>0 ? [s.slice(0,i), decodeURIComponent(s.slice(i+1))] : [s,''];
+  });
+  return Object.fromEntries(kv);
+}
+function requireDash(req,res,next){
+  if (ALWAYS_PROMPT) return res.redirect(302, '/dash-login');
+  const c = parseCookie(req);
+  if (c.dash === 'ok') return next();
+  return res.redirect(302, '/dash-login');
+}app.get('/dash-login', (_req,res)=>{
+  res.set('cache-control','no-store, no-cache, must-revalidate, max-age=0');
+  res.type('html').send(`<!doctype html><meta charset="utf-8">
+<title>Hotel-Dashboard – Login</title>
+<body style="font-family:system-ui;padding:2rem;max-width:640px;margin:auto">
+<h1>Login</h1>
+<form method="post" action="/dash-login" style="display:grid;gap:.6rem;max-width:320px">
+  <label>Benutzer <input name="username" value="admin" required></label>
+  <label>Passwort <input name="password" type="password" required></label>
+  <button>Login</button>
+</form>
+<p style="margin-top:1rem"><a href="/dash-logout">Logout</a></p>
+</body>`);
+});app.post('/dash-login', (req,res)=>{
+  const { username, password } = req.body || {};
+  if (username === DASH_USER && password === DASH_PASS){
+    const cookie = [`dash=ok`, `Path=/`, `HttpOnly`, `SameSite=Lax`];
+    if (!ALWAYS_PROMPT) cookie.push(`Max-Age=${DASH_TTL}`);
+    res.setHeader('Set-Cookie', cookie.join('; '));
+    return res.redirect(302, '/index.html');
+  }
+  return res.redirect(302, '/dash-login');
+});app.get('/dash-logout', (_req,res)=>{
+  res.set('Set-Cookie','dash=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax');
+  res.redirect(302, '/dash-login');
+});/* === Geschützte Routen – vor express.static! === */
+app.get('/index.html', requireDash, (_req,res)=>{
+  res.sendFile(path.join(__dirname,'public','index.html'));
+});
+app.get('/status.json', requireDash, (_req,res)=>{
+  try{
+    const os = require('os');
+    res.json({ ok:true, host: os.hostname(), up: os.uptime() });
+  }catch(e){
+    res.status(500).json({ ok:false, error:String(e) });
+  }
+});/* Statische Dateien (CSS/JS/Bilder), aber kein Auto-Index */
+app.use(express.static(path.join(__dirname,'public'), { index:false }));/* Landing */
+app.get('/', (_req,res)=> res.redirect(302, '/index.html'));/* 404 */
+app.use((_req,res)=> res.status(404).send('Not Found'));app.listen(PORT, '127.0.0.1', () => {
+  console.log('Hotel Dashboard läuft auf Port', PORT);
+});

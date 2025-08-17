@@ -1,0 +1,4 @@
+[
+  { "username": "admin", "password": "Rottweil.12", "redirect": "/status.html" },
+  { "username": "info@myhome-rottweil.de", "password": "Rottweil.12", "redirect": "/ibelsa.html" }
+]

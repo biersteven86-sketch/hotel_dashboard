@@ -1,0 +1,44 @@
+/* hotel-dashboard minimal server - CommonJS */
+const express = require("express");
+const path = require("path");
+const session = require("express-session");
+
+const app = express();
+const PORT = process.env.PORT || 3011;
+
+app.disable("x-powered-by");
+app.set("case sensitive routing", false);
+app.set("strict routing", false);
+app.set("trust proxy", true);
+
+app.use(express.urlencoded({ extended: true }));   // <— Form POST parsen
+app.use(express.json());
+app.use(session({
+  secret: process.env.SESSION_SECRET || "hotel-dashboard-session",
+  resave: false,
+  saveUninitialized: false,
+  cookie: { sameSite: "lax" }
+}));
+
+// Statische Dateien, aber ohne Auto-Index, damit "/" unten greift
+app.use(express.static(path.join(__dirname, "public"), { index: false }));
+
+// Login-Seite
+app.get("/", (_req, res) => res.sendFile(path.join(__dirname, "public", "login.html")));
+app.get("/login", (_req, res) => res.sendFile(path.join(__dirname, "public", "login.html")));
+app.get("/Login", (_req, res) => res.sendFile(path.join(__dirname, "public", "login.html")));
+
+// *** WICHTIG: POST /login vorhanden ***
+app.post(["/login", "/Login"], (req, res) => {
+  const { username, password } = req.body || {};
+  if (!username || !password) return res.redirect("/login");
+  try { req.session.user = { name: username, at: Date.now() }; } catch {}
+  return res.redirect(303, "/ibelsa.html");   // Erwarteter Redirect
+});
+
+// Healthcheck
+app.get("/healthz", (_req, res) => res.json({ ok: true }));
+
+app.listen(PORT, "127.0.0.1", () => {
+  console.log(`Hotel Dashboard läuft auf Port ${PORT}`);
+});

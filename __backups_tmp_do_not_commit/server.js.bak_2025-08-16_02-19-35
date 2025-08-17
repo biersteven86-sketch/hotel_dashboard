@@ -1,0 +1,27 @@
+require("dotenv").config();
+const express = require("express");
+const path    = require("path");
+
+const app  = express();
+const PORT = process.env.PORT || 3011;
+
+app.set("trust proxy", true);
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// Statische Dateien
+app.use(express.static(path.join(__dirname, "public"), { index: false }));
+
+// Root -> Loginseite
+app.get("/", (_req, res) => res.sendFile(path.join(__dirname, "public", "login.html")));
+
+// POST /login -> Weiterleitung
+app.post("/login", (req, res) => {
+  const { username, password } = req.body || {};
+  if (!username || !password) return res.redirect("/login.html");
+  res.redirect("/ibelsa.html");
+});
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Hotel Dashboard läuft auf Port ${PORT}`);
+});

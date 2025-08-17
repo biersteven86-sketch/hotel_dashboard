@@ -1,0 +1,46 @@
+const express = require('express');
+const path    = require('path');
+const session = require('express-session');
+
+const app  = express();
+const PORT = process.env.PORT || 3011;
+
+// ---- Middleware
+app.use(express.urlencoded({ extended: true })); // Form-POST
+app.use(express.json());
+app.use(session({
+  secret: 'hotel-dashboard-secret',
+  resave: false,
+  saveUninitialized: true,
+}));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ---- Login
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(401).send('Login fehlgeschlagen');
+  }
+
+  req.session.user = String(username).trim();
+
+  let target = 'ibelsa.html';               // Default
+  const uname = String(username).trim().toLowerCase();
+  if (uname === 'admin') target = 'index.html';
+
+  console.log(`[LOGIN] user=${username} -> ${target}`);
+  return res.redirect('/' + target);
+});
+
+// ---- Root -> Login-Seite
+app.get('/', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+// ---- (Deine weiteren Routen / Proxys hier unverändert lassen)
+
+// ---- Serverstart
+app.listen(PORT, () => {
+  console.log(`✅ Hotel Dashboard läuft auf Port ${PORT}`);
+});

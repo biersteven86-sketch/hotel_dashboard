@@ -1,0 +1,86 @@
+require("dotenv").config();
+const express = require("express");
+const path = require("path");
+const fs = require("fs");
+
+const app  = express();
+const PORT = process.env.PORT || 3011;
+const WEB  = __dirname;
+const PUB  = path.join(__dirname, "public");
+
+app.disable("x-powered-by");
+app.set("trust proxy", true);
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+function loadUsers() {
+  try {
+    const raw = fs.readFileSync(path.join(WEB, "users.json"), "utf8");
+    const list = JSON.parse(raw);
+    return Array.isArray(list) ? list : (list.users || []);
+  } catch (e) {
+    return [];
+  }
+}
+function findUser(name, pass) {
+  const users = loadUsers();
+  const u = String(name||"").toLowerCase();
+  const p = String(pass||"");
+  return users.find(x => String(x.user).toLowerCase() === u && String(x.pass) === p);
+}
+
+// Root -> Login
+app.get("/", (_req, res) => res.redirect(302, "/login"));
+
+// Login-Form (statische Datei)
+app.get("/login", (_req, res) => res.sendFile(path.join(PUB, "login.html")));
+
+// Login-POST: Nutzer aus users.json lesen, Ziel wählen
+app.post("/login", (req, res) => {
+  const { username, password } = req.body || {};
+  const user = findUser(username, password);
+  if (!user) return res.redirect(302, "/login");
+
+  // Für Admin (oder explizites Ziel index.html) 10-Minuten-Session setzen
+  if (user.target === "/index.html") {
+    res.set("Set-Cookie", );
+  }
+  return res.redirect(302, user.target || "/ibelsa.html");
+});
+
+// /index.html nur mit Cookie zulassen
+app.get("/index.html", (req, res) => {
+  const ck = req.headers.cookie || "";
+  if (!/dash_sid=/.test(ck)) return res.redirect(302, "/login");
+  res.sendFile(path.join(PUB, "index.html"));
+});
+
+// /ibelsa.html ohne Session-Zwang ausliefern
+app.get("/ibelsa.html", (_req, res) => res.sendFile(path.join(PUB, "ibelsa.html")));
+
+// Healthcheck
+app.get("/healthz", (_req, res) => res.json({ ok: true }));
+
+// Statisches Verzeichnis (ohne Auto-Index, damit /index.html-Guard greift)
+app.use(express.static(PUB, { index: false }));
+
+// 404
+app.use((_req, res) => res.status(404).send("Not Found"));
+
+app.listen(PORT, "127.0.0.1", () => console.log("Hotel Dashboard läuft auf Port", PORT));
+"JS"
+
+echo "== PM2 Neustart =="
+pm2 restart hotel-web --update-env || pm2 start "/home/steven/hotel_dashboard/web/server.js" --name hotel-web
+
+echo; echo "== Kurztests =="
+echo "-- GET /login (sollte 200):"
+curl -si http://127.0.0.1:3011/login | sed -n "1,12p"
+
+echo; echo "-- POST /login admin -> /index.html (303 erwartet):"
+curl -si -X POST http://127.0.0.1:3011/login      -H "Content-Type: application/x-www-form-urlencoded"      --data "username=admin&password=Rottweil.12" | sed -n "1,20p"
+
+echo; echo "-- POST /login info -> /ibelsa.html (303 erwartet):"
+curl -si -X POST http://127.0.0.1:3011/login      -H "Content-Type: application/x-www-form-urlencoded"      --data "username=info@myhome-rottweil.de&password=Rottweil.12" | sed -n "1,20p"
+
+echo; echo "Fertig. Falls etwas rot ist: tail -n 80 /home/steven/.pm2/logs/hotel-web-error.log"

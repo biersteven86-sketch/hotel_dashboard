@@ -1,0 +1,25 @@
+/* gemeinsames Theme für Login + ibelsa.html */
+:root{
+  --bg1:#0d47a1; --bg2:#1e88e5;
+  --card-bg:rgba(0,0,0,.55);
+  --text:#fff; --muted:#d0d7e2;
+  --btn:#2ecc71; --btn-h:#27ae60;
+  --input-bg:#f7f9fc; --input-b:#dfe3ea; --input-t:#0b2239;
+}
+
+*{box-sizing:border-box} body{margin:0;font-family:Poppins,system-ui,Arial,sans-serif;color:var(--text)}
+.bg{min-height:100vh;background:linear-gradient(135deg,var(--bg1),var(--bg2));display:flex;align-items:flex-start;justify-content:center;padding:32px}
+.card{background:var(--card-bg);backdrop-filter:blur(8px);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:16px 16px 20px;width:clamp(280px,90vw,1080px)}
+.card--login{width:340px;margin-top:10vh;text-align:center}
+h1,h2{margin:.2rem 0 .6rem} .muted{color:var(--muted);font-size:.9rem;margin:.2rem 0 1rem}
+.row{display:flex;gap:8px;align-items:center;margin:8px 0 12px}
+.input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--input-b);background:var(--input-bg);color:var(--input-t)}
+.btn{padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:700}
+.btn--primary{background:var(--btn);color:#fff} .btn--primary:hover{background:var(--btn-h)}
+.table{width:100%;border-collapse:collapse;margin-top:8px}
+.table th,.table td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.12);text-align:left}
+.table th{color:#eef3ff}
+.alert{background:#e57373;color:#fff;border-radius:8px;padding:8px 10px;margin:6px 0}
+.nav{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:8px}
+.brand{font-weight:700}
+

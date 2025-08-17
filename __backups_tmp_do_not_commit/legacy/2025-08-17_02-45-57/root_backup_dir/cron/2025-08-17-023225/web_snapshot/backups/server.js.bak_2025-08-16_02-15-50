@@ -1,0 +1,54 @@
+require("dotenv").config();
+const express = require("express");
+const session = require("express-session");
+const path = require("path");
+
+const app = express();
+const PORT = process.env.PORT || 3011;
+
+app.disable("x-powered-by");
+app.set("trust proxy", true);
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(session({
+  secret: process.env.SESSION_SECRET || "hotel-dashboard-session",
+  resave: false,
+  saveUninitialized: false
+}));
+
+// Statische Dateien ohne Auto-Index, Root -> login.html
+app.use(express.static(path.join(__dirname, "public"), { index: false }));
+app.get("/", (_req, res) => res.sendFile(path.join(__dirname, "public", "login.html")));
+
+// *** WICHTIG: POST /login vorhanden (robust, akzeptiert /login und /Login) ***
+app.post(["/login","/Login"], (req, res) => {
+  const { username, password } = req.body || {};
+  if (!username || !password) return res.status(400).send("Missing credentials");
+  try { req.session.user = { name: username, at: Date.now() }; } catch {}
+  return res.redirect(303, "/ibelsa.html");
+});
+
+// Healthcheck
+app.get("/healthz", (_req, res) => res.json({ ok: true }));
+
+// Auf 127.0.0.1:3011 (hinter Apache) hören
+app.listen(PORT, "127.0.0.1", () => console.log("Hotel Dashboard läuft auf Port", PORT));
+"JSEND"
+
+# PM2: starten/neu starten
+pm2 describe hotel-web >/dev/null 2>&1 && pm2 restart hotel-web || pm2 start "/home/steven/hotel_dashboard/web/server.js" --name hotel-web
+
+sleep 1
+
+echo "== LOCAL GET /login.html =="
+curl -s -i http://127.0.0.1:3011/login.html | head -n 15
+echo
+echo "== LOCAL POST /login =="
+curl -s -i -X POST http://127.0.0.1:3011/login   -H "Content-Type: application/x-www-form-urlencoded"   --data "username=test&password=test" | head -n 15
+echo
+echo "== DOMAIN GET /login =="
+curl -s -i https://www.hotel-dashboard.de/login | head -n 15
+echo
+echo "== DOMAIN POST /login =="
+curl -s -i -X POST https://www.hotel-dashboard.de/login   -H "Content-Type: application/x-www-form-urlencoded"   --data "username=test&password=test" | head -n 15

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hotel – Dashboard • Login</title>
+  <style>
+    :root{
+      --bg1:#0b4fa6; --bg2:#1c5fb8; --bg3:#2a5cc7;
+      --card-top:rgba(255,255,255,.25); --card-bot:rgba(0,0,0,.12);
+      --stroke:rgba(255,255,255,.35);
+      --muted:#d2e2ff; --white:#fff;
+      --field:#e9f2ff; --fieldText:#21354b;
+      --green1:#2ecc71; --green2:#27ae60;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--white); font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;
+      /* Vollflächiges Hintergrundbild + weiches Overlay, damit das Login-Panel lesbar bleibt */
+      background:
+        linear-gradient(180deg, rgba(15,33,70,.55), rgba(15,33,70,.55)),
+        url("./hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
+      display:grid; place-items:center; padding:32px;
+    }
+    .card{
+      width:min(620px, 92vw);
+      border-radius:22px;
+      background: linear-gradient(180deg, var(--card-top), var(--card-bot));
+      border:1px solid var(--stroke);
+      box-shadow: 0 18px 50px rgba(0,0,0,.28);
+      padding:38px 34px 26px;
+      position:relative;
+      backdrop-filter: blur(2px);
+    }
+    .brand{display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:10px}
+    .brand .logo{
+      width:26px; height:26px; border-radius:4px; background:#d30707;
+      display:grid; place-items:center;
+      box-shadow: 0 2px 6px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.35);
+      font-weight:800; font-size:13px; letter-spacing:.5px;
+    }
+    .brand .logo span{color:#fff; transform:translateY(1px)}
+    .brand .by{font-size:12px; color:var(--muted); opacity:.9}
+    .title{
+      margin:0 0 8px; text-align:center; font-weight:800;
+      font-size: clamp(28px, 4.8vw, 44px);
+      text-shadow:0 2px 0 rgba(0,0,0,.25);
+      line-height:1.08;
+    }
+    .subtitle{
+      text-align:center; margin:0 0 22px; color:var(--muted);
+      font-size: clamp(14px, 2vw, 16px);
+    }
+    .form{display:grid; gap:14px}
+    .label{display:block; margin:2px 8px 6px; opacity:.95; font-size: clamp(14px, 2vw, 15px)}
+    .wrap{position:relative}
+    input{
+      width:100%; height:44px; border-radius:10px; border:0;
+      background:var(--field); color:var(--fieldText);
+      padding:0 12px; outline:none; font-size:15px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
+    }
+    input::placeholder{color:#6c859f}
+    .btn{
+      height:46px; border-radius:12px; border:0; cursor:pointer;
+      background:linear-gradient(180deg, var(--green1), var(--green2));
+      color:#fff; font-weight:800; font-size:16px;
+      box-shadow: 0 6px 16px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.35);
+    }
+    .footer{margin-top:10px; text-align:center; font-size:12px; color:var(--muted)}
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-label="Login">
+    <div class="brand">
+      <div class="logo"><span>MH</span></div>
+      <div class="by">Powered by My Home Hotel Larn, Rottweil</div>
+    </div>
+    <h1 class="title">Hotel – Dashboard</h1>
+    <p class="subtitle">Anmelden – bitte Zugangsdaten eingeben.</p>
+
+    <form class="form" action="/login" method="post" autocomplete="off">
+      <label class="label" for="user">Benutzername</label>
+      <div class="wrap">
+        <input id="user" name="username" type="text" placeholder="Benutzername" />
+      </div>
+
+      <label class="label" for="pass">Passwort</label>
+      <div class="wrap">
+        <input id="pass" name="password" type="password" placeholder="Passwort" />
+      </div>
+
+      <button class="btn" type="submit">Login</button>
+    </form>
+
+    <div class="footer">© 2025 Hotel – Dashboard</div>
+  </main>
+</body>
+</html>

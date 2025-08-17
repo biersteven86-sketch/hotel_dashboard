@@ -1,0 +1,45 @@
+/* hotel-dashboard server (CommonJS) */
+require("dotenv").config();
+const express = require("express");
+const session = require("express-session");
+const path    = require("path");
+
+const app  = express();
+const PORT = process.env.PORT || 3011;
+
+app.disable("x-powered-by");
+app.set("case sensitive routing", false); // /Login == /login
+app.set("strict routing", false);
+app.set("trust proxy", true);
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(session({
+  secret: process.env.SESSION_SECRET || "hotel-dashboard-session",
+  resave: false,
+  saveUninitialized: false,
+  cookie: { sameSite: "lax" }
+}));
+
+// Statisch aus /public (ohne auto-index)
+app.use(express.static(path.join(__dirname, "public"), { index: false }));
+
+// Login-Seite
+app.get(["/","/login","/Login"], (_req, res) =>
+  res.sendFile(path.join(__dirname, "public", "login.html"))
+);
+
+// *** WICHTIG: POST /login vorhanden ***
+app.post(["/login","/Login"], (req, res) => {
+  const { username, password } = req.body || {};
+  if (!username || !password) return res.redirect("/login.html");
+  try { req.session.user = { name: username, at: Date.now() }; } catch {}
+  return res.redirect(303, "/ibelsa.html");  // Erwarteter Redirect
+});
+
+// Beispiel-API (kann später ersetzt werden)
+app.get("/api/hotel-info", (_req, res)=> res.json({ ok:true }));
+
+app.listen(PORT, "0.0.0.0", () =>
+  console.log(`Hotel-Dashboard läuft auf Port ${PORT}`)
+);
