@@ -37,6 +37,7 @@ app.use('/login', loginLimiter);
 
 // Static-Files
 const publicDir = path.join(__dirname, 'public');
+app.get('/', (req, res) => res.redirect('/login.html'));
 app.use(express.static(publicDir));
 
 // Users laden
@@ -94,3 +95,19 @@ app.get('/', (_req, res) => res.sendFile(startPage));
 // Optional: explizite Routen für Status & Dashboard
 app.get('/status', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'status.html')));
 app.get('/dashboard', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'ibelsa.html')));
+
+// --- Backup-Route (Login-Seite sichern) ---
+app.get('/backup-login', (req, res) => {
+  try {
+    const src  = path.join(__dirname, 'public', 'login.html');
+    const dest = path.join(
+      __dirname, 'public',
+      `login_backup_${new Date().toISOString().replace(/[:.]/g,'-')}.html`
+    );
+    fs.copyFileSync(src, dest);
+    res.send(`Backup erstellt: ${path.basename(dest)}`);
+  } catch (err) {
+    console.error('[Backup]', err);
+    res.status(500).send('Backup fehlgeschlagen');
+  }
+});
