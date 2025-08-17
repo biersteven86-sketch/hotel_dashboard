@@ -15,8 +15,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 // Force / -> login.html
 app.get('/', (req,res) => res.redirect('/login.html'));
-// Force / -> login.html
-app.get('/', (req,res) => res.redirect('/login.html'));
 
 // Sessions (MemoryStore – für kleines Dashboard ok)
 app.use(session({
