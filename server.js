@@ -120,7 +120,7 @@ app.get('/after-login', (req, res) => {
     if (u && u.toLowerCase() === adminUser.toLowerCase()) {
       return res.redirect('/status.html');
     }
-    return res.redirect('/ibelsa.html');
+    return res.redirect('/after-login');
   } catch (e) {
     return res.redirect('/login.html');
   }
