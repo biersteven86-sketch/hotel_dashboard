@@ -7,25 +7,20 @@
   <meta name="color-scheme" content="light dark">
   <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
   <style>
-    :root{
-      --bg:#0b1020; --glass:rgba(255,255,255,.10); --glass-strong:rgba(255,255,255,.18);
-      --stroke:rgba(255,255,255,.25); --text:#eef2ff; --muted:#b7c0d8;
-      --accent:#7c5cff; --accent-2:#38bdf8; --ok:#10b981; --danger:#ef4444;
-      --shadow:0 10px 30px rgba(0,0,0,.45); --radius:18px;
-    }
+    :root{ --bg:#0b1020; --glass:rgba(255,255,255,.10); --glass-strong:rgba(255,255,255,.18);
+      --stroke:rgba(255,255,255,.25); --text:#eef2ff; --muted:#b7c0d8; --accent:#7c5cff;
+      --accent-2:#38bdf8; --ok:#10b981; --danger:#ef4444; --shadow:0 10px 30px rgba(0,0,0,.45); --radius:18px }
     *{box-sizing:border-box} html,body{height:100%}
     body{margin:0;font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
-      color:var(--text);background:var(--bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;}
+      color:var(--text);background:var(--bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat}
     body::before{content:"";position:fixed;inset:0;background:
       radial-gradient(1200px 600px at 10% 10%, rgba(124,92,255,.20), transparent 60%),
       radial-gradient(1200px 600px at 90% 90%, rgba(56,189,248,.18), transparent 60%),
       linear-gradient(to bottom right, rgba(0,0,0,.25), rgba(0,0,0,.35));
       pointer-events:none}
     .wrap{min-height:100%;display:grid;place-items:center;padding:clamp(20px,4vw,60px)}
-    .card{width:min(420px,92vw);border-radius:var(--radius);
-      background:linear-gradient(180deg,var(--glass),rgba(255,255,255,.06));
-      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-      border:1px solid var(--stroke);box-shadow:var(--shadow);overflow:hidden}
+    .card{width:min(420px,92vw);border-radius:var(--radius);background:linear-gradient(180deg,var(--glass),rgba(255,255,255,.06));
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--stroke);box-shadow:var(--shadow);overflow:hidden}
     .brand{display:flex;align-items:center;gap:12px;padding:22px 22px 8px}
     .logo{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
       box-shadow:0 8px 20px rgba(124,92,255,.4), inset 0 0 20px rgba(255,255,255,.15)}
@@ -34,8 +29,7 @@
     .content{padding:20px 22px 24px}
     form{display:grid;gap:14px}
     label{font-size:13px;color:var(--muted);display:block;margin:0 0 6px}
-    .field{position:relative;background:var(--glass-strong);border:1px solid var(--stroke);
-      border-radius:14px;display:flex;align-items:center;padding:10px 12px}
+    .field{position:relative;background:var(--glass-strong);border:1px solid var(--stroke);border-radius:14px;display:flex;align-items:center;padding:10px 12px}
     .field input{flex:1;background:transparent;border:0;outline:0;color:var(--text);font-size:15px;padding:6px 2px}
     .field button.icon{all:unset;cursor:pointer;padding:6px 8px;border-radius:10px}
     .field button.icon:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -45,9 +39,8 @@
     .error{display:none;background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.45);
       color:#fecaca;padding:10px 12px;border-radius:12px;font-size:13px}
     .visually-hidden{position:absolute!important;width:1px;height:1px;margin:-1px;border:0;padding:0;clip:rect(0 0 0 0);overflow:hidden;white-space:nowrap}
-    .submit{margin-top:6px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      color:#fff;border:0;border-radius:14px;padding:12px 16px;font-weight:700;font-size:15px;cursor:pointer;
-      box-shadow:0 10px 24px rgba(124,92,255,.35);transition:transform .08s ease}
+    .submit{margin-top:6px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;border:0;border-radius:14px;
+      padding:12px 16px;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 10px 24px rgba(124,92,255,.35);transition:transform .08s ease}
     .submit:disabled{opacity:.6;cursor:not-allowed;box-shadow:none}
     .submit:active{transform:translateY(1px) scale(.997)}
     .foot{text-align:center;color:var(--muted);font-size:12px;padding:12px 18px 18px}
@@ -78,10 +71,7 @@
         </div>
 
         <form action="/login" method="POST" id="loginForm" autocomplete="on" novalidate>
-          <!-- Anti-CSRF (vom Server befüllen, z. B. per Template/Express) -->
           <input type="hidden" name="csrf" id="csrf" value="">
-
-          <!-- Optionales Weiterleitungsziel (?next=/ibelsa.html) -->
           <input type="hidden" name="next" id="next" value="">
 
           <div>
@@ -121,69 +111,21 @@
   </div>
 
   <script>
-    // Jahr
     document.getElementById('y').textContent = new Date().getFullYear();
-
-    const f  = document.getElementById('loginForm');
-    const u  = document.getElementById('username');
-    const p  = document.getElementById('password');
-    const s  = document.getElementById('submitBtn');
-    const e  = document.getElementById('err');
-    const c  = document.getElementById('caps');
-    const tp = document.getElementById('togglePw');
-    const nextField = document.getElementById('next');
-    const csrfField = document.getElementById('csrf');
-
-    // Fehlermeldung anzeigen, wenn ?e=1 an URL
-    const params = new URLSearchParams(location.search);
-    if (params.get('e') === '1') e.style.display = 'block';
-
-    // Optionaler Message-Text ?m=Hinweis
-    if (params.get('m')) {
-      e.textContent = params.get('m');
-      e.style.display = 'block';
-    }
-
-    // Caps-Lock Hinweis
-    ['keydown','keyup'].forEach(evt=>{
-      p.addEventListener(evt, (ev)=>{
-        try {
-          const on = ev.getModifierState && ev.getModifierState('CapsLock');
-          c.style.display = on ? 'block' : 'none';
-        } catch(_) {}
-      });
-    });
-
-    // Passwort Sichtbarkeit
-    tp.addEventListener('click', ()=>{
-      const t = p.getAttribute('type') === 'password' ? 'text' : 'password';
-      p.setAttribute('type', t);
-      tp.setAttribute('aria-pressed', t === 'text' ? 'true' : 'false');
-    });
-
-    // Button aktivieren, wenn beides gefüllt
-    const updateState = ()=>{
-      s.disabled = !(u.value.trim().length && p.value.trim().length);
-    };
-    u.addEventListener('input', updateState);
-    p.addEventListener('input', updateState);
-    updateState();
-
-    // Enter-Submit nur wenn gültig
-    f.addEventListener('keydown', (ev)=>{
-      if (ev.key === 'Enter' && s.disabled) { ev.preventDefault(); }
-    });
-
-    // Doppelklick/Mehrfachsubmit verhindern
-    f.addEventListener('submit', ()=>{
-      s.disabled = true;
-    });
-
-    // Hidden Felder befüllen
-    // Zielseite: Standard wird serverseitig auf /public/ibelsa.html weitergeleitet
-    if (params.get('next')) nextField.value = params.get('next');
-
-    // CSRF vom Server per Template/Inline-Script setzen, z. B.:
+    const f=document.getElementById('loginForm'),u=document.getElementById('username'),
+          p=document.getElementById('password'),s=document.getElementById('submitBtn'),
+          e=document.getElementById('err'),c=document.getElementById('caps'),
+          tp=document.getElementById('togglePw'),params=new URLSearchParams(location.search),
+          nextField=document.getElementById('next'),csrfField=document.getElementById('csrf');
+    if (params.get('e')==='1') e.style.display='block';
+    if (params.get('m')){ e.textContent=params.get('m'); e.style.display='block'; }
+    ['keydown','keyup'].forEach(evt=>{ p.addEventListener(evt,ev=>{ try{ const on=ev.getModifierState&&ev.getModifierState('CapsLock'); c.style.display=on?'block':'none'; }catch(_){} }); });
+    tp.addEventListener('click',()=>{ const t=p.getAttribute('type')==='password'?'text':'password'; p.setAttribute('type',t); tp.setAttribute('aria-pressed', t==='text'?'true':'false'); });
+    const updateState=()=>{ s.disabled=!(u.value.trim().length&&p.value.trim().length); };
+    u.addEventListener('input',updateState); p.addEventListener('input',updateState); updateState();
+    f.addEventListener('keydown',ev=>{ if(ev.key==='Enter'&&s.disabled){ ev.preventDefault(); }});
+    f.addEventListener('submit',()=>{ s.disabled=true; });
+    if (params.get('next')) nextField.value=params.get('next');
     // csrfField.value = window.__CSRF || "";
   </script>
 </body>
