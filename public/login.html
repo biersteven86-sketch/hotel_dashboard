@@ -1,4 +1,3 @@
-cat > /home/steven/hotel_dashboard/public/login.html <<'HTML'
 <!doctype html>
 <html lang="de">
 <head>
@@ -9,123 +8,60 @@ cat > /home/steven/hotel_dashboard/public/login.html <<'HTML'
   <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
   <style>
     :root{
-      --bg: #0b1020;
-      --glass: rgba(255,255,255,.10);
-      --glass-strong: rgba(255,255,255,.18);
-      --stroke: rgba(255,255,255,.25);
-      --text: #eef2ff;
-      --muted: #b7c0d8;
-      --accent: #7c5cff;
-      --accent-2:#38bdf8;
-      --ok:#10b981;
-      --danger:#ef4444;
-      --shadow: 0 10px 30px rgba(0,0,0,.45);
-      --radius: 18px;
+      --bg:#0b1020; --glass:rgba(255,255,255,.10); --glass-strong:rgba(255,255,255,.18);
+      --stroke:rgba(255,255,255,.25); --text:#eef2ff; --muted:#b7c0d8;
+      --accent:#7c5cff; --accent-2:#38bdf8; --ok:#10b981; --danger:#ef4444;
+      --shadow:0 10px 30px rgba(0,0,0,.45); --radius:18px;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font:16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
-      color:var(--text);
-      background: var(--bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
-    }
-
-    /* Overlay + subtle vignette */
-    body::before{
-      content:""; position:fixed; inset:0;
-      background:
-        radial-gradient(1200px 600px at 10% 10%, rgba(124,92,255,.20), transparent 60%),
-        radial-gradient(1200px 600px at 90% 90%, rgba(56,189,248,.18), transparent 60%),
-        linear-gradient(to bottom right, rgba(0,0,0,.25), rgba(0,0,0,.35));
-      pointer-events:none;
-    }
-
-    .wrap{
-      min-height:100%;
-      display:grid;
-      place-items:center;
-      padding:clamp(20px, 4vw, 60px);
-    }
-
-    .card{
-      width:min(420px, 92vw);
-      border-radius:var(--radius);
-      background: linear-gradient(180deg, var(--glass), rgba(255,255,255,.06));
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border:1px solid var(--stroke);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-
-    .brand{
-      display:flex; align-items:center; gap:12px;
-      padding:22px 22px 8px 22px;
-    }
-    .logo{
-      width:42px; height:42px; border-radius:10px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      box-shadow: 0 8px 20px rgba(124,92,255,.4), inset 0 0 20px rgba(255,255,255,.15);
-    }
-    .brand h1{
-      margin:0; font-size:20px; letter-spacing:.2px; font-weight:700;
-    }
-    .brand p{
-      margin:2px 0 0 0; font-size:13px; color:var(--muted);
-    }
-
-    .content{ padding:20px 22px 24px 22px; }
-
-    form{ display:grid; gap:14px; }
-
-    label{ font-size:13px; color:var(--muted); display:block; margin:0 0 6px; }
-
-    .field{
-      position:relative;
-      background: var(--glass-strong);
-      border:1px solid var(--stroke);
-      border-radius:14px;
-      display:flex; align-items:center;
-      padding:10px 12px;
-    }
-    .field input{
-      flex:1; background:transparent; border:0; outline:0; color:var(--text);
-      font-size:15px; padding:6px 2px;
-    }
-    .field button.icon{
-      all:unset; cursor:pointer; padding:6px 8px; border-radius:10px;
-    }
-    .field button.icon:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
-
-    .row{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:4px;}
-    .row .left{ display:flex; align-items:center; gap:10px; color:var(--muted); font-size:13px; }
-    .caps{ display:none; color:var(--danger); font-size:12px; }
-    .error{ display:none; background:rgba(239,68,68,.14); border:1px solid rgba(239,68,68,.45); color:#fecaca; padding:10px 12px; border-radius:12px; font-size:13px;}
-
-    .submit{
-      margin-top:6px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color:white; border:0; border-radius:14px; padding:12px 16px;
-      font-weight:700; font-size:15px; cursor:pointer;
-      box-shadow: 0 10px 24px rgba(124,92,255,.35);
-      transition: transform .08s ease;
-    }
-    .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none; }
-    .submit:active{ transform: translateY(1px) scale(.997); }
-
-    .foot{
-      text-align:center; color:var(--muted); font-size:12px; padding:12px 18px 18px;
-    }
-    a.muted{ color:var(--muted); text-decoration:none; border-bottom:1px dashed rgba(255,255,255,.25); }
-    a.muted:hover{ color:var(--text); border-bottom-color: rgba(255,255,255,.45); }
-
-    @media (max-width:380px){
-      .brand h1{ font-size:18px; }
-      .brand p{ font-size:12px; }
-    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);background:var(--bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;}
+    body::before{content:"";position:fixed;inset:0;background:
+      radial-gradient(1200px 600px at 10% 10%, rgba(124,92,255,.20), transparent 60%),
+      radial-gradient(1200px 600px at 90% 90%, rgba(56,189,248,.18), transparent 60%),
+      linear-gradient(to bottom right, rgba(0,0,0,.25), rgba(0,0,0,.35));
+      pointer-events:none}
+    .wrap{min-height:100%;display:grid;place-items:center;padding:clamp(20px,4vw,60px)}
+    .card{width:min(420px,92vw);border-radius:var(--radius);
+      background:linear-gradient(180deg,var(--glass),rgba(255,255,255,.06));
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+      border:1px solid var(--stroke);box-shadow:var(--shadow);overflow:hidden}
+    .brand{display:flex;align-items:center;gap:12px;padding:22px 22px 8px}
+    .logo{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      box-shadow:0 8px 20px rgba(124,92,255,.4), inset 0 0 20px rgba(255,255,255,.15)}
+    .brand h1{margin:0;font-size:20px;letter-spacing:.2px;font-weight:700}
+    .brand p{margin:2px 0 0 0;font-size:13px;color:var(--muted)}
+    .content{padding:20px 22px 24px}
+    form{display:grid;gap:14px}
+    label{font-size:13px;color:var(--muted);display:block;margin:0 0 6px}
+    .field{position:relative;background:var(--glass-strong);border:1px solid var(--stroke);
+      border-radius:14px;display:flex;align-items:center;padding:10px 12px}
+    .field input{flex:1;background:transparent;border:0;outline:0;color:var(--text);font-size:15px;padding:6px 2px}
+    .field button.icon{all:unset;cursor:pointer;padding:6px 8px;border-radius:10px}
+    .field button.icon:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:4px}
+    .row .left{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+    .caps{display:none;color:var(--danger);font-size:12px}
+    .error{display:none;background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.45);
+      color:#fecaca;padding:10px 12px;border-radius:12px;font-size:13px}
+    .visually-hidden{position:absolute!important;width:1px;height:1px;margin:-1px;border:0;padding:0;clip:rect(0 0 0 0);overflow:hidden;white-space:nowrap}
+    .submit{margin-top:6px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      color:#fff;border:0;border-radius:14px;padding:12px 16px;font-weight:700;font-size:15px;cursor:pointer;
+      box-shadow:0 10px 24px rgba(124,92,255,.35);transition:transform .08s ease}
+    .submit:disabled{opacity:.6;cursor:not-allowed;box-shadow:none}
+    .submit:active{transform:translateY(1px) scale(.997)}
+    .foot{text-align:center;color:var(--muted);font-size:12px;padding:12px 18px 18px}
+    a.muted{color:var(--muted);text-decoration:none;border-bottom:1px dashed rgba(255,255,255,.25)}
+    a.muted:hover{color:var(--text);border-bottom-color:rgba(255,255,255,.45)}
+    @media (max-width:380px){.brand h1{font-size:18px}.brand p{font-size:12px}}
+    @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto} .submit{transition:none}}
   </style>
 </head>
 <body>
+  <noscript><div class="wrap"><p class="error" style="display:block;max-width:420px;margin:auto">
+    JavaScript ist deaktiviert. Das Login kann dadurch eingeschränkt sein.
+  </p></div></noscript>
+
   <div class="wrap">
     <div class="card" role="form" aria-labelledby="title">
       <div class="brand">
@@ -137,20 +73,31 @@ cat > /home/steven/hotel_dashboard/public/login.html <<'HTML'
       </div>
 
       <div class="content">
-        <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte Benutzernamen oder Passwort prüfen.</div>
+        <div class="error" id="err" role="alert" aria-live="assertive">
+          Anmeldung fehlgeschlagen. Bitte Benutzernamen oder Passwort prüfen.
+        </div>
 
         <form action="/login" method="POST" id="loginForm" autocomplete="on" novalidate>
+          <!-- Anti-CSRF (vom Server befüllen, z. B. per Template/Express) -->
+          <input type="hidden" name="csrf" id="csrf" value="">
+
+          <!-- Optionales Weiterleitungsziel (?next=/ibelsa.html) -->
+          <input type="hidden" name="next" id="next" value="">
+
           <div>
             <label for="username">Benutzername</label>
             <div class="field">
-              <input id="username" name="username" type="text" inputmode="email" autocomplete="username" placeholder="z. B. admin" required />
+              <input id="username" name="username" type="text" inputmode="email"
+                     autocomplete="username" placeholder="z. B. admin" required
+                     autocapitalize="none" spellcheck="false" />
             </div>
           </div>
 
           <div>
             <label for="password">Passwort</label>
             <div class="field">
-              <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required />
+              <input id="password" name="password" type="password" autocomplete="current-password"
+                     placeholder="••••••••" required />
               <button class="icon" type="button" id="togglePw" aria-label="Passwort ein-/ausblenden">👁️</button>
             </div>
             <div class="caps" id="caps">Warnung: Feststelltaste ist aktiv.</div>
@@ -184,9 +131,16 @@ cat > /home/steven/hotel_dashboard/public/login.html <<'HTML'
     const e  = document.getElementById('err');
     const c  = document.getElementById('caps');
     const tp = document.getElementById('togglePw');
+    const nextField = document.getElementById('next');
+    const csrfField = document.getElementById('csrf');
 
     // Fehlermeldung anzeigen, wenn ?e=1 an URL
-    if (new URLSearchParams(location.search).get('e') === '1') {
+    const params = new URLSearchParams(location.search);
+    if (params.get('e') === '1') e.style.display = 'block';
+
+    // Optionaler Message-Text ?m=Hinweis
+    if (params.get('m')) {
+      e.textContent = params.get('m');
       e.style.display = 'block';
     }
 
@@ -204,6 +158,7 @@ cat > /home/steven/hotel_dashboard/public/login.html <<'HTML'
     tp.addEventListener('click', ()=>{
       const t = p.getAttribute('type') === 'password' ? 'text' : 'password';
       p.setAttribute('type', t);
+      tp.setAttribute('aria-pressed', t === 'text' ? 'true' : 'false');
     });
 
     // Button aktivieren, wenn beides gefüllt
@@ -214,11 +169,22 @@ cat > /home/steven/hotel_dashboard/public/login.html <<'HTML'
     p.addEventListener('input', updateState);
     updateState();
 
+    // Enter-Submit nur wenn gültig
+    f.addEventListener('keydown', (ev)=>{
+      if (ev.key === 'Enter' && s.disabled) { ev.preventDefault(); }
+    });
+
     // Doppelklick/Mehrfachsubmit verhindern
     f.addEventListener('submit', ()=>{
       s.disabled = true;
     });
+
+    // Hidden Felder befüllen
+    // Zielseite: Standard wird serverseitig auf /public/ibelsa.html weitergeleitet
+    if (params.get('next')) nextField.value = params.get('next');
+
+    // CSRF vom Server per Template/Inline-Script setzen, z. B.:
+    // csrfField.value = window.__CSRF || "";
   </script>
 </body>
 </html>
-HTML
