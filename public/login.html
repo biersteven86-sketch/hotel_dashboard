@@ -1,42 +1,222 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login</title>
+  <meta name="color-scheme" content="light dark">
+  <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
   <style>
-    html,body{height:100%;margin:0}
+    :root{
+      --bg: #0b1020;
+      --glass: rgba(255,255,255,.10);
+      --glass-strong: rgba(255,255,255,.18);
+      --stroke: rgba(255,255,255,.25);
+      --text: #eef2ff;
+      --muted: #b7c0d8;
+      --accent: #7c5cff;
+      --accent-2:#38bdf8;
+      --ok:#10b981;
+      --danger:#ef4444;
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      font-family: Arial, sans-serif;
-      display:flex;align-items:center;justify-content:center;
-      background: #0d0d0d url('/hotel-dashboard-bg.jpg') center/cover no-repeat fixed;
+      margin:0; font:16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background: var(--bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
-    .login-container{
-      background: rgba(255,255,255,.92);
-      width: 100%; max-width: 380px; padding: 26px;
-      border-radius: 12px; box-shadow: 0 8px 18px rgba(0,0,0,.25);
-      text-align:center;
+
+    /* Overlay + subtle vignette */
+    body::before{
+      content:""; position:fixed; inset:0;
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(124,92,255,.20), transparent 60%),
+        radial-gradient(1200px 600px at 90% 90%, rgba(56,189,248,.18), transparent 60%),
+        linear-gradient(to bottom right, rgba(0,0,0,.25), rgba(0,0,0,.35));
+      pointer-events:none;
     }
-    .login-container h1{margin:0 0 18px;color:#222}
-    .login-container input{
-      width:100%; padding:12px 14px; margin: 10px 0;
-      border:1px solid #ccc; border-radius:8px; font-size:16px;
+
+    .wrap{
+      min-height:100%;
+      display:grid;
+      place-items:center;
+      padding:clamp(20px, 4vw, 60px);
     }
-    .login-container button{
-      width:100%; padding:12px; margin-top:8px; border:none;
-      border-radius:8px; background:#1976d2; color:#fff; font-size:16px; cursor:pointer;
+
+    .card{
+      width:min(420px, 92vw);
+      border-radius:var(--radius);
+      background: linear-gradient(180deg, var(--glass), rgba(255,255,255,.06));
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      overflow:hidden;
     }
-    .login-container button:hover{background:#1159a3}
+
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      padding:22px 22px 8px 22px;
+    }
+    .logo{
+      width:42px; height:42px; border-radius:10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 8px 20px rgba(124,92,255,.4), inset 0 0 20px rgba(255,255,255,.15);
+    }
+    .brand h1{
+      margin:0; font-size:20px; letter-spacing:.2px; font-weight:700;
+    }
+    .brand p{
+      margin:2px 0 0 0; font-size:13px; color:var(--muted);
+    }
+
+    .content{ padding:20px 22px 24px 22px; }
+
+    form{ display:grid; gap:14px; }
+
+    label{ font-size:13px; color:var(--muted); display:block; margin:0 0 6px; }
+
+    .field{
+      position:relative;
+      background: var(--glass-strong);
+      border:1px solid var(--stroke);
+      border-radius:14px;
+      display:flex; align-items:center;
+      padding:10px 12px;
+    }
+    .field input{
+      flex:1; background:transparent; border:0; outline:0; color:var(--text);
+      font-size:15px; padding:6px 2px;
+    }
+    .field button.icon{
+      all:unset; cursor:pointer; padding:6px 8px; border-radius:10px;
+    }
+    .field button.icon:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+    .row{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:4px;}
+    .row .left{ display:flex; align-items:center; gap:10px; color:var(--muted); font-size:13px; }
+    .caps{ display:none; color:var(--danger); font-size:12px; }
+    .error{ display:none; background:rgba(239,68,68,.14); border:1px solid rgba(239,68,68,.45); color:#fecaca; padding:10px 12px; border-radius:12px; font-size:13px;}
+
+    .submit{
+      margin-top:6px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color:white; border:0; border-radius:14px; padding:12px 16px;
+      font-weight:700; font-size:15px; cursor:pointer;
+      box-shadow: 0 10px 24px rgba(124,92,255,.35);
+      transition: transform .08s ease;
+    }
+    .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none; }
+    .submit:active{ transform: translateY(1px) scale(.997); }
+
+    .foot{
+      text-align:center; color:var(--muted); font-size:12px; padding:12px 18px 18px;
+    }
+    a.muted{ color:var(--muted); text-decoration:none; border-bottom:1px dashed rgba(255,255,255,.25); }
+    a.muted:hover{ color:var(--text); border-bottom-color: rgba(255,255,255,.45); }
+
+    @media (max-width:380px){
+      .brand h1{ font-size:18px; }
+      .brand p{ font-size:12px; }
+    }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <h1>Login</h1>
-    <form method="POST" action="/login">
-      <input type="text"     name="username" placeholder="Benutzername" required />
-      <input type="password" name="password" placeholder="Passwort"     required />
-      <button type="submit">Anmelden</button>
-    </form>
+  <div class="wrap">
+    <div class="card" role="form" aria-labelledby="title">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1 id="title">Hotel-Dashboard</h1>
+          <p>Bitte anmelden</p>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte Benutzernamen oder Passwort prüfen.</div>
+
+        <form action="/login" method="POST" id="loginForm" autocomplete="on" novalidate>
+          <div>
+            <label for="username">Benutzername</label>
+            <div class="field">
+              <input id="username" name="username" type="text" inputmode="email" autocomplete="username" placeholder="z. B. admin" required />
+            </div>
+          </div>
+
+          <div>
+            <label for="password">Passwort</label>
+            <div class="field">
+              <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required />
+              <button class="icon" type="button" id="togglePw" aria-label="Passwort ein-/ausblenden">👁️</button>
+            </div>
+            <div class="caps" id="caps">Warnung: Feststelltaste ist aktiv.</div>
+          </div>
+
+          <div class="row">
+            <div class="left">
+              <input type="checkbox" id="remember" disabled aria-disabled="true">
+              <label for="remember" title="Sessions werden serverseitig verwaltet">Angemeldet bleiben</label>
+            </div>
+          </div>
+
+          <button class="submit" id="submitBtn" type="submit" disabled>Anmelden</button>
+        </form>
+      </div>
+
+      <div class="foot">
+        <small>© <span id="y"></span> Hotel-Dashboard · <a class="muted" href="/status">Status</a></small>
+      </div>
+    </div>
   </div>
+
+  <script>
+    // Jahr
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    const f  = document.getElementById('loginForm');
+    const u  = document.getElementById('username');
+    const p  = document.getElementById('password');
+    const s  = document.getElementById('submitBtn');
+    const e  = document.getElementById('err');
+    const c  = document.getElementById('caps');
+    const tp = document.getElementById('togglePw');
+
+    // Fehlermeldung anzeigen, wenn ?e=1 an URL
+    if (new URLSearchParams(location.search).get('e') === '1') {
+      e.style.display = 'block';
+    }
+
+    // Caps-Lock Hinweis
+    ['keydown','keyup'].forEach(evt=>{
+      p.addEventListener(evt, (ev)=>{
+        try {
+          const on = ev.getModifierState && ev.getModifierState('CapsLock');
+          c.style.display = on ? 'block' : 'none';
+        } catch(_) {}
+      });
+    });
+
+    // Passwort Sichtbarkeit
+    tp.addEventListener('click', ()=>{
+      const t = p.getAttribute('type') === 'password' ? 'text' : 'password';
+      p.setAttribute('type', t);
+    });
+
+    // Button aktivieren, wenn beides gefüllt
+    const updateState = ()=>{
+      s.disabled = !(u.value.trim().length && p.value.trim().length);
+    };
+    u.addEventListener('input', updateState);
+    p.addEventListener('input', updateState);
+    updateState();
+
+    // Doppelklick/Mehrfachsubmit verhindern
+    f.addEventListener('submit', ()=>{
+      s.disabled = true;
+    });
+  </script>
 </body>
 </html>
