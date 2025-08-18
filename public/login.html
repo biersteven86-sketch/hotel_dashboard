@@ -1,222 +1,210 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
   <title>Login</title>
-  <meta name="color-scheme" content="light dark">
-  <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
     :root{
-      --bg: #0b1020;
-      --glass: rgba(255,255,255,.10);
-      --glass-strong: rgba(255,255,255,.18);
-      --stroke: rgba(255,255,255,.25);
-      --text: #eef2ff;
-      --muted: #b7c0d8;
-      --accent: #7c5cff;
-      --accent-2:#38bdf8;
-      --ok:#10b981;
-      --danger:#ef4444;
-      --shadow: 0 10px 30px rgba(0,0,0,.45);
-      --radius: 18px;
+      --bg:#0d0f14;
+      --panel:#111520;
+      --panel-2:#0c1018;
+      --text:#e9eef5;
+      --muted:#97a3b6;
+      --accent:#6ea8ff;
+      --accent-2:#7a5cff;
+      --ok:#2ecc71;
+      --err:#ff5c5c;
+      --radius:16px;
+      --shadow:0 10px 35px rgba(0,0,0,.45);
     }
+
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; font:16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      margin:0;
+      font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, "Noto Sans", sans-serif;
       color:var(--text);
-      background: var(--bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
-    }
-
-    /* Overlay + subtle vignette */
-    body::before{
-      content:""; position:fixed; inset:0;
-      background:
-        radial-gradient(1200px 600px at 10% 10%, rgba(124,92,255,.20), transparent 60%),
-        radial-gradient(1200px 600px at 90% 90%, rgba(56,189,248,.18), transparent 60%),
-        linear-gradient(to bottom right, rgba(0,0,0,.25), rgba(0,0,0,.35));
-      pointer-events:none;
+      background:radial-gradient(1200px 800px at 10% 0%, #141a26 0%, #0b0f16 60%, #070a0f 100%);
+      /* Falls du bereits ein Hintergrundbild nutzt, kommentiere die nächste Zeile ein und passe den Pfad an */
+      /* background: url('/hotel-dashboard-bg.jpg') center/cover no-repeat fixed; */
     }
 
     .wrap{
       min-height:100%;
       display:grid;
       place-items:center;
-      padding:clamp(20px, 4vw, 60px);
+      padding:48px 16px;
     }
 
     .card{
-      width:min(420px, 92vw);
+      width:min(440px, 92vw);
+      background:linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+      border:1px solid rgba(255,255,255,.06);
       border-radius:var(--radius);
-      background: linear-gradient(180deg, var(--glass), rgba(255,255,255,.06));
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border:1px solid var(--stroke);
-      box-shadow: var(--shadow);
+      box-shadow:var(--shadow);
       overflow:hidden;
     }
 
+    /* === BRAND / LOGO === */
     .brand{
-      display:flex; align-items:center; gap:12px;
-      padding:22px 22px 8px 22px;
-    }
-    .logo{
-      width:42px; height:42px; border-radius:10px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      box-shadow: 0 8px 20px rgba(124,92,255,.4), inset 0 0 20px rgba(255,255,255,.15);
-    }
-    .brand h1{
-      margin:0; font-size:20px; letter-spacing:.2px; font-weight:700;
-    }
-    .brand p{
-      margin:2px 0 0 0; font-size:13px; color:var(--muted);
+      display:flex;
+      align-items:center;
+      gap:16px;
+      padding:28px 28px 16px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      background:
+        radial-gradient(600px 200px at -10% -40%, rgba(122,92,255,.18), transparent 60%),
+        radial-gradient(400px 200px at 110% -40%, rgba(110,168,255,.18), transparent 60%);
     }
 
-    .content{ padding:20px 22px 24px 22px; }
+    .badge{
+      flex:0 0 auto;
+      width:56px;height:56px;
+      border-radius:14px;
+      display:grid;place-items:center;
+      font-weight:800;
+      letter-spacing:.5px;
+      background:
+        conic-gradient(from -40deg, var(--accent), var(--accent-2), var(--accent));
+      color:white;
+      box-shadow:0 8px 24px rgba(110,168,255,.35), inset 0 0 18px rgba(255,255,255,.2);
+      border:1px solid rgba(255,255,255,.28);
+      text-shadow:0 1px 0 rgba(0,0,0,.35);
+    }
+    .badge span{ font-size:22px; }
 
-    form{ display:grid; gap:14px; }
+    .wordmark{
+      line-height:1.05;
+      font-weight:900;
+      letter-spacing:0.4px;
+    }
+    .wordmark .line1{
+      font-size:15px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:1.6px;
+    }
+    .wordmark .line2{
+      font-size:26px;
+      background:linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 60%, #a889ff 100%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      text-shadow:0 0 0 rgba(0,0,0,0);
+    }
 
-    label{ font-size:13px; color:var(--muted); display:block; margin:0 0 6px; }
+    .body{
+      padding:24px 28px 28px;
+    }
+
+    .hint{
+      color:var(--muted);
+      font-size:14px;
+      margin:0 0 18px 0;
+    }
 
     .field{
-      position:relative;
-      background: var(--glass-strong);
-      border:1px solid var(--stroke);
-      border-radius:14px;
-      display:flex; align-items:center;
-      padding:10px 12px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin:12px 0;
     }
-    .field input{
-      flex:1; background:transparent; border:0; outline:0; color:var(--text);
-      font-size:15px; padding:6px 2px;
+    .label{
+      color:var(--muted);
+      font-size:13px;
+      letter-spacing:.3px;
     }
-    .field button.icon{
-      all:unset; cursor:pointer; padding:6px 8px; border-radius:10px;
+    .input{
+      background:#0c1018;
+      border:1px solid rgba(255,255,255,.08);
+      color:var(--text);
+      padding:12px 14px;
+      border-radius:12px;
+      outline:none;
+      transition:.18s border-color ease,.18s box-shadow ease;
     }
-    .field button.icon:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+    .input:focus{
+      border-color:rgba(110,168,255,.65);
+      box-shadow:0 0 0 4px rgba(110,168,255,.15);
+    }
 
-    .row{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:4px;}
-    .row .left{ display:flex; align-items:center; gap:10px; color:var(--muted); font-size:13px; }
-    .caps{ display:none; color:var(--danger); font-size:12px; }
-    .error{ display:none; background:rgba(239,68,68,.14); border:1px solid rgba(239,68,68,.45); color:#fecaca; padding:10px 12px; border-radius:12px; font-size:13px;}
-
-    .submit{
-      margin-top:6px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color:white; border:0; border-radius:14px; padding:12px 16px;
-      font-weight:700; font-size:15px; cursor:pointer;
-      box-shadow: 0 10px 24px rgba(124,92,255,.35);
-      transition: transform .08s ease;
+    .actions{
+      margin-top:18px;
+      display:flex;
+      align-items:center;
+      gap:12px;
     }
-    .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none; }
-    .submit:active{ transform: translateY(1px) scale(.997); }
-
-    .foot{
-      text-align:center; color:var(--muted); font-size:12px; padding:12px 18px 18px;
+    .btn{
+      appearance:none;
+      border:0;
+      cursor:pointer;
+      padding:12px 16px;
+      border-radius:12px;
+      font-weight:700;
+      letter-spacing:.3px;
+      background:linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+      color:white;
+      box-shadow:0 10px 22px rgba(110,168,255,.25);
+      transition:transform .08s ease, filter .18s ease;
     }
-    a.muted{ color:var(--muted); text-decoration:none; border-bottom:1px dashed rgba(255,255,255,.25); }
-    a.muted:hover{ color:var(--text); border-bottom-color: rgba(255,255,255,.45); }
+    .btn:active{ transform:translateY(1px); }
+    .ghost{
+      background:transparent;
+      color:var(--muted);
+      border:1px solid rgba(255,255,255,.12);
+    }
 
-    @media (max-width:380px){
-      .brand h1{ font-size:18px; }
-      .brand p{ font-size:12px; }
+    .footer{
+      padding:14px 20px 20px;
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+      border-top:1px solid rgba(255,255,255,.06);
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card" role="form" aria-labelledby="title">
-      <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
-        <div>
-          <h1 id="title">Hotel-Dashboard</h1>
-          <p>Bitte anmelden</p>
+  <main class="wrap" aria-label="Login">
+    <section class="card" role="region" aria-labelledby="brand-title">
+      <header class="brand">
+        <div class="badge" aria-hidden="true"><span>HD</span></div>
+        <div class="wordmark">
+          <div id="brand-title" class="line1">Hotel‑Dashboard</div>
+          <div class="line2">Login</div>
         </div>
-      </div>
+      </header>
 
-      <div class="content">
-        <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte Benutzernamen oder Passwort prüfen.</div>
+      <div class="body">
+        <p class="hint">Bitte melde dich mit deinen Zugangsdaten an.</p>
 
-        <form action="/login" method="POST" id="loginForm" autocomplete="on" novalidate>
-          <div>
-            <label for="username">Benutzername</label>
-            <div class="field">
-              <input id="username" name="username" type="text" inputmode="email" autocomplete="username" placeholder="z. B. admin" required />
-            </div>
+        <form action="/login" method="post" autocomplete="off">
+          <div class="field">
+            <label class="label" for="username">Benutzername</label>
+            <input class="input" id="username" name="username" type="text" required>
           </div>
 
-          <div>
-            <label for="password">Passwort</label>
-            <div class="field">
-              <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required />
-              <button class="icon" type="button" id="togglePw" aria-label="Passwort ein-/ausblenden">👁️</button>
-            </div>
-            <div class="caps" id="caps">Warnung: Feststelltaste ist aktiv.</div>
+          <div class="field">
+            <label class="label" for="password">Passwort</label>
+            <input class="input" id="password" name="password" type="password" required>
           </div>
 
-          <div class="row">
-            <div class="left">
-              <input type="checkbox" id="remember" disabled aria-disabled="true">
-              <label for="remember" title="Sessions werden serverseitig verwaltet">Angemeldet bleiben</label>
-            </div>
+          <div class="actions">
+            <button class="btn" type="submit">Anmelden</button>
+            <button class="btn ghost" type="reset">Zurücksetzen</button>
           </div>
-
-          <button class="submit" id="submitBtn" type="submit" disabled>Anmelden</button>
         </form>
       </div>
 
-      <div class="foot">
-        <small>© <span id="y"></span> Hotel-Dashboard · <a class="muted" href="/status">Status</a></small>
+      <div class="footer">
+        © <span id="year"></span> Hotel‑Dashboard · Alle Rechte vorbehalten
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 
   <script>
-    // Jahr
-    document.getElementById('y').textContent = new Date().getFullYear();
-
-    const f  = document.getElementById('loginForm');
-    const u  = document.getElementById('username');
-    const p  = document.getElementById('password');
-    const s  = document.getElementById('submitBtn');
-    const e  = document.getElementById('err');
-    const c  = document.getElementById('caps');
-    const tp = document.getElementById('togglePw');
-
-    // Fehlermeldung anzeigen, wenn ?e=1 an URL
-    if (new URLSearchParams(location.search).get('e') === '1') {
-      e.style.display = 'block';
-    }
-
-    // Caps-Lock Hinweis
-    ['keydown','keyup'].forEach(evt=>{
-      p.addEventListener(evt, (ev)=>{
-        try {
-          const on = ev.getModifierState && ev.getModifierState('CapsLock');
-          c.style.display = on ? 'block' : 'none';
-        } catch(_) {}
-      });
-    });
-
-    // Passwort Sichtbarkeit
-    tp.addEventListener('click', ()=>{
-      const t = p.getAttribute('type') === 'password' ? 'text' : 'password';
-      p.setAttribute('type', t);
-    });
-
-    // Button aktivieren, wenn beides gefüllt
-    const updateState = ()=>{
-      s.disabled = !(u.value.trim().length && p.value.trim().length);
-    };
-    u.addEventListener('input', updateState);
-    p.addEventListener('input', updateState);
-    updateState();
-
-    // Doppelklick/Mehrfachsubmit verhindern
-    f.addEventListener('submit', ()=>{
-      s.disabled = true;
-    });
+    document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
