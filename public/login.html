@@ -1,145 +1,222 @@
-# 1) Backup
-cp /home/steven/hotel_dashboard/public/login.html /home/steven/hotel_dashboard/public/login.backup_$(date +%F_%H-%M-%S).html 2>/dev/null || true
-
-# 2) Neue Version schreiben
 cat > /home/steven/hotel_dashboard/public/login.html <<'HTML'
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login</title>
-  <link rel="icon" href="/favicon.ico">
+  <meta name="color-scheme" content="light dark">
+  <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
   <style>
     :root{
-      --bg-overlay: rgba(0,0,0,.35);
-      --card-bg: rgba(255,255,255,.96);
-      --txt: #0c0f14;
-      --muted: #5b6472;
-      --accent: #6c5ce7;     /* edles Violett */
-      --accent-2: #00d2ff;   /* Cyan Akzent */
-      --radius: 14px;
-      --shadow: 0 12px 32px rgba(0,0,0,.18);
-      --focus: 0 0 0 3px rgba(108,92,231,.25);
+      --bg: #0b1020;
+      --glass: rgba(255,255,255,.10);
+      --glass-strong: rgba(255,255,255,.18);
+      --stroke: rgba(255,255,255,.25);
+      --text: #eef2ff;
+      --muted: #b7c0d8;
+      --accent: #7c5cff;
+      --accent-2:#38bdf8;
+      --ok:#10b981;
+      --danger:#ef4444;
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+      --radius: 18px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0;
-      color:var(--txt);
-      font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;
-      background:#111;
-      /* Scharfer Hintergrund – kein Blur */
-      background-image:
-        linear-gradient( to bottom right, rgba(0,0,0,.25), rgba(0,0,0,.25) ),
-        url('/hotel-dashboard-bg.jpg');
-      background-size:cover;
-      background-position:center;
-      background-attachment:fixed;
+      margin:0; font:16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background: var(--bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
-    .page{
+
+    /* Overlay + subtle vignette */
+    body::before{
+      content:""; position:fixed; inset:0;
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(124,92,255,.20), transparent 60%),
+        radial-gradient(1200px 600px at 90% 90%, rgba(56,189,248,.18), transparent 60%),
+        linear-gradient(to bottom right, rgba(0,0,0,.25), rgba(0,0,0,.35));
+      pointer-events:none;
+    }
+
+    .wrap{
       min-height:100%;
       display:grid;
       place-items:center;
-      padding:32px 16px;
-      position:relative;
+      padding:clamp(20px, 4vw, 60px);
     }
-    .overlay{
-      position:fixed; inset:0;
-      background:var(--bg-overlay);
-      pointer-events:none;
-    }
+
     .card{
-      width:min(440px, 92vw);
-      background:var(--card-bg);
+      width:min(420px, 92vw);
       border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:28px;
-      backdrop-filter:saturate(120%);
+      background: linear-gradient(180deg, var(--glass), rgba(255,255,255,.06));
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      overflow:hidden;
     }
+
     .brand{
-      display:flex; align-items:center; gap:12px; margin-bottom:18px;
+      display:flex; align-items:center; gap:12px;
+      padding:22px 22px 8px 22px;
     }
-    .brand .logo{
-      width:40px; height:40px; border-radius:10px;
-      background:linear-gradient(135deg, var(--accent), var(--accent-2));
+    .logo{
+      width:42px; height:42px; border-radius:10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 8px 20px rgba(124,92,255,.4), inset 0 0 20px rgba(255,255,255,.15);
     }
     .brand h1{
-      font-size:20px; margin:0; letter-spacing:.2px;
+      margin:0; font-size:20px; letter-spacing:.2px; font-weight:700;
     }
-    .sub{margin:6px 0 18px; color:var(--muted); font-size:14px}
-    form{display:grid; gap:14px; margin-top:4px}
-    label{font-size:14px; color:#263041}
-    input{
-      width:100%;
-      padding:12px 14px;
-      border:1px solid #dbe1ea;
-      border-radius:10px;
-      background:#fff;
-      outline:none;
-      transition:border-color .15s ease, box-shadow .15s ease;
-      font-size:16px;
+    .brand p{
+      margin:2px 0 0 0; font-size:13px; color:var(--muted);
     }
-    input:focus{border-color:var(--accent); box-shadow:var(--focus)}
-    .btn{
+
+    .content{ padding:20px 22px 24px 22px; }
+
+    form{ display:grid; gap:14px; }
+
+    label{ font-size:13px; color:var(--muted); display:block; margin:0 0 6px; }
+
+    .field{
+      position:relative;
+      background: var(--glass-strong);
+      border:1px solid var(--stroke);
+      border-radius:14px;
+      display:flex; align-items:center;
+      padding:10px 12px;
+    }
+    .field input{
+      flex:1; background:transparent; border:0; outline:0; color:var(--text);
+      font-size:15px; padding:6px 2px;
+    }
+    .field button.icon{
+      all:unset; cursor:pointer; padding:6px 8px; border-radius:10px;
+    }
+    .field button.icon:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+    .row{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:4px;}
+    .row .left{ display:flex; align-items:center; gap:10px; color:var(--muted); font-size:13px; }
+    .caps{ display:none; color:var(--danger); font-size:12px; }
+    .error{ display:none; background:rgba(239,68,68,.14); border:1px solid rgba(239,68,68,.45); color:#fecaca; padding:10px 12px; border-radius:12px; font-size:13px;}
+
+    .submit{
       margin-top:6px;
-      appearance:none; border:0; width:100%;
-      padding:12px 16px; border-radius:10px;
-      font-weight:600; font-size:16px; letter-spacing:.2px;
-      background:linear-gradient(135deg, var(--accent), var(--accent-2));
-      color:#fff; cursor:pointer;
-      transition:transform .08s ease, filter .2s ease;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color:white; border:0; border-radius:14px; padding:12px 16px;
+      font-weight:700; font-size:15px; cursor:pointer;
+      box-shadow: 0 10px 24px rgba(124,92,255,.35);
+      transition: transform .08s ease;
     }
-    .btn:hover{filter:brightness(.98)}
-    .btn:active{transform:translateY(1px)}
-    .row{display:grid; gap:6px}
-    .footer{
-      margin-top:14px; text-align:center; color:#eaf1ff; font-size:13px; opacity:.9;
+    .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none; }
+    .submit:active{ transform: translateY(1px) scale(.997); }
+
+    .foot{
+      text-align:center; color:var(--muted); font-size:12px; padding:12px 18px 18px;
     }
-    @media (prefers-color-scheme: dark){
-      .card{background:rgba(255,255,255,.98)}
+    a.muted{ color:var(--muted); text-decoration:none; border-bottom:1px dashed rgba(255,255,255,.25); }
+    a.muted:hover{ color:var(--text); border-bottom-color: rgba(255,255,255,.45); }
+
+    @media (max-width:380px){
+      .brand h1{ font-size:18px; }
+      .brand p{ font-size:12px; }
     }
   </style>
 </head>
 <body>
-  <div class="overlay"></div>
-  <main class="page" aria-label="Login-Bereich">
-    <section class="card" role="form" aria-labelledby="hdr">
+  <div class="wrap">
+    <div class="card" role="form" aria-labelledby="title">
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
-        <h1 id="hdr">Hotel‑Dashboard</h1>
+        <div>
+          <h1 id="title">Hotel-Dashboard</h1>
+          <p>Bitte anmelden</p>
+        </div>
       </div>
-      <p class="sub">Bitte anmelden, um fortzufahren.</p>
 
-      <form action="/login" method="post" autocomplete="on">
-        <div class="row">
-          <label for="username">Benutzername</label>
-          <input id="username" name="username" type="text" required
-                 inputmode="email" autocomplete="username"
-                 placeholder="z. B. admin oder info@…">
-        </div>
-        <div class="row">
-          <label for="password">Passwort</label>
-          <input id="password" name="password" type="password" required
-                 autocomplete="current-password" placeholder="••••••••">
-        </div>
-        <button class="btn" type="submit">Anmelden</button>
-      </form>
+      <div class="content">
+        <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte Benutzernamen oder Passwort prüfen.</div>
 
-      <p class="footer">
-        © <span id="y"></span> Hotel‑Dashboard · Sicher verbunden
-      </p>
-    </section>
-  </main>
+        <form action="/login" method="POST" id="loginForm" autocomplete="on" novalidate>
+          <div>
+            <label for="username">Benutzername</label>
+            <div class="field">
+              <input id="username" name="username" type="text" inputmode="email" autocomplete="username" placeholder="z. B. admin" required />
+            </div>
+          </div>
+
+          <div>
+            <label for="password">Passwort</label>
+            <div class="field">
+              <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required />
+              <button class="icon" type="button" id="togglePw" aria-label="Passwort ein-/ausblenden">👁️</button>
+            </div>
+            <div class="caps" id="caps">Warnung: Feststelltaste ist aktiv.</div>
+          </div>
+
+          <div class="row">
+            <div class="left">
+              <input type="checkbox" id="remember" disabled aria-disabled="true">
+              <label for="remember" title="Sessions werden serverseitig verwaltet">Angemeldet bleiben</label>
+            </div>
+          </div>
+
+          <button class="submit" id="submitBtn" type="submit" disabled>Anmelden</button>
+        </form>
+      </div>
+
+      <div class="foot">
+        <small>© <span id="y"></span> Hotel-Dashboard · <a class="muted" href="/status">Status</a></small>
+      </div>
+    </div>
+  </div>
 
   <script>
-    // Jahr automatisch setzen & kleines UX: Button beim Submit deaktivieren
+    // Jahr
     document.getElementById('y').textContent = new Date().getFullYear();
-    const form = document.querySelector('form');
-    form.addEventListener('submit', () => {
-      const btn = form.querySelector('.btn');
-      btn.disabled = true;
-      btn.textContent = 'Bitte warten…';
+
+    const f  = document.getElementById('loginForm');
+    const u  = document.getElementById('username');
+    const p  = document.getElementById('password');
+    const s  = document.getElementById('submitBtn');
+    const e  = document.getElementById('err');
+    const c  = document.getElementById('caps');
+    const tp = document.getElementById('togglePw');
+
+    // Fehlermeldung anzeigen, wenn ?e=1 an URL
+    if (new URLSearchParams(location.search).get('e') === '1') {
+      e.style.display = 'block';
+    }
+
+    // Caps-Lock Hinweis
+    ['keydown','keyup'].forEach(evt=>{
+      p.addEventListener(evt, (ev)=>{
+        try {
+          const on = ev.getModifierState && ev.getModifierState('CapsLock');
+          c.style.display = on ? 'block' : 'none';
+        } catch(_) {}
+      });
+    });
+
+    // Passwort Sichtbarkeit
+    tp.addEventListener('click', ()=>{
+      const t = p.getAttribute('type') === 'password' ? 'text' : 'password';
+      p.setAttribute('type', t);
+    });
+
+    // Button aktivieren, wenn beides gefüllt
+    const updateState = ()=>{
+      s.disabled = !(u.value.trim().length && p.value.trim().length);
+    };
+    u.addEventListener('input', updateState);
+    p.addEventListener('input', updateState);
+    updateState();
+
+    // Doppelklick/Mehrfachsubmit verhindern
+    f.addEventListener('submit', ()=>{
+      s.disabled = true;
     });
   </script>
 </body>
