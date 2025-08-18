@@ -29,9 +29,7 @@ const loginLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false
 });
-// Rate-Limit nur für POST /login (nicht für GET)
-// app.use('/login', loginLimiter);
-
+app.use('/login', loginLimiter);
 
 // Statische Dateien
 const publicDir = path.join(__dirname, 'public');
@@ -53,11 +51,11 @@ app.get('/login',  (_req, res) => res.sendFile(path.join(publicDir, 'login.html'
 app.get('/status', (_req, res) => res.sendFile(path.join(publicDir, 'status.html')));
 app.get('/ibelsa', (_req, res) => res.sendFile(path.join(publicDir, 'ibelsa.html')));
 app.get('/index',  (_req, res) => res.sendFile(path.join(publicDir, 'index.html')));
-// optional: /index.html -> /index
+// optional: /index.html → /index (damit nie „.html“ sichtbar ist)
 app.get('/index.html', (_req, res) => res.redirect('/index'));
 
 // 3) Login prüfen
-app.post('/login', loginLimiter, (req, res) => {
+app.post('/login', (req, res) => {
   const { username, password } = req.body || {};
   const {
     DASH_USER,  DASH_PASS,

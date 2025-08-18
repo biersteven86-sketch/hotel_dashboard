@@ -1,27 +1,31 @@
+cat > ~/hotel_dashboard/public/login.html <<'EOF'
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel-Dashboard Login</title>
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
       height: 100vh;
-      background: url("/hotel_dashboard_background.jpg") no-repeat center center fixed;
-      background-size: cover;
       display: flex;
       justify-content: center;
       align-items: center;
+      font-family: Arial, sans-serif;
+      background: url('background.jpg') no-repeat center center/cover;
     }
+
     .login-container {
+      width: 360px;
+      padding: 40px;
       background: rgba(255, 255, 255, 0.95);
       border-radius: 12px;
-      padding: 40px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-      width: 350px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
       text-align: center;
+      animation: fadeIn 0.8s ease-in-out;
     }
+
     .logo {
       font-size: 28px;
       font-weight: 800;
@@ -29,9 +33,10 @@
       background: linear-gradient(90deg, #4A00E0, #8E2DE2);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      letter-spacing: 1.5px;
       text-transform: uppercase;
+      letter-spacing: 1.5px;
     }
+
     .login-container input {
       width: 100%;
       padding: 12px;
@@ -40,20 +45,27 @@
       border-radius: 8px;
       font-size: 14px;
     }
+
     .login-container button {
       width: 100%;
       padding: 12px;
-      background: linear-gradient(90deg, #8E2DE2, #4A00E0);
+      background: linear-gradient(90deg, #4A00E0, #8E2DE2);
       border: none;
       border-radius: 8px;
       color: white;
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: background 0.3s;
     }
+
     .login-container button:hover {
-      transform: scale(1.05);
+      background: linear-gradient(90deg, #5A00F0, #9E3DF2);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -68,3 +80,4 @@
   </div>
 </body>
 </html>
+EOF
