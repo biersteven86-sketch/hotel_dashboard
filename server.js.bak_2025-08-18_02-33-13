@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const rateLimit = require('express-rate-limit');
-require('dotenv').config({ quiet: true });
+require('dotenv').config();
 
 const app  = express();
 const PORT = process.env.PORT || 3011;
