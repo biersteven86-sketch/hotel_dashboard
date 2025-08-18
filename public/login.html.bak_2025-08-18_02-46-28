@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <style>
+    :root{
+      --bg-image: url('/hotel-dashboard-bg.jpg');
+      --box-bg: #ffffff;
+      --box-shadow: 0 8px 16px rgba(0,0,0,.25);
+      --radius: 12px;
+      --accent: #2575fc;
+      --accent-hover: #1a5ed6;
+      --text: #333;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; padding:0;
+      display:flex; align-items:center; justify-content:center;
+      font-family: Arial, Helvetica, sans-serif;
+      background-image: var(--bg-image);         /* knallhart: nur Bild */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    .login-container{
+      width: min(92vw, 340px);
+      background: var(--box-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--box-shadow);
+      padding: 24px 24px 20px;
+      text-align:center;
+    }
+    h2{ margin:0 0 16px; color:var(--text); font-weight:700 }
+    .field{
+      margin: 10px 0;
+      text-align:left;
+    }
+    label{
+      display:block; font-size:.9rem; color:#555; margin-bottom:6px;
+    }
+    input[type="text"], input[type="password"]{
+      width:100%; padding:10px 12px; border:1px solid #ccc; border-radius:8px; font-size:1rem;
+    }
+    button{
+      width:100%; padding:12px; margin-top:12px;
+      background: var(--accent); color:#fff; border:0; border-radius:8px; font-size:1rem; cursor:pointer;
+    }
+    button:hover{ background: var(--accent-hover); }
+    .msg{
+      margin-top:10px; font-size:.9rem; color:#c00; min-height:1.2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Login</h2>
+    <form method="POST" action="/login">
+      <div class="field">
+        <label for="username">Benutzername</label>
+        <input id="username" name="username" type="text" placeholder="z.B. admin" required>
+      </div>
+      <div class="field">
+        <label for="password">Passwort</label>
+        <input id="password" name="password" type="password" placeholder="Passwort" required>
+      </div>
+      <button type="submit">Anmelden</button>
+      <div class="msg">
+        <!-- Optional: Anzeige bei Fehlversuch -->
+        <script>
+          const p=new URLSearchParams(location.search);
+          if(p.get('ok')==='false'){document.currentScript.parentElement.textContent='Login fehlgeschlagen. Bitte erneut versuchen.';}
+          if(p.get('logged_out')==='1'){document.currentScript.parentElement.textContent='Abgemeldet.';}
+        </script>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
