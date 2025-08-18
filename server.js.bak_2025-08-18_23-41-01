@@ -3,12 +3,10 @@ const express   = require('express');
 const path      = require('path');
 const session   = require('express-session');
 const rateLimit = require('express-rate-limit');
-const os        = require('os');
 require('dotenv').config({ quiet: true });
 
 const app  = express();
 const PORT = process.env.PORT || 3011;
-const publicDir = path.join(__dirname, 'public');
 
 app.set('trust proxy', 1);
 
@@ -24,7 +22,7 @@ app.use(session({
   cookie: { httpOnly: true, sameSite: 'lax', secure: false, maxAge: 60 * 60 * 1000 }
 }));
 
-// Rate-Limit NUR für POST /login
+// Rate Limit NUR für POST /login
 const loginLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 50,
@@ -32,13 +30,16 @@ const loginLimiter = rateLimit({
   legacyHeaders: false
 });
 
-// Static (ohne Auto-Index)
+// Static
+const publicDir = path.join(__dirname, 'public');
 app.use(express.static(publicDir, { index: false }));
 
 // Domain-Root → /login
 app.use((req, res, next) => {
-  if ((req.hostname === 'hotel-dashboard.de' || req.hostname === 'www.hotel-dashboard.de') &&
-      (req.path === '/' || req.path === '')) return res.redirect('/login');
+  if (
+    (req.hostname === 'hotel-dashboard.de' || req.hostname === 'www.hotel-dashboard.de') &&
+    (req.path === '/' || req.path === '')
+  ) return res.redirect('/login');
   next();
 });
 
@@ -48,15 +49,26 @@ app.get('/health', (_req, res) => res.type('text').send('OK'));
 // Root → /login
 app.get('/', (_req, res) => res.redirect('/login'));
 
-// Seiten (wichtig: absoluter Pfad via path.join)
-app.get('/login',  (_req, res, next) => res.sendFile(path.join(publicDir, 'login.html'),  err => err ? next(err) : undefined));
-app.head('/login', (_req, res) => res.status(200).end()); // manche Umgebungen mappen HEAD nicht
-app.get('/status', (_req, res, next) => res.sendFile(path.join(publicDir, 'status.html'), err => err ? next(err) : undefined));
-app.get('/ibelsa', (_req, res, next) => res.sendFile(path.join(publicDir, 'ibelsa.html'),  err => err ? next(err) : undefined));
-app.get('/index',  (_req, res, next) => res.sendFile(path.join(publicDir, 'index.html'),   err => err ? next(err) : undefined));
+// /login robust bedienen (explicit GET) + HEAD sauber beantworten
+const loginFile = path.join(publicDir, 'login.html');
+app.get('/login', (_req, res, next) => {
+  res.sendFile(loginFile, (err) => {
+    if (err) {
+      console.error('[sendFile:/login] Fehler:', err.code, err.message, '— file:', loginFile);
+      next(err);
+    }
+  });
+});
+// Einige Umgebungen mappen HEAD nicht automatisch → explizit:
+app.head('/login', (_req, res) => res.status(200).end());
+
+app.get('/status', (_req, res, next) => res.sendFile(path.join(publicDir, 'status.html'), next));
+app.get('/ibelsa',  (_req, res, next) => res.sendFile(path.join(publicDir, 'ibelsa.html'),  next));
+app.get('/index',   (_req, res, next) => res.sendFile(path.join(publicDir, 'index.html'),   next));
+// /index.html → /index
 app.get('/index.html', (_req, res) => res.redirect('/index'));
 
-// Login prüfen (unverändert)
+// Login prüfen
 app.post('/login', loginLimiter, (req, res) => {
   const { username, password } = req.body || {};
   const { DASH_USER, DASH_PASS, ADMIN_USER, ADMIN_PASS, IBELSA_USER, IBELSA_PASS } = process.env;
@@ -72,7 +84,7 @@ app.post('/login', loginLimiter, (req, res) => {
   return res.redirect('/after-login');
 });
 
-// Nach Login: Admin → /index, andere → /ibelsa (unverändert)
+// After-Login Redirect
 app.get('/after-login', (req, res) => {
   const u = (req.session && req.session.user) ? String(req.session.user) : '';
   const adminUser = (process.env.ADMIN_USER || 'admin').toLowerCase();
@@ -80,27 +92,17 @@ app.get('/after-login', (req, res) => {
   return res.redirect('/ibelsa');
 });
 
-// 404 → Login
-app.use((_req, res, next) => {
-  res.status(404).sendFile(path.join(publicDir, 'login.html'), err => err ? next(err) : undefined);
-});
+// 404 → login
+app.use((_req, res) => res.status(404).sendFile(loginFile));
 
-// Fehler-Handler (zeigt 500 im Log statt leerer Seite)
+// Error-Handler (zeigt 500 im Log)
 app.use((err, _req, res, _next) => {
-  console.error('[ERROR]', err && (err.stack || err));
+  console.error('[ERROR]', err.stack || err);
   res.status(500).type('text').send('Serverfehler');
 });
 
-// Start-Log mit URLs
-function lanIP() {
-  const ifs = os.networkInterfaces();
-  for (const n of Object.keys(ifs)) for (const i of ifs[n] || [])
-    if (i && i.family === 'IPv4' && !i.internal) return i.address;
-  return '127.0.0.1';
-}
 app.listen(PORT, () => {
   console.log('Hotel-Dashboard läuft auf Port', PORT);
   console.log('  • publicDir:', publicDir);
-  console.log('  • LAN:   http://'+lanIP()+':'+PORT+'/');
-  console.log('  • Local: http://127.0.0.1:'+PORT+'/');
+  console.log('  • loginFile:', loginFile);
 });
