@@ -25,7 +25,17 @@ app.use('/login', loginLimiter);
 
 // Statische Dateien
 const publicDir = path.join(__dirname, 'public');
+// Root-Domain automatisch auf Login-Seite weiterleiten
+  res.redirect("/login");
+});
+
+app.get("/", (req, res) => { res.redirect("/login"); });
 app.use(express.static(publicDir));
+app.get("/login", (req,res)=>res.sendFile(path.join(publicDir,"login.html")));
+
+app.get("/ibelsa", (req,res)=>res.sendFile(path.join(publicDir,"ibelsa.html")));
+
+app.get("/status", (req,res)=>res.sendFile(path.join(publicDir,"status.html")));
 
 // Hilfsfunktion: wohin nach Login?
 function destinationFor(user) {
