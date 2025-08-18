@@ -1,9 +1,10 @@
+// /home/steven/hotel_dashboard/server.js  (CommonJS)
 const express   = require('express');
 const path      = require('path');
 const session   = require('express-session');
 const rateLimit = require('express-rate-limit');
 const os        = require('os');
-require('dotenv').config({ quiet: true });
+require('dotenv').config({ quiet: true });   // weniger Dotenv-Noise
 
 const app  = express();
 const PORT = process.env.PORT || 3011;
@@ -15,7 +16,7 @@ app.set('trust proxy', 1);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Sessions
+// Sessions (MemoryStore ok unter PM2, Einzelprozess)
 app.use(session({
   secret: process.env.SESSION_SECRET || 'change-me-please',
   resave: false,
@@ -31,10 +32,10 @@ const loginLimiter = rateLimit({
   legacyHeaders: false
 });
 
-// Statische Dateien
+// Statische Dateien (ohne auto-Index)
 app.use(express.static(publicDir, { index: false }));
 
-// Domain-Redirect
+// www → /login
 app.use((req, res, next) => {
   if ((req.hostname === 'hotel-dashboard.de' || req.hostname === 'www.hotel-dashboard.de') &&
       (req.path === '/' || req.path === '')) {
@@ -43,33 +44,38 @@ app.use((req, res, next) => {
   next();
 });
 
-// Root → Login
+// 1) Root immer zur Login-Seite
 app.get('/', (_req, res) => res.redirect('/login'));
 
-// Login/Status/Ibelsa/Index
+// 2) Lesbare Routen ohne .html
+//    sendFile mit { root } verhindert Path-Probleme
 app.get('/login',  (_req, res) => res.sendFile('login.html',  { root: publicDir }));
 app.get('/status', (_req, res) => res.sendFile('status.html', { root: publicDir }));
 app.get('/ibelsa', (_req, res) => res.sendFile('ibelsa.html', { root: publicDir }));
 app.get('/index',  (_req, res) => res.sendFile('index.html',  { root: publicDir }));
 app.get('/index.html', (_req, res) => res.redirect('/index'));
 
-// Login prüfen
+// 3) Login prüfen
 app.post('/login', loginLimiter, (req, res) => {
   const { username, password } = req.body || {};
-  const { DASH_USER, DASH_PASS, ADMIN_USER, ADMIN_PASS, IBELSA_USER, IBELSA_PASS } = process.env;
+  const {
+    DASH_USER,  DASH_PASS,
+    ADMIN_USER, ADMIN_PASS,
+    IBELSA_USER,IBELSA_PASS
+  } = process.env;
 
   const ok =
     (username === (DASH_USER   || '') && password === (DASH_PASS   || '')) ||
     (username === (ADMIN_USER  || '') && password === (ADMIN_PASS  || '')) ||
     (username === (IBELSA_USER || '') && password === (IBELSA_PASS || ''));
 
-  if (!ok) return res.redirect('/login?e=1');
+  if (!ok) return res.redirect('/login');
 
   req.session.user = username;
   return res.redirect('/after-login');
 });
 
-// After-Login Redirect
+// 4) Nach Login je nach User weiterleiten
 app.get('/after-login', (req, res) => {
   const u = (req.session && req.session.user) ? String(req.session.user) : '';
   const adminUser = (process.env.ADMIN_USER || 'admin').toLowerCase();
@@ -77,10 +83,13 @@ app.get('/after-login', (req, res) => {
   return res.redirect('/ibelsa');
 });
 
-// 404 → Login
+// kleine Health-Route für Tests
+app.get('/health', (_req, res) => res.type('text').send('OK'));
+
+// 404 → zurück zur Login-Seite
 app.use((_req, res) => res.status(404).sendFile('login.html', { root: publicDir }));
 
-// Helper: LAN-IP finden
+// Start + freundliche URLs ausgeben
 function getLanIPv4() {
   const ifs = os.networkInterfaces();
   for (const name of Object.keys(ifs)) {
