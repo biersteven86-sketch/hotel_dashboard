@@ -1,20 +1,20 @@
 // /home/steven/hotel_dashboard/server.js  (CommonJS)
-const express = require('express');
-const path = require('path');
-const session = require('express-session');
-const rateLimit = require('express-rate-limit');
-require('dotenv').config({ quiet: true });
+const express  = require('express');
+const path     = require('path');
+const session  = require('express-session');
+const rateLimit= require('express-rate-limit');
+require('dotenv').config({ quiet: true });   // weniger Dotenv-Noise
 
 const app  = express();
 const PORT = process.env.PORT || 3011;
 
 app.set('trust proxy', 1);
 
-// Body-Parser
+// Parser
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Sessions
+// Sessions (MemoryStore ok unter PM2, Einzelprozess)
 app.use(session({
   secret: process.env.SESSION_SECRET || 'change-me-please',
   resave: false,
@@ -22,7 +22,7 @@ app.use(session({
   cookie: { httpOnly: true, sameSite: 'lax', secure: false, maxAge: 60 * 60 * 1000 }
 }));
 
-// Rate-Limit nur auf /login (POST)
+// Rate Limit nur fürs Login
 const loginLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 50,
@@ -31,64 +31,55 @@ const loginLimiter = rateLimit({
 });
 app.use('/login', loginLimiter);
 
-// Static-Files
+// Statische Dateien
 const publicDir = path.join(__dirname, 'public');
 app.use(express.static(publicDir));
 
-// Root: direkt die Login-Seite ausliefern (kein Redirect, vermeidet 500er)
-app.get('/', (_req, res) =>
-  res.sendFile(path.join(publicDir, 'login.html'))
-);
+// 1) Root immer zur Login-Seite
+app.get('/', (_req, res) => res.redirect('/login'));
 
-// Lesbare Routen ohne .html
+// 2) Lesbare Routen ohne .html
 app.get('/login',  (_req, res) => res.sendFile(path.join(publicDir, 'login.html')));
 app.get('/status', (_req, res) => res.sendFile(path.join(publicDir, 'status.html')));
 app.get('/ibelsa', (_req, res) => res.sendFile(path.join(publicDir, 'ibelsa.html')));
 app.get('/index',  (_req, res) => res.sendFile(path.join(publicDir, 'index.html')));
+// optional: /index.html → /index (damit nie „.html“ sichtbar ist)
+app.get('/index.html', (_req, res) => res.redirect('/index'));
 
-// Login prüfen
+// 3) Login prüfen
 app.post('/login', (req, res) => {
-  try {
-    const { username, password } = req.body || {};
-    const {
-      DASH_USER, DASH_PASS,
-      ADMIN_USER, ADMIN_PASS,
-      IBELSA_USER, IBELSA_PASS
-    } = process.env;
+  const { username, password } = req.body || {};
+  const {
+    DASH_USER,  DASH_PASS,
+    ADMIN_USER, ADMIN_PASS,
+    IBELSA_USER,IBELSA_PASS
+  } = process.env;
 
-    const ok =
-      (username === (DASH_USER  || '') && password === (DASH_PASS  || '')) ||
-      (username === (ADMIN_USER || '') && password === (ADMIN_PASS || '')) ||
-      (username === (IBELSA_USER|| '') && password === (IBELSA_PASS|| ''));
+  const ok =
+    (username === (DASH_USER   || '') && password === (DASH_PASS   || '')) ||
+    (username === (ADMIN_USER  || '') && password === (ADMIN_PASS  || '')) ||
+    (username === (IBELSA_USER || '') && password === (IBELSA_PASS || ''));
 
-    if (!ok) return res.redirect('/login');
+  if (!ok) return res.redirect('/login');
 
-    req.session.user = username;
-    return res.redirect('/after-login');
-  } catch (e) {
-    console.error('[LOGIN]', e);
-    return res.status(500).send('Fehler beim Login.');
-  }
+  req.session.user = username;
+  return res.redirect('/after-login');
 });
 
-// Nach Login je nach User weiterleiten (ADMIN -> /index, sonst -> /ibelsa)
+// 4) Nach Login je nach User weiterleiten
 app.get('/after-login', (req, res) => {
   const u = (req.session && req.session.user) ? String(req.session.user) : '';
   const adminUser = (process.env.ADMIN_USER || 'admin').toLowerCase();
   if (u && u.toLowerCase() === adminUser) {
+    // **Änderung**: Admin → INDEX (nicht mehr Status)
     return res.redirect('/index');
   }
+  // alle anderen → Ibelsa
   return res.redirect('/ibelsa');
 });
 
-// Fallback 404 -> Login-Seite
+// 404-Fallback: zurück zur Login-Seite
 app.use((_req, res) => res.status(404).sendFile(path.join(publicDir, 'login.html')));
-
-// Fehler-Handler (verhindert blanke 500er)
-app.use((err, _req, res, _next) => {
-  console.error('[ERROR]', err);
-  res.status(500).type('text').send('500 – Internal Server Error');
-});
 
 app.listen(PORT, () => {
   console.log(`Hotel-Dashboard läuft auf Port ${PORT}`);
