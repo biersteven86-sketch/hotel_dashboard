@@ -1,8 +1,8 @@
-/* /home/steven/hotel_dashboard/server.js (CommonJS) */
-const express  = require('express');
-const path     = require('path');
-const session  = require('express-session');
-const rateLimit= require('express-rate-limit');
+// /home/steven/hotel_dashboard/server.js  (CommonJS)
+const express   = require('express');
+const path      = require('path');
+const session   = require('express-session');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config({ quiet: true });
 
 const app  = express();
@@ -14,7 +14,7 @@ app.set('trust proxy', 1);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Sessions
+// Session
 app.use(session({
   secret: process.env.SESSION_SECRET || 'change-me-please',
   resave: false,
@@ -22,7 +22,7 @@ app.use(session({
   cookie: { httpOnly: true, sameSite: 'lax', secure: false, maxAge: 60 * 60 * 1000 }
 }));
 
-// Rate Limit nur fürs Login (POST)
+// Rate Limit NUR für POST /login
 const loginLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 50,
@@ -32,33 +32,40 @@ const loginLimiter = rateLimit({
 
 // Static
 const publicDir = path.join(__dirname, 'public');
-const loginFile = path.resolve(publicDir, 'login.html');   // <- absoluter Pfad
-const indexFile = path.resolve(publicDir, 'index.html');
-const ibelsaFile= path.resolve(publicDir, 'ibelsa.html');
-const statusFile= path.resolve(publicDir, 'status.html');
-
 app.use(express.static(publicDir, { index: false }));
 
-// Domain-Root -> /login
+// Domain-Root → /login
 app.use((req, res, next) => {
-  if ((req.hostname === "hotel-dashboard.de" || req.hostname === "www.hotel-dashboard.de") &&
-      (req.path === "/" || req.path === "")) {
-    return res.redirect("/login");
-  }
+  if (
+    (req.hostname === 'hotel-dashboard.de' || req.hostname === 'www.hotel-dashboard.de') &&
+    (req.path === '/' || req.path === '')
+  ) return res.redirect('/login');
   next();
 });
 
-// Healthcheck
-app.get('/health', (_req, res) => res.status(200).send('OK'));
+// Health
+app.get('/health', (_req, res) => res.type('text').send('OK'));
 
-// Root -> /login
+// Root → /login
 app.get('/', (_req, res) => res.redirect('/login'));
 
-// Saubere Routen ohne .html
-app.get('/login',  (_req, res, next) => res.sendFile(loginFile,  err => err ? next(err) : undefined));
-app.get('/status', (_req, res, next) => res.sendFile(statusFile, err => err ? next(err) : undefined));
-app.get('/ibelsa', (_req, res, next) => res.sendFile(ibelsaFile, err => err ? next(err) : undefined));
-app.get('/index',  (_req, res, next) => res.sendFile(indexFile,  err => err ? next(err) : undefined));
+// /login robust bedienen (explicit GET) + HEAD sauber beantworten
+const loginFile = path.join(publicDir, 'login.html');
+app.get('/login', (_req, res, next) => {
+  res.sendFile(loginFile, (err) => {
+    if (err) {
+      console.error('[sendFile:/login] Fehler:', err.code, err.message, '— file:', loginFile);
+      next(err);
+    }
+  });
+});
+// Einige Umgebungen mappen HEAD nicht automatisch → explizit:
+app.head('/login', (_req, res) => res.status(200).end());
+
+app.get('/status', (_req, res, next) => res.sendFile(path.join(publicDir, 'status.html'), next));
+app.get('/ibelsa',  (_req, res, next) => res.sendFile(path.join(publicDir, 'ibelsa.html'),  next));
+app.get('/index',   (_req, res, next) => res.sendFile(path.join(publicDir, 'index.html'),   next));
+// /index.html → /index
 app.get('/index.html', (_req, res) => res.redirect('/index'));
 
 // Login prüfen
@@ -85,21 +92,17 @@ app.get('/after-login', (req, res) => {
   return res.redirect('/ibelsa');
 });
 
-// 404 -> Login (Datei direkt)
-app.use((_req, res, next) => {
-  res.status(404).sendFile(loginFile, err => err ? next(err) : undefined);
-});
+// 404 → login
+app.use((_req, res) => res.status(404).sendFile(loginFile));
 
-// Fehler-Logger (hilft uns bei 500ern statt Express-Defaultseite)
+// Error-Handler (zeigt 500 im Log)
 app.use((err, _req, res, _next) => {
-  console.error('[server] Fehler:', err && (err.stack || err));
-  res.status(err.status || 500).type('text').send('Serverfehler');
+  console.error('[ERROR]', err.stack || err);
+  res.status(500).type('text').send('Serverfehler');
 });
 
 app.listen(PORT, () => {
-  console.log(`Hotel-Dashboard läuft auf Port ${PORT}`);
-  console.log(`  • publicDir: ${publicDir}`);
-  console.log(`  • loginFile: ${loginFile}`);
-  console.log(`  • LAN:   http://${process.env.LAN_IP || ''}:${PORT}/`);
-  console.log(`  • Local: http://127.0.0.1:${PORT}/`);
+  console.log('Hotel-Dashboard läuft auf Port', PORT);
+  console.log('  • publicDir:', publicDir);
+  console.log('  • loginFile:', loginFile);
 });
