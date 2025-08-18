@@ -1,14 +1,12 @@
 // /home/steven/hotel_dashboard/server.js  (CommonJS)
-const express   = require('express');
-const path      = require('path');
-const session   = require('express-session');
-const rateLimit = require('express-rate-limit');
-const os        = require('os');
+const express  = require('express');
+const path     = require('path');
+const session  = require('express-session');
+const rateLimit= require('express-rate-limit');
 require('dotenv').config({ quiet: true });   // weniger Dotenv-Noise
 
 const app  = express();
 const PORT = process.env.PORT || 3011;
-const publicDir = path.join(__dirname, 'public');
 
 app.set('trust proxy', 1);
 
@@ -24,22 +22,25 @@ app.use(session({
   cookie: { httpOnly: true, sameSite: 'lax', secure: false, maxAge: 60 * 60 * 1000 }
 }));
 
-// Rate Limit nur fürs Login-POST
+// Rate Limit nur fürs Login
 const loginLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 50,
   standardHeaders: true,
   legacyHeaders: false
 });
+// Rate-Limit nur für POST /login (nicht für GET)
+// app.use('/login', loginLimiter);
 
-// Statische Dateien (ohne auto-Index)
+
+// Statische Dateien
+const publicDir = path.join(__dirname, 'public');
 app.use(express.static(publicDir, { index: false }));
 
-// www → /login
+// www auf Login umleiten
 app.use((req, res, next) => {
-  if ((req.hostname === 'hotel-dashboard.de' || req.hostname === 'www.hotel-dashboard.de') &&
-      (req.path === '/' || req.path === '')) {
-    return res.redirect('/login');
+  if ((req.hostname === "hotel-dashboard.de" || req.hostname === "www.hotel-dashboard.de") && (req.path === "/" || req.path === "")) {
+    return res.redirect("/login");
   }
   next();
 });
@@ -48,11 +49,11 @@ app.use((req, res, next) => {
 app.get('/', (_req, res) => res.redirect('/login'));
 
 // 2) Lesbare Routen ohne .html
-//    sendFile mit { root } verhindert Path-Probleme
-app.get('/login',  (_req, res) => res.sendFile('login.html',  { root: publicDir }));
-app.get('/status', (_req, res) => res.sendFile('status.html', { root: publicDir }));
-app.get('/ibelsa', (_req, res) => res.sendFile('ibelsa.html', { root: publicDir }));
-app.get('/index',  (_req, res) => res.sendFile('index.html',  { root: publicDir }));
+app.get('/login',  (_req, res) => res.sendFile(path.join(publicDir, 'login.html')));
+app.get('/status', (_req, res) => res.sendFile(path.join(publicDir, 'status.html')));
+app.get('/ibelsa', (_req, res) => res.sendFile(path.join(publicDir, 'ibelsa.html')));
+app.get('/index',  (_req, res) => res.sendFile(path.join(publicDir, 'index.html')));
+// optional: /index.html -> /index
 app.get('/index.html', (_req, res) => res.redirect('/index'));
 
 // 3) Login prüfen
@@ -79,30 +80,17 @@ app.post('/login', loginLimiter, (req, res) => {
 app.get('/after-login', (req, res) => {
   const u = (req.session && req.session.user) ? String(req.session.user) : '';
   const adminUser = (process.env.ADMIN_USER || 'admin').toLowerCase();
-  if (u && u.toLowerCase() === adminUser) return res.redirect('/index');
+  if (u && u.toLowerCase() === adminUser) {
+    // **Änderung**: Admin → INDEX (nicht mehr Status)
+    return res.redirect('/index');
+  }
+  // alle anderen → Ibelsa
   return res.redirect('/ibelsa');
 });
 
-// kleine Health-Route für Tests
-app.get('/health', (_req, res) => res.type('text').send('OK'));
-
-// 404 → zurück zur Login-Seite
-app.use((_req, res) => res.status(404).sendFile('login.html', { root: publicDir }));
-
-// Start + freundliche URLs ausgeben
-function getLanIPv4() {
-  const ifs = os.networkInterfaces();
-  for (const name of Object.keys(ifs)) {
-    for (const info of ifs[name] || []) {
-      if (info && info.family === 'IPv4' && !info.internal) return info.address;
-    }
-  }
-  return '127.0.0.1';
-}
+// 404-Fallback: zurück zur Login-Seite
+app.use((_req, res) => res.status(404).sendFile(path.join(publicDir, 'login.html')));
 
 app.listen(PORT, () => {
-  const ip = getLanIPv4();
-  console.log('Hotel-Dashboard läuft:');
-  console.log(`  • LAN:   http://${ip}:${PORT}/`);
-  console.log(`  • Local: http://127.0.0.1:${PORT}/`);
+  console.log(`Hotel-Dashboard läuft auf Port ${PORT}`);
 });
