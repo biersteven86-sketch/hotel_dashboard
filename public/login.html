@@ -10,11 +10,10 @@
   :root{
     --bg:#0b1020;
     --glass:rgba(255,255,255,.10);
-    --glass-strong:rgba(255,255,255,.16);
     --stroke:rgba(255,255,255,.22);
     --text:#eef2ff;
     --muted:#b7c0d8;
-    --accent:#e60023;
+    --accent:#d00028;   /* kräftiges Rot */
     --shadow:0 10px 30px rgba(0,0,0,.45);
     --radius:24px;
     --matt:#0a0a0a;
@@ -39,7 +38,6 @@
     overflow:hidden;
   }
 
-  /* Header mit Logo */
   .brand{display:flex; align-items:center; gap:18px; padding:26px 24px 10px; justify-content:center}
   .logo-box{
     position:relative; width:78px; height:78px; border-radius:18px;
@@ -61,7 +59,6 @@
   form{ display:grid; gap:14px }
   label{ font-size:13px; color:var(--muted); margin-bottom:6px }
 
-  /* Felder: nur Rahmen, kein Hintergrund */
   .field{
     background:transparent;
     border:1px solid var(--stroke);
@@ -76,7 +73,6 @@
   .field button.icon{ all:unset; cursor:pointer; padding:8px; display:grid; place-items:center }
   .icon svg{ width:22px; height:22px; display:block }
 
-  /* Autofill fix */
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus{
@@ -89,15 +85,15 @@
   .error{ display:none; background:rgba(239,68,68,.14); border:1px solid rgba(239,68,68,.45); color:#fecaca; padding:10px 12px; border-radius:12px; font-size:13px; margin-bottom:6px }
 
   .row-links{ display:flex; justify-content:space-between; align-items:center; font-size:13px; margin-top:4px }
-  .row-links a{ color:#ff4d4d; text-decoration:none; font-weight:600; border-bottom:1px dashed rgba(255,255,255,.28) }
+  .row-links a{ color:var(--accent); text-decoration:none; font-weight:600; border-bottom:1px dashed rgba(255,255,255,.28) }
   .row-links a:hover{ color:#ffffff; border-bottom-color:rgba(255,255,255,.6) }
 
   .submit{
     margin-top:6px;
-    background:linear-gradient(135deg,var(--accent),#ff3355);
+    background:linear-gradient(135deg,var(--accent),#b00020);
     color:#fff; border:0; border-radius:14px; padding:12px 16px;
     font-weight:800; font-size:15px; cursor:pointer;
-    box-shadow:0 10px 24px rgba(230,0,35,.35);
+    box-shadow:0 10px 24px rgba(178,0,32,.35);
   }
   .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none }
 
@@ -157,7 +153,7 @@
 
     <div class="foot">
       <small>© <span id="y"></span> Hotel-Dashboard<br>
-      Powered by MY HOME Hotel Lamm Rottweil GMBH</small>
+      Powered by MY HOME HOTEL LAMM Rottweil GMBH</small>
     </div>
   </div>
 
