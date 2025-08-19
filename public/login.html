@@ -5,91 +5,90 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login · Hotel-Dashboard</title>
   <meta name="color-scheme" content="light dark">
+
   <!-- Assets vorladen -->
   <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
   <link rel="preload" as="image" href="/HD-Logo.png">
+
   <style>
     :root{
-      --bg:#0b1020;
-      --text:#eef2ff;
-      --muted:#b7c0d8;
-      --accent:#d00028;                 /* kräftiges Rot */
-      --stroke:rgba(255,255,255,.16);   /* dezenter Rahmen */
-      --radius:22px;                    /* etwas runder wie im Mock */
-      --card-1:#0c0f15;                 /* tiefschwarz (oben)   */
-      --card-2:#0a0c11;                 /* tiefschwarz (mitte)  */
-      --card-3:#090b10;                 /* tiefschwarz (unten)  */
+      /* Grundfarben */
+      --bg:#0b0f14;             /* Fallback-Hintergrund unter dem Bild */
+      --text:#eef2ff;           /* Primärtext (weißlich) */
+      --muted:#b7c0d8;          /* Sekundärtext */
+      --accent:#e70f2a;         /* Sattes Rot für Akzente */
+      --accent-dark:#b00020;    /* dunklerer Rotton für Verläufe */
+      --border:#23262e;         /* sehr dunkler Rand */
+      --card:#000000;           /* TIEFschwarze Login-Card */
+      --shadow:0 14px 36px rgba(0,0,0,.55);
+      --radius:20px;
     }
-    *{box-sizing:border-box} html,body{height:100%}
 
+    *{box-sizing:border-box}
+    html,body{height:100%}
+
+    /* Hintergrund NUR mit Bild – keine zusätzlichen Overlays */
     body{
       margin:0;
       font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
       color:var(--text);
-      /* Hintergrundbild: unverändert, ohne Overlays */
       background:var(--bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
 
-    /* keine body::before-Overlays */
+    .wrap{
+      min-height:100%;
+      display:grid;
+      place-items:center;
+      padding:clamp(20px,4vw,60px);
+    }
 
-    .wrap{min-height:100%; display:grid; place-items:center; padding:clamp(20px,4vw,60px)}
-
-    /* Karte: tiefschwarz mit leichter „Bevel“-Kante, abstehend */
+    /* Login-Karte: tiefschwarz, kein Glas/Blur */
     .card{
       width:min(460px,92vw);
       border-radius:var(--radius);
-      background:linear-gradient(180deg,var(--card-1),var(--card-2) 60%,var(--card-3)); /* keine Glas-Optik, nur Tiefe */
-      border:1px solid var(--stroke);
-      /* außen tiefer Schatten + feine Lichtkante + leichte Unterkante */
-      box-shadow:
-        0 28px 64px rgba(0,0,0,.75),          /* tiefer Drop */
-        0 1px 0 rgba(255,255,255,.06) inset,  /* Top-Highlight */
-        0 -10px 18px rgba(0,0,0,.55) inset,   /* Unterkante innen */
-        0 0 0 1px rgba(255,255,255,.04);      /* feiner Saum */
+      background:var(--card);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
       overflow:hidden;
-      display:flex; flex-direction:column;
+      display:flex;
+      flex-direction:column;
     }
 
     /* Branding */
     .brand{
       display:flex; align-items:center; gap:16px;
-      padding:24px 22px 10px; justify-content:center
+      padding:24px 22px 10px; justify-content:center;
     }
     .brand-text h1{
-      margin:0; font-size:24px; font-weight:800; letter-spacing:.5px;
-      text-shadow:
-        0 6px 18px rgba(0,0,0,.7),   /* Tiefe wie im Mock */
-        0 1px 0 rgba(255,255,255,.10);
+      margin:0; font-size:26px; font-weight:900; letter-spacing:.4px;
+      text-shadow:0 2px 0 rgba(0,0,0,.35);
     }
-
-    /* PNG-Logo */
     .logo-box{ width:72px; height:72px; display:flex; align-items:center; justify-content:center }
     .logo-img{ width:72px; height:72px; display:block; object-fit:contain }
 
-    /* Formularbereich */
+    /* Inhalt + Formular */
     .content{ padding:20px 22px 0 }
     form{ display:grid; gap:14px }
     label{ font-size:13px; color:var(--muted); display:block; margin:0 0 6px }
 
-    /* Felder: transparent (wie von dir gewünscht) + präzisere Kante */
+    /* Felder: nur Rahmen, transparenter Hintergrund */
     .field{
       background:transparent;
-      border:1px solid var(--stroke);
+      border:1px solid var(--border);
       border-radius:14px;
       display:grid; grid-template-columns:1fr auto; align-items:center;
-      padding:0 8px; min-height:46px;
-      box-shadow:
-        0 1px 0 rgba(255,255,255,.05) inset,  /* zarter Oberlicht-Saum */
-        0 -6px 12px rgba(0,0,0,.45) inset;    /* leichte Mulde wie im Mock */
+      min-height:46px; padding:0 8px;
     }
     .field input{
-      flex:1; background:transparent; border:0; outline:0;
-      color:var(--text); font-size:15px; padding:10px 8px; width:100%;
+      background:transparent; border:0; outline:0; color:var(--text);
+      font-size:15px; padding:10px 8px; width:100%;
     }
-    .field button.icon{ all:unset; cursor:pointer; padding:8px; border-radius:10px; display:grid; place-items:center }
+    .field button.icon{
+      all:unset; cursor:pointer; padding:8px; border-radius:10px; display:grid; place-items:center
+    }
     .icon svg{ width:22px; height:22px; display:block }
 
-    /* Autofill ohne Gelb */
+    /* Autofill ohne gelben Hintergrund */
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
     input:-webkit-autofill:focus{
@@ -99,19 +98,28 @@
     }
 
     .caps{ display:none; color:#ef4444; font-size:12px; margin-top:6px }
-    .error{ display:none; background:rgba(239,68,68,.14); border:1px solid rgba(239,68,68,.45); color:#fecaca; padding:10px 12px; border-radius:12px; font-size:13px; margin-bottom:6px }
+    .error{
+      display:none; background:rgba(239,68,68,.14);
+      border:1px solid rgba(239,68,68,.45);
+      color:#fecaca; padding:10px 12px; border-radius:12px; font-size:13px; margin-bottom:6px
+    }
 
-    /* Link-Reihe */
+    /* Link-Zeile */
     .row-links{ display:flex; justify-content:space-between; align-items:center; font-size:13px; margin-top:4px }
-    .row-links a{ color:var(--accent); text-decoration:none; font-weight:700; border-bottom:1px dashed rgba(255,255,255,.28) }
+    .row-links a{
+      color:var(--accent); text-decoration:none; font-weight:800;
+      border-bottom:1px dashed rgba(255,255,255,.28)
+    }
     .row-links a:hover{ color:#fff; border-bottom-color:rgba(255,255,255,.5) }
 
-    /* Button: wie vorher */
+    /* Button: kräftiges Rot mit Schatten */
     .submit{
       margin-top:6px;
-      background:linear-gradient(135deg,var(--accent),#b00020);
-      color:#fff; border:0; border-radius:14px; padding:12px 16px; font-weight:800; font-size:15px; cursor:pointer;
-      box-shadow:0 10px 24px rgba(178,0,32,.35); transition:transform .08s ease
+      background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+      color:#fff; border:0; border-radius:14px; padding:12px 16px;
+      font-weight:900; font-size:16px; cursor:pointer;
+      box-shadow:0 14px 28px rgba(231,15,42,.28), inset 0 -2px 0 rgba(0,0,0,.25);
+      transition:transform .08s ease
     }
     .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none }
     .submit:active{ transform:translateY(1px) scale(.997) }
@@ -119,14 +127,16 @@
     .help{ text-align:center; margin:10px 0 14px; font-size:13px; color:var(--muted) }
 
     /* Footer im Fenster */
-    .foot{ text-align:center; color:var(--muted); font-size:12px; padding:12px 18px 18px; border-top:1px solid rgba(255,255,255,.08) }
+    .foot{
+      text-align:center; color:var(--muted); font-size:12px;
+      padding:12px 18px 18px; border-top:1px solid rgba(255,255,255,.08)
+    }
     .foot small{ display:block; line-height:1.35 }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card" role="group" aria-labelledby="hd-title">
-
       <!-- BRAND -->
       <div class="brand">
         <div class="logo-box" aria-hidden="true">
@@ -135,7 +145,7 @@
         <div class="brand-text"><h1 id="hd-title">Hotel‑Dashboard</h1></div>
       </div>
 
-      <!-- FORMULAR -->
+      <!-- CONTENT -->
       <div class="content">
         <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
 
@@ -143,7 +153,7 @@
           <div>
             <label for="username">Benutzername</label>
             <div class="field">
-              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
+              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
             </div>
           </div>
 
