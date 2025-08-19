@@ -20,20 +20,26 @@
   }
 
   html,body{height:100%}
+
+  /* >>> EINZIG relevante Änderung: Hintergrund extra robust setzen */
   body{
     margin:0;
     display:flex; justify-content:center; align-items:center;
     color:var(--text);
     font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Arial,"Noto Sans";
 
-    /* Hintergrund wieder aktiv */
-    background-color: #0b1020;
-    background-image: url("/Hotel-Dashboard-hintergrund.jpg") !important;
-    background-position: center center;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    background-color:#0b1020;
+    /* absolut + relativ; der erste, der gefunden wird, gewinnt */
+    background-image: image-set(
+      url("/Hotel-Dashboard-hintergrund.jpg") type("image/jpeg"),
+      url("./Hotel-Dashboard-hintergrund.jpg") type("image/jpeg")
+    );
+    background-position:center center;
+    background-size:cover;
+    background-repeat:no-repeat;
+    background-attachment:fixed;
   }
+  /* <<< ENDE Änderung */
 
   .card{
     width:min(460px,92vw);
@@ -67,7 +73,7 @@
   label{ font-size:13px; color:var(--muted); margin-bottom:6px }
 
   .field{
-    background:transparent;
+    background:transparent;   /* nur Rahmen, kein Hintergrund */
     border:1px solid var(--stroke);
     border-radius:14px;
     display:grid; grid-template-columns:1fr auto; align-items:center;
@@ -109,7 +115,8 @@
   .foot{ text-align:center; color:var(--muted); font-size:12px; padding:16px }
 </style>
 </head>
-<body>
+<!-- zusätzlicher Fallback direkt am body; ändert nichts am Layout -->
+<body style='background-image:url("/Hotel-Dashboard-hintergrund.jpg");background-size:cover;background-repeat:no-repeat;background-position:center center;background-attachment:fixed;'>
   <div class="card" role="group" aria-labelledby="hd-title">
     <div class="brand">
       <div class="logo-box" aria-hidden="true"><div class="hd">HD</div></div>
