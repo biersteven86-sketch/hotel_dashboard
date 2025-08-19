@@ -11,7 +11,7 @@
 
   <style>
     :root{
-      --bg:#06080c;     /* Body-Hintergrund */
+      --bg:#06080c;
       --panel:#000;     /* echtes Tiefschwarz */
       --text:#eef2f8;
       --muted:#a4aebb;
@@ -43,11 +43,11 @@
       border-radius:var(--radius);
       position:relative;
       overflow:visible;
-      background:var(--panel); /* echtes Schwarz */
+      background:var(--panel);
       box-shadow:
-        0 50px 90px rgba(0,0,0,.9),       /* tiefer äußerer Schatten */
-        0 1px 0 rgba(255,255,255,.06) inset, /* feine Lichtkante oben */
-        0 -1px 0 rgba(0,0,0,.85) inset;   /* Bodenlinie */
+        0 50px 90px rgba(0,0,0,.9),
+        0 1px 0 rgba(255,255,255,.06) inset,
+        0 -1px 0 rgba(0,0,0,.85) inset;
       border:1px solid rgba(255,255,255,.08);
     }
 
@@ -79,23 +79,31 @@
       height:140px;
       border-radius:50%;
       background: radial-gradient(circle at 30% 20%,
-        rgba(255,255,255,.20) 0%,
+        rgba(255,255,255,.25) 0%,
         rgba(255,255,255,0) 65%);
       mix-blend-mode:screen;
       z-index:4;
       pointer-events:none;
     }
 
-    /* Panel-Glanz */
+    /* Verstärkter Panel-Glanz */
     .card > .shine{
       content:"";
       position:absolute; inset:0;
       border-radius:inherit;
-      background:linear-gradient(145deg,
-        rgba(255,255,255,.08) 0%,
-        rgba(255,255,255,0) 40%);
+      background:
+        linear-gradient(145deg,
+          rgba(255,255,255,.25) 0%,
+          rgba(255,255,255,.15) 30%,
+          rgba(255,255,255,0) 65%
+        ),
+        radial-gradient(circle at 20% 10%,
+          rgba(255,255,255,.18) 0%,
+          rgba(255,255,255,0) 60%
+        );
+      background-blend-mode:screen;
       mix-blend-mode:screen;
-      opacity:.15;
+      opacity:.55;   /* deutlich stärker */
       pointer-events:none;
       z-index:2;
     }
