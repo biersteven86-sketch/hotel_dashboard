@@ -3,240 +3,195 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login · Hotel-Dashboard</title>
-  <meta name="color-scheme" content="light dark">
-  <!-- Pfad muss exakt zum vorhandenen Dateinamen passen -->
+  <title>Login · Hotel‑Dashboard</title>
+  <meta name="color-scheme" content="dark light">
+
+  <!-- Exakte Dateien vorladen -->
   <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
+  <link rel="preload" as="image" href="/HD-Logo.png">
+
   <style>
     :root{
-      /* Farben */
-      --text:#eef2ff;
+      --text:#ffffff;
       --muted:#b7c0d8;
-      --accent:#e11d48; /* kräftiges Rot für Aktionen/Links */
-      --accent-2:#7c5cff; /* bleibt ungenutzt, falls später nötig */
-      --stroke:rgba(255,255,255,.18);
-
-      /* Layout */
-      --radius:18px;
-      --shadow:0 14px 40px rgba(0,0,0,.55);
-
-      /* Schwarzer Karten-Hintergrund (mattes Schwarz) */
-      --card:#0a0a0a;
-      --field:#121212;   /* Felder dunkel, nicht transparent, kein Gelb */
-      --field-stroke:#262626;
-      --field-focus:#3f3f46;
+      --accent:#E50914;          /* kräftiges Rot für Aktionen */
+      --card:#0b0b0b;            /* tiefschwarze Login-Box */
+      --field:#101010;           /* dunkle Felder, nicht transparent */
+      --field-stroke:#23262b;    /* dezente Kontur */
+      --field-focus:#3f3f46;     /* Fokus-Rand */
+      --radius:22px;
+      --shadow:0 22px 60px rgba(0,0,0,.55);
     }
 
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
-      font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
+      font:16px/1.45 system-ui,-apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial, "Noto Sans";
       color:var(--text);
 
-      /* Nur das Bild. Keine Overlays/Gradients/Glas. */
+      /* Nur Bild – keine Gradients/Overlays/Glas */
       background:#000 url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
 
-    .wrap{
-      min-height:100%;
-      display:grid;
-      place-items:center;
-      padding:clamp(20px,4vw,60px);
-    }
+    .wrap{min-height:100%; display:grid; place-items:center; padding:clamp(20px,4vw,60px)}
 
     .card{
-      width:min(420px,92vw);
+      width:min(520px,92vw);
+      background:var(--card);
+      border:1px solid #121212;
       border-radius:var(--radius);
-      background:var(--card);               /* tiefschwarz, kein Glas */
-      border:1px solid var(--field-stroke); /* matte, dezente Kante */
       box-shadow:var(--shadow);
       overflow:hidden;
     }
 
-    /* Branding */
-    .brand{display:flex; align-items:center; gap:16px; padding:22px 22px 8px}
+    /* Kopf/Brand */
+    .brand{display:flex; align-items:center; gap:16px; padding:28px 26px 10px}
     .logo-box{
-      width:72px; height:72px; border-radius:16px;
-      background:#0a0a0a;                  /* passend zur Karte */
-      border:1px solid #1f1f1f;            /* matte Umrandung */
-      display:flex; align-items:center; justify-content:center;
-      overflow:hidden; flex-shrink:0;
+      width:78px; height:78px; border-radius:16px;
+      background:#0a0a0a; border:1px solid #1a1a1a;
+      display:flex; align-items:center; justify-content:center; overflow:hidden;
+      flex-shrink:0;
     }
     .logo-box img{width:100%; height:100%; object-fit:cover}
+    .brand h1{margin:0; font-size:30px; font-weight:900; letter-spacing:.3px}
 
-    .brand-text h1{
-      margin:0;
-      font-size:24px;
-      font-weight:800;
-      letter-spacing:.5px;
-    }
-
-    /* Inhalt */
-    .content{ padding:18px 22px 22px }
-    form{ display:grid; gap:14px }
-
-    label{ font-size:13px; color:var(--muted); display:block; margin:0 0 6px }
+    .content{ padding:18px 26px 24px }
+    form{ display:grid; gap:16px }
+    label{ font-size:13px; color:var(--muted); margin:0 0 6px }
 
     .field{
-      background:var(--field);              /* dunkel, NICHT transparent */
+      display:grid; grid-template-columns:1fr auto; align-items:center; gap:8px;
+      min-height:48px; padding:0 12px;
+      background:var(--field);
       border:1px solid var(--field-stroke);
       border-radius:14px;
-      display:flex; align-items:center; gap:8px;
-      padding:10px 12px;
       transition:border-color .15s ease, box-shadow .15s ease;
     }
-    .field:focus-within{
-      border-color:var(--field-focus);
-      box-shadow:0 0 0 2px var(--field-focus) inset;
-    }
-    .field input{
-      flex:1; background:transparent; border:0; outline:0;
-      color:var(--text); font-size:15px; padding:6px 2px;
-    }
+    .field:focus-within{ border-color:var(--field-focus); box-shadow:0 0 0 2px var(--field-focus) inset }
+    .field input{ background:transparent; border:0; outline:0; color:var(--text); font-size:15px; padding:12px 6px }
 
-    /* Autofill-Gelb neutralisieren (Chrome/Safari) */
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover,
-    input:-webkit-autofill:focus{
-      -webkit-text-fill-color: var(--text);
-      -webkit-box-shadow: 0 0 0px 1000px var(--field) inset;
+    /* Autofill (Chrome/Safari) neutralisieren */
+    input:-webkit-autofill{
+      -webkit-text-fill-color: var(--text) !important;
+      -webkit-box-shadow: 0 0 0px 1000px var(--field) inset !important;
       transition: background-color 5000s ease-in-out 0s;
       caret-color: var(--text);
     }
 
-    .icon-btn{
-      all:unset; cursor:pointer; padding:6px 8px; border-radius:10px;
-      line-height:1;
-    }
+    .icon{ all:unset; cursor:pointer; padding:8px; border-radius:10px; color:#9aa3b2 }
+    .icon svg{ width:22px; height:22px; display:block }
 
-    .row{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:4px }
-    .row .left{ display:flex; align-items:center; gap:10px; color:var(--muted); font-size:13px }
+    .caps{ display:none; color:#ef4444; font-size:12px; margin-top:6px }
 
-    .caps{ display:none; color:#ef4444; font-size:12px }
-
-    .error{
-      display:none;
-      background:rgba(239,68,68,.12);
-      border:1px solid rgba(239,68,68,.35);
-      color:#fecaca;
-      padding:10px 12px;
-      border-radius:12px;
-      font-size:13px;
-      margin-bottom:8px;
-    }
-
-    .actions{
-      display:flex; justify-content:space-between; align-items:center; margin-top:6px;
-    }
-
-    .link{
-      color:var(--accent); font-size:13px; text-decoration:none; border-bottom:1px dashed rgba(255,255,255,.25);
-    }
-    .link:hover{ border-bottom-color:rgba(255,255,255,.5) }
+    .link-row{ display:flex; justify-content:flex-start; margin-top:2px }
+    .link-row a{ font-size:13px; color:var(--accent); text-decoration:none; font-weight:700 }
+    .link-row a:hover{ text-decoration:underline }
 
     .submit{
-      margin-top:8px;
-      background:var(--accent);
-      color:#fff; border:0; border-radius:14px;
-      padding:12px 16px; font-weight:700; font-size:15px; cursor:pointer;
-      box-shadow:0 10px 24px rgba(225,29,72,.35); transition:transform .08s ease, opacity .2s ease;
+      margin-top:6px; background:var(--accent); color:#fff; border:0; border-radius:16px;
+      padding:14px 18px; font-weight:800; font-size:16px; cursor:pointer; letter-spacing:.2px;
+      box-shadow:0 12px 28px rgba(229,9,20,.28);
+      transition: transform .08s ease, filter .15s ease;
     }
-    .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none }
+    .submit:hover{ filter:brightness(1.03) }
     .submit:active{ transform:translateY(1px) scale(.997) }
+    .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none }
 
-    .help{ margin-top:10px; font-size:13px; color:var(--muted); }
+    .help{ text-align:center; color:var(--muted); font-size:12px; padding-top:6px }
 
-    .foot{
-      text-align:center; color:var(--muted); font-size:12px;
-      padding:10px 18px 16px;
-      border-top:1px solid var(--field-stroke);
-      background:var(--card);
-    }
-
-    /* Kleinigkeiten für sehr kleine Breiten */
-    @media (max-width:360px){
-      .brand-text h1{ font-size:20px }
-    }
+    .divider{ height:1px; background:#151515; margin:10px 0 0 }
+    .foot{ text-align:center; color:var(--muted); font-size:12px; padding:10px 14px 18px; background:var(--card) }
+    .foot small{ display:block; line-height:1.35 }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="card" role="region" aria-label="Login">
+    <div class="card" role="group" aria-labelledby="hd-title">
+
       <div class="brand">
-        <!-- Dein HD-Logo als PNG (Datei liegt neben dem Hintergrund) -->
         <div class="logo-box">
-          <img src="/HD-LOGO.png" alt="HD-Logo">
+          <img id="brandLogo" src="/HD-Logo.png" alt="HD Logo">
         </div>
-        <div class="brand-text">
-          <h1>Hotel‑Dashboard</h1>
-        </div>
+        <h1 id="hd-title">Hotel‑Dashboard</h1>
       </div>
 
       <div class="content">
-        <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
-
-        <form action="/login" method="POST" id="loginForm" autocomplete="on">
+        <form action="/login" method="POST" id="loginForm" novalidate>
           <div>
             <label for="username">Benutzername</label>
             <div class="field">
-              <input id="username" name="username" type="text" placeholder="z. B. admin" required />
+              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
             </div>
           </div>
 
           <div>
             <label for="password">Passwort</label>
             <div class="field">
-              <input id="password" name="password" type="password" placeholder="••••••••" required />
-              <!-- Auge: geschlossen bei Passwort, offen bei Text -->
-              <button class="icon-btn" type="button" id="togglePw" aria-label="Passwort anzeigen/ausblenden">🙈</button>
+              <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
+              <button class="icon" type="button" id="togglePw" aria-label="Passwort anzeigen/ausblenden">
+                <!-- geschlossen -->
+                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.05 0-9.27-3.11-11-8 1.02-2.93 3.03-5.19 5.47-6.53m3.17-1.19A9.77 9.77 0 0112 4c5.05 0 9.27 3.11 11 8a11.73 11.73 0 01-1.41 2.94M9.88 9.88A3 3 0 1112 15a3 3 0 01-2.12-5.12z"/>
+                  <line x1="3" y1="3" x2="21" y2="21"/>
+                </svg>
+                <!-- offen -->
+                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+                  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
             </div>
             <div class="caps" id="caps">Warnung: Feststelltaste ist aktiv.</div>
           </div>
 
-          <div class="actions">
-            <a class="link" href="/forgot">Passwort vergessen?</a>
-            <button class="submit" id="submitBtn" type="submit" disabled>Anmelden</button>
+          <div class="link-row">
+            <a href="/reset">Passwort vergessen?</a>
           </div>
 
-          <div class="help">
-            Bei Problemen wenden Sie sich an den Administrator.
-          </div>
+          <button class="submit" id="submitBtn" type="submit" disabled>Anmelden</button>
+
+          <div class="help">Bei Problemen wenden Sie sich bitte an den Administrator.</div>
         </form>
       </div>
 
+      <div class="divider"></div>
       <div class="foot">
-        <small>© <span id="y"></span> Hotel‑Dashboard · powered by MyHomeHotel am Rottweil GmbH</small>
+        <small>© <span id="y"></span> Hotel‑Dashboard</small>
+        <small>Powered by MY HOME HOTEL AM ROTTWEIL GMBH</small>
       </div>
     </div>
   </div>
 
-<script>
-  // Jahr
-  document.getElementById('y').textContent = new Date().getFullYear();
+  <script>
+    // Jahr
+    document.getElementById('y').textContent = new Date().getFullYear();
 
-  // Elemente
-  const u = document.getElementById('username');
-  const p = document.getElementById('password');
-  const s = document.getElementById('submitBtn');
-  const tp = document.getElementById('togglePw');
-  const c = document.getElementById('caps');
+    // Elemente
+    const u=document.getElementById('username'),
+          p=document.getElementById('password'),
+          s=document.getElementById('submitBtn'),
+          tp=document.getElementById('togglePw'),
+          eyeOn=document.getElementById('eye-on'),
+          eyeOff=document.getElementById('eye-off'),
+          caps=document.getElementById('caps');
 
-  // Submit-Enable wenn beide Felder befüllt
-  const update = () => { s.disabled = !(u.value && p.value); };
-  u.addEventListener('input', update);
-  p.addEventListener('input', update);
-  update();
+    // Submit aktivieren, wenn beide Felder befüllt
+    const update=()=>{ s.disabled=!(u.value.trim() && p.value.trim()); };
+    u.addEventListener('input',update); p.addEventListener('input',update); update();
 
-  // Auge toggeln (🙈 geschlossen bei "password", 👁️ offen bei "text")
-  const updateEye = () => { tp.textContent = (p.type === 'password') ? '🙈' : '👁️'; };
-  tp.addEventListener('click', () => { p.type = (p.type === 'password') ? 'text' : 'password'; updateEye(); });
-  updateEye();
+    // Auge toggeln: geschlossen ↔ offen
+    tp.addEventListener('click',()=>{
+      const show = (p.type==="password");
+      p.type = show ? "text" : "password";
+      eyeOn.style.display  = show ? "block" : "none";
+      eyeOff.style.display = show ? "none"  : "block";
+    });
 
-  // Caps-Lock Hinweis
-  ['keydown','keyup'].forEach(ev => p.addEventListener(ev, e => {
-    try { c.style.display = e.getModifierState('CapsLock') ? 'block' : 'none'; } catch(_){}
-  }));
-</script>
+    // Caps-Lock Hinweis
+    ['keydown','keyup'].forEach(ev=>p.addEventListener(ev,e=>{
+      try{ caps.style.display=e.getModifierState('CapsLock')?'block':'none'; }catch(_){}
+    }));
+  </script>
 </body>
 </html>
