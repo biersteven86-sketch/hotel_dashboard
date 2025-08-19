@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login · Hotel-Dashboard</title>
   <meta name="color-scheme" content="light dark">
-  <!-- Hintergrund korrekt vorladen -->
+  <!-- Assets vorladen -->
   <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
+  <link rel="preload" as="image" href="/HD-Logo.png">
   <style>
     :root{
       --bg:#0b1020;
@@ -18,7 +19,6 @@
       --accent:#d00028;     /* kräftiges Rot */
       --shadow:0 10px 30px rgba(0,0,0,.45);
       --radius:18px;
-      --matt:#0a0a0a;       /* matt-schwarz (Logo-Rand) */
     }
     *{box-sizing:border-box} html,body{height:100%}
 
@@ -26,7 +26,7 @@
       margin:0;
       font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
       color:var(--text);
-      /* Hintergrund: Bild + Grundfarbe – Dateiname wie besprochen */
+      /* Hintergrundbild – unverändert, richtiger Dateiname */
       background:var(--bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
     body::before{
@@ -51,15 +51,25 @@
     }
 
     /* Branding */
-    .brand{display:flex; align-items:center; gap:16px; padding:24px 22px 10px; justify-content:center}
+    .brand{
+      display:flex; align-items:center; gap:16px;
+      padding:24px 22px 10px; justify-content:center
+    }
     .brand-text h1{ margin:0; font-size:24px; font-weight:800; letter-spacing:.5px }
+
+    /* Neues PNG-Logo */
+    .logo-box{ width:72px; height:72px; display:flex; align-items:center; justify-content:center }
+    .logo-img{
+      width:72px; height:72px; display:block; object-fit:contain;
+      /* kein zusätzlicher Rand/Schatten – Bild bringt 3D bereits mit */
+    }
 
     /* Formularbereich */
     .content{ padding:20px 22px 0 }
     form{ display:grid; gap:14px }
     label{ font-size:13px; color:var(--muted); display:block; margin:0 0 6px }
 
-    /* Felder: nur Rahmen, kein Hintergrund */
+    /* Felder: nur Rahmen, transparenter Hintergrund */
     .field{
       background:transparent;
       border:1px solid var(--stroke);
@@ -106,61 +116,16 @@
     /* Footer im Fenster */
     .foot{ text-align:center; color:var(--muted); font-size:12px; padding:12px 18px 18px; border-top:1px solid rgba(255,255,255,.08) }
     .foot small{ display:block; line-height:1.35 }
-
-    /* Logo-Container (Größe wie gehabt) */
-    .logo-box{ width:72px; height:72px; display:flex; align-items:center; justify-content:center }
-    .logo-box svg{ width:100%; height:auto; display:block }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card" role="group" aria-labelledby="hd-title">
 
-      <!-- BRAND: Hexagon-Wabe als SVG-Button + Titel -->
+      <!-- BRAND: PNG-Logo + Titel -->
       <div class="brand">
         <div class="logo-box" aria-hidden="true">
-          <!-- SVG-Hexagon mit kräftigem Rot in der Tiefe, matt-schwarzer Rand, 3D-Schatten -->
-          <svg viewBox="0 0 120 104" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <defs>
-              <!-- kräftiges, modernes Rot in der Mitte, außen dunkler bis matt-schwarz -->
-              <radialGradient id="hdRed" cx="50%" cy="55%" r="70%">
-                <stop offset="0%"  stop-color="#E30F2F"/>
-                <stop offset="65%" stop-color="#B00F22"/>
-                <stop offset="100%" stop-color="#0B0B0B"/>
-              </radialGradient>
-              <!-- weicher, realistischer Schlagschatten -->
-              <filter id="hdShadow" x="-25%" y="-25%" width="150%" height="150%">
-                <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="rgba(0,0,0,0.55)"/>
-              </filter>
-              <!-- leichte Innen-Tiefe -->
-              <filter id="innerBevel" x="-5%" y="-5%" width="110%" height="110%">
-                <feGaussianBlur in="SourceAlpha" stdDeviation="1.6" result="blur"/>
-                <feOffset dx="0" dy="1" result="offset"/>
-                <feComposite in="offset" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="innerShadow"/>
-                <feComposite in="SourceGraphic" in2="innerShadow" operator="over"/>
-              </filter>
-              <!-- Text-Schatten für bessere Lesbarkeit -->
-              <filter id="textShadow" x="-50%" y="-50%" width="200%" height="200%">
-                <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.6)"/>
-              </filter>
-            </defs>
-
-            <!-- Hexagon-Körper -->
-            <polygon points="60,2 118,26 118,78 60,102 2,78 2,26"
-                     fill="url(#hdRed)"
-                     stroke="#0A0A0A" stroke-width="4"
-                     filter="url(#hdShadow) url(#innerBevel)"/>
-
-            <!-- "HD" in Weiß, mittig -->
-            <text x="50%" y="56%"
-                  text-anchor="middle"
-                  font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial, Helvetica, sans-serif"
-                  font-size="36" font-weight="900"
-                  fill="#FFFFFF"
-                  filter="url(#textShadow)">
-              HD
-            </text>
-          </svg>
+          <img src="/HD-Logo.png" alt="HD Logo" class="logo-img">
         </div>
         <div class="brand-text"><h1 id="hd-title">Hotel‑Dashboard</h1></div>
       </div>
@@ -227,7 +192,8 @@
           tp=document.getElementById('togglePw'),
           eyeOn=document.getElementById('eye-on'),
           eyeOff=document.getElementById('eye-off'),
-          c=document.getElementById('caps');
+          c=document.getElementById('caps'),
+          err=document.getElementById('err');
 
     const update=()=>{ s.disabled=!(u.value.trim() && p.value.trim()); };
     u.addEventListener('input',update); p.addEventListener('input',update); update();
@@ -242,6 +208,9 @@
     ['keydown','keyup'].forEach(ev=>p.addEventListener(ev,e=>{
       try{ c.style.display=e.getModifierState('CapsLock')?'block':'none'; }catch(_){}
     }));
+
+    // Fehlermeldung via /login?err=1 anzeigen
+    if (new URLSearchParams(location.search).get('err')) err.style.display='block';
   </script>
 </body>
 </html>
