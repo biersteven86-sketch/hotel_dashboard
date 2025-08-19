@@ -86,24 +86,27 @@
       pointer-events:none;
     }
 
-    /* Verstärkter Panel-Glanz */
+    /* Weißfilter über die gesamte Fläche */
     .card > .shine{
       content:"";
       position:absolute; inset:0;
       border-radius:inherit;
       background:
-        linear-gradient(145deg,
+        /* diagonaler Glanzstreifen */
+        linear-gradient(135deg,
           rgba(255,255,255,.25) 0%,
-          rgba(255,255,255,.15) 30%,
-          rgba(255,255,255,0) 65%
+          rgba(255,255,255,.15) 35%,
+          rgba(255,255,255,0) 70%
         ),
-        radial-gradient(circle at 20% 10%,
-          rgba(255,255,255,.18) 0%,
-          rgba(255,255,255,0) 60%
+        /* Glow in der Mitte */
+        radial-gradient(circle at 50% 50%,
+          rgba(255,255,255,.15) 0%,
+          rgba(255,255,255,.08) 40%,
+          rgba(255,255,255,0) 85%
         );
       background-blend-mode:screen;
       mix-blend-mode:screen;
-      opacity:.55;   /* deutlich stärker */
+      opacity:.55;
       pointer-events:none;
       z-index:2;
     }
