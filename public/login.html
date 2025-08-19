@@ -37,7 +37,7 @@
       padding:clamp(20px,4vw,60px);
     }
 
-    /* ===== Tiefschwarz + großflächiger Glanz ===== */
+    /* Tiefschwarz + gleichmäßig glänzend-matt */
     .card{
       width:min(560px,94vw);
       border-radius:var(--radius);
@@ -45,7 +45,9 @@
       display:flex; flex-direction:column;
       position:relative;
 
+      /* dunkler Grundton (nicht grau) */
       background: linear-gradient(180deg, #111216 0%, #0b0c0e 100%);
+
       border:1px solid rgba(255,255,255,.06);
       box-shadow:
         0 28px 60px rgba(0,0,0,.55),
@@ -53,19 +55,32 @@
         inset 0 -1px 0 rgba(0,0,0,.25);
     }
 
+    /* großflächiger, gleichmäßiger Glanz über die gesamte Fläche */
     .card::before{
       content:"";
       position:absolute; inset:0;
       pointer-events:none;
-      /* Großflächiger Glanz */
       background:
-        linear-gradient(145deg,
+        radial-gradient(150% 200% at 50% -20%,
           rgba(255,255,255,.12) 0%,
-          rgba(255,255,255,.06) 25%,
-          rgba(255,255,255,.02) 60%,
-          rgba(255,255,255,0) 100%);
+          rgba(255,255,255,.06) 40%,
+          rgba(255,255,255,.02) 75%,
+          rgba(255,255,255,0) 100%
+        ),
+        linear-gradient(145deg,
+          rgba(255,255,255,.08) 0%,
+          rgba(255,255,255,0) 70%
+        );
       mix-blend-mode:screen;
-      opacity:.4;   /* Feinjustierbar: .3 matter, .5 stärker glänzend */
+      opacity:.38; /* .30 matter | .45 stärker glänzend */
+    }
+
+    /* feine, gefräste Top-Linie */
+    .card::after{
+      content:"";
+      position:absolute; inset:0 0 auto 0; height:1px;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
+      pointer-events:none;
     }
 
     .brand{display:flex;align-items:center;justify-content:center;gap:18px;padding:26px 24px 8px;}
