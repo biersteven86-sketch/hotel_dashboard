@@ -12,7 +12,7 @@
   <style>
     :root{
       --bg:#06080c;
-      --panel:#000;
+      --panel:#000;     /* echtes Tiefschwarz */
       --text:#eef2f8;
       --muted:#a4aebb;
       --accent:#e02724;
@@ -39,7 +39,7 @@
 
     .card{
       width:min(620px,94vw);
-      margin-top:60px;
+      margin-top:36px;                /* höher auf der Seite */
       border-radius:var(--radius);
       position:relative;
       overflow:visible;
@@ -51,15 +51,15 @@
       border:1px solid rgba(255,255,255,.08);
     }
 
-    /* HD-Logo */
+    /* HD-Logo – etwas größer & höher, damit die Wabenkanten oben abschließen */
     .card::before{
       content:"";
       position:absolute;
       left:50%;
-      top:-95px;
+      top:-100px;                     /* höher */
       transform:translateX(-50%);
-      width:140px;
-      height:140px;
+      width:150px;                    /* größer */
+      height:150px;
       background:url("/HD-Logo.png") center/contain no-repeat;
       filter:
         drop-shadow(0 10px 18px rgba(0,0,0,.65))
@@ -68,16 +68,14 @@
       pointer-events:none;
     }
 
-    /* --- Entfernt: Radialer Verlauf auf Logo, der weiße Rundung machte --- */
-
-    /* Verstärkter Weißfilter über die gesamte Fläche */
+    /* Verstärkter Weiß-Glanz über die gesamte Fläche */
     .card > .shine{
       content:"";
       position:absolute; inset:0;
       border-radius:inherit;
       background:
         linear-gradient(135deg,
-          rgba(255,255,255,.4) 0%,
+          rgba(255,255,255,.40) 0%,
           rgba(255,255,255,.25) 40%,
           rgba(255,255,255,0) 80%
         ),
@@ -88,17 +86,17 @@
         );
       background-blend-mode:screen;
       mix-blend-mode:screen;
-      opacity:.75; /* deutlich stärker */
+      opacity:.75;
       pointer-events:none;
       z-index:2;
     }
 
     .brand{
       display:flex; justify-content:center;
-      padding:70px 24px 10px;
+      padding:78px 24px 12px;         /* mehr Luft oben, passend zum größeren Logo */
     }
     .wordmark{
-      width:min(92%,480px); height:auto; display:block;
+      width:min(94%,520px); height:auto; display:block;
       filter:drop-shadow(0 3px 0 rgba(0,0,0,.75));
     }
 
@@ -146,10 +144,18 @@
     .submit:disabled{opacity:.6;cursor:not-allowed;box-shadow:none}
 
     .help{text-align:center;margin:12px 0 18px;font-size:13px;color:var(--muted)}
-    .foot{margin-top:10px;padding:16px 20px 20px;
-          border-top:1px solid rgba(255,255,255,.06);
-          text-align:center;color:var(--muted);font-size:12px}
-    .foot small{display:block;line-height:1.35}
+
+    /* größerer, luftiger Footer */
+    .foot{
+      margin-top:12px;
+      padding:18px 22px 24px;        /* mehr Platz unten */
+      border-top:1px solid rgba(255,255,255,.06);
+      text-align:center;
+      color:var(--muted);
+      font-size:14px;                /* größer */
+      line-height:1.45;
+    }
+    .foot small{display:block}
   </style>
 </head>
 
@@ -194,7 +200,7 @@
       </div>
 
       <div class="foot">
-        <small>© <span id="y"></span> Hotel-Dashboard<br>
+        <small>© <span id="y"></span> Hotel‑Dashboard<br>
           Powered by MY HOME HOTEL AM ROTTWEIL GMBH</small>
       </div>
     </div>
