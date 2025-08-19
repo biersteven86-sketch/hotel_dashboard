@@ -11,16 +11,12 @@
 
   <style>
     :root{
-      /* Ziel: dunkler, dezenter Metallic-Look (nah am Hintergrund, kein Graustich) */
-      --bg:#0a0d12;            /* nur Fallback – Foto liegt drunter */
-      --panel-0:#3a3f46;       /* oben etwas heller */
-      --panel-1:#2f343b;       /* Mitte (dunkler Grundton) */
-      --panel-2:#24282e;       /* unten dunkler */
-      --stroke:#4a5058;        /* Feldrahmen dezent dunkel */
+      --bg:#0a0d12;            /* Fallback-Hintergrund */
       --text:#e9edf5;
       --muted:#a2abba;
       --accent:#e02724;
       --accent-2:#b31517;
+      --stroke:#4a5058;
       --radius:22px;
     }
 
@@ -41,7 +37,7 @@
       padding:clamp(20px,4vw,60px);
     }
 
-    /* ====== Dezenter „brushed dark“ Look (keine sichtbaren Streifen) ====== */
+    /* ====== Tiefschwarz + glänzend-matt Effekt ====== */
     .card{
       width:min(560px,94vw);
       border-radius:var(--radius);
@@ -49,33 +45,19 @@
       display:flex; flex-direction:column;
       position:relative;
 
-      /* 1) Grundverlauf (dunkel, nahe am Hintergrund) */
-      /* 2) extrem subtile Brush-Struktur (Alpha 0.02 / 0.015) */
-      /* 3) sehr zarte Diagonal-Glanzschicht (Alpha 0.04) */
       background:
-        linear-gradient(180deg, var(--panel-0) 0%, var(--panel-1) 42%, var(--panel-2) 100%),
-        repeating-linear-gradient(135deg,
-          rgba(255,255,255,.02) 0px,
-          rgba(255,255,255,.02) 1px,
-          rgba(0,0,0,0)        1px,
-          rgba(0,0,0,0)        4px
-        ),
-        repeating-linear-gradient(135deg,
-          rgba(0,0,0,.015) 0px,
-          rgba(0,0,0,.015) 2px,
-          rgba(0,0,0,0)    2px,
-          rgba(0,0,0,0)    6px
-        ),
-        linear-gradient(145deg, rgba(255,255,255,.04), rgba(255,255,255,0) 45% 70%, rgba(0,0,0,.05));
+        /* Basis fast schwarz */
+        linear-gradient(180deg, #151618 0%, #0f1012 100%),
+        /* zarter Diagonal-Glanz */
+        linear-gradient(145deg, rgba(255,255,255,.05) 0%, rgba(255,255,255,0) 60%);
 
-      border:1px solid rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.06);
       box-shadow:
-        0 26px 60px rgba(0,0,0,.50),          /* Drop-Shadow */
-        inset 0 1px 0 rgba(255,255,255,.08),  /* obere Lichtkante (sehr subtil) */
-        inset 0 -1px 0 rgba(0,0,0,.28);       /* untere Abdunklung */
+        0 28px 60px rgba(0,0,0,.55),
+        inset 0 1px 0 rgba(255,255,255,.07),
+        inset 0 -1px 0 rgba(0,0,0,.35);
     }
 
-    /* feine gefräste Top-Linie – sehr zurückhaltend */
     .card::before{
       content:"";
       position:absolute; inset:0 0 auto 0; height:1px;
@@ -83,58 +65,25 @@
       pointer-events:none;
     }
 
-    .brand{
-      display:flex; align-items:center; justify-content:center; gap:18px;
-      padding:26px 24px 8px;
-    }
-    .logo-box{ width:92px; height:92px; display:grid; place-items:center }
-    .logo-img{ width:92px; height:92px; object-fit:contain; display:block }
+    .brand{display:flex;align-items:center;justify-content:center;gap:18px;padding:26px 24px 8px;}
+    .logo-box{width:92px;height:92px;display:grid;place-items:center}
+    .logo-img{width:92px;height:92px;object-fit:contain;display:block}
+    .title{margin:0;font-weight:900;letter-spacing:.2px;font-size:clamp(26px,3.6vw,36px);text-shadow:0 1px 0 rgba(255,255,255,.16),0 4px 12px rgba(0,0,0,.55);}
 
-    .title{
-      margin:0;
-      font-weight:900;
-      letter-spacing:.2px;
-      font-size:clamp(26px,3.6vw,36px);
-      text-shadow:
-        0 1px 0 rgba(255,255,255,.16),
-        0 4px 12px rgba(0,0,0,.55);
-    }
-
-    .content{ padding:18px 24px 0 }
-
-    label{
-      display:block;
-      font-size:13px;
-      color:var(--muted);
-      margin:0 0 6px;
-    }
+    .content{padding:18px 24px 0}
+    label{display:block;font-size:13px;color:var(--muted);margin:0 0 6px;}
 
     .field{
-      display:grid;
-      grid-template-columns:1fr auto;
-      align-items:center;
-      min-height:50px;
-      padding:0 10px;
+      display:grid;grid-template-columns:1fr auto;align-items:center;
+      min-height:50px;padding:0 10px;
       border-radius:14px;
       border:1px solid var(--stroke);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.035), rgba(0,0,0,.07));
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.05),
-        inset 0 -1px 0 rgba(0,0,0,.22);
+      background:linear-gradient(180deg, rgba(255,255,255,.035), rgba(0,0,0,.07));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.05), inset 0 -1px 0 rgba(0,0,0,.22);
     }
-    .field input{
-      background:transparent; border:0; outline:0;
-      color:var(--text);
-      font-size:16px;
-      padding:12px 8px;
-      width:100%;
-    }
-    .field button.icon{
-      all:unset; cursor:pointer; border-radius:10px; padding:8px; display:grid; place-items:center;
-      color:#c7cfdb;
-    }
-    .icon svg{ width:22px; height:22px; display:block }
+    .field input{background:transparent;border:0;outline:0;color:var(--text);font-size:16px;padding:12px 8px;width:100%;}
+    .field button.icon{all:unset;cursor:pointer;border-radius:10px;padding:8px;display:grid;place-items:center;color:#c7cfdb;}
+    .icon svg{width:22px;height:22px;display:block}
 
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
@@ -144,78 +93,46 @@
       transition:background-color 5000s ease-in-out 0s;
     }
 
-    .caps{ display:none; color:#ef4444; font-size:12px; margin-top:6px }
-    .error{
-      display:none;
-      background:rgba(224,39,36,.12);
-      border:1px solid rgba(224,39,36,.45);
-      color:#ffd6d6;
-      padding:10px 12px; border-radius:12px; font-size:13px; margin:0 0 10px;
-    }
+    .caps{display:none;color:#ef4444;font-size:12px;margin-top:6px}
+    .error{display:none;background:rgba(224,39,36,.12);border:1px solid rgba(224,39,36,.45);color:#ffd6d6;padding:10px 12px;border-radius:12px;font-size:13px;margin:0 0 10px;}
 
-    .row-links{
-      display:flex; justify-content:flex-start; align-items:center; gap:12px;
-      font-size:13px; margin-top:6px;
-    }
-    .row-links a{
-      color:var(--accent); text-decoration:none; font-weight:700;
-      border-bottom:1px dashed rgba(255,255,255,.22);
-    }
-    .row-links a:hover{ color:#fff; border-bottom-color:rgba(255,255,255,.38) }
+    .row-links{display:flex;justify-content:flex-start;align-items:center;gap:12px;font-size:13px;margin-top:6px;}
+    .row-links a{color:var(--accent);text-decoration:none;font-weight:700;border-bottom:1px dashed rgba(255,255,255,.22);}
+    .row-links a:hover{color:#fff;border-bottom-color:rgba(255,255,255,.38)}
 
     .submit{
-      margin-top:12px;
-      border:0;
-      border-radius:14px;
-      padding:14px 18px;
-      font-weight:900; font-size:16px;
-      color:#fff; cursor:pointer;
+      margin-top:12px;border:0;border-radius:14px;padding:14px 18px;
+      font-weight:900;font-size:16px;color:#fff;cursor:pointer;
       background:linear-gradient(180deg,var(--accent),var(--accent-2));
-      box-shadow:
-        0 18px 34px rgba(224,39,36,.32),
-        0 1px 0 rgba(255,255,255,.05) inset;
+      box-shadow:0 18px 34px rgba(224,39,36,.32),0 1px 0 rgba(255,255,255,.05) inset;
       transition:transform .08s ease, box-shadow .12s ease;
     }
-    .submit:hover{
-      box-shadow:
-        0 22px 42px rgba(224,39,36,.40),
-        0 1px 0 rgba(255,255,255,.07) inset;
-    }
-    .submit:active{ transform:translateY(1px) scale(.997) }
-    .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none }
+    .submit:hover{box-shadow:0 22px 42px rgba(224,39,36,.40),0 1px 0 rgba(255,255,255,.07) inset;}
+    .submit:active{transform:translateY(1px) scale(.997)}
+    .submit:disabled{opacity:.6;cursor:not-allowed;box-shadow:none}
 
-    .help{ text-align:center; margin:12px 0 16px; font-size:13px; color:var(--muted) }
-
-    .foot{
-      margin-top:8px;
-      padding:14px 20px 18px;
-      border-top:1px solid rgba(255,255,255,.08);
-      text-align:center; color:var(--muted); font-size:12px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.015), rgba(0,0,0,.06));
-    }
-    .foot small{ display:block; line-height:1.35 }
+    .help{text-align:center;margin:12px 0 16px;font-size:13px;color:var(--muted)}
+    .foot{margin-top:8px;padding:14px 20px 18px;border-top:1px solid rgba(255,255,255,.08);text-align:center;color:var(--muted);font-size:12px;background:linear-gradient(180deg, rgba(255,255,255,.015), rgba(0,0,0,.06));}
+    .foot small{display:block;line-height:1.35}
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card" role="group" aria-labelledby="hd-title">
-
       <div class="brand">
         <div class="logo-box" aria-hidden="true">
           <img src="/HD-Logo.png" alt="HD Logo" class="logo-img">
         </div>
-        <h1 class="title" id="hd-title">Hotel‑Dashboard</h1>
+        <h1 class="title" id="hd-title">Hotel-Dashboard</h1>
       </div>
 
       <div class="content">
         <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
-
         <form action="/login" method="POST" id="loginForm" novalidate>
           <div>
             <label for="username">Benutzername</label>
             <div class="field">
-              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
+              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
             </div>
           </div>
 
@@ -224,67 +141,35 @@
             <div class="field">
               <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
               <button class="icon" type="button" id="togglePw" aria-label="Passwort anzeigen/ausblenden">
-                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.05 0-9.27-3.11-11-8 1.02-2.93 3.03-5.19 5.47-6.53m3.17-1.19A9.77 9.77 0 0112 4c5.05 0 9.27 3.11 11 8a11.73 11.73 0 01-1.41 2.94M9.88 9.88A3 3 0 1112 15a3 3 0 01-2.12-5.12z"/>
-                  <line x1="3" y1="3" x2="21" y2="21"/>
-                </svg>
-                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none" aria-hidden="true">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
-                  <circle cx="12" cy="12" r="3"/>
-                </svg>
+                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.05 0-9.27-3.11-11-8 1.02-2.93 3.03-5.19 5.47-6.53m3.17-1.19A9.77 9.77 0 0112 4c5.05 0 9.27 3.11 11 8a11.73 11.73 0 01-1.41 2.94M9.88 9.88A3 3 0 1112 15a3 3 0 01-2.12-5.12z"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </div>
             <div class="caps" id="caps">Warnung: Feststelltaste ist aktiv.</div>
           </div>
 
-          <div class="row-links">
-            <a href="/reset">Passwort vergessen?</a>
-          </div>
-
+          <div class="row-links"><a href="/reset">Passwort vergessen?</a></div>
           <button class="submit" id="submitBtn" type="submit" disabled>Anmelden</button>
-
           <div class="help">Bei Problemen wenden Sie sich bitte an den Administrator.</div>
         </form>
       </div>
 
       <div class="foot">
-        <small>
-          © <span id="y"></span> Hotel‑Dashboard<br>
-          Powered by MY HOME HOTEL AM ROTTWEIL GMBH
-        </small>
+        <small>© <span id="y"></span> Hotel-Dashboard<br>Powered by MY HOME HOTEL AM ROTTWEIL GMBH</small>
       </div>
     </div>
   </div>
 
   <script>
     document.getElementById('y').textContent = new Date().getFullYear();
-
-    const u = document.getElementById('username');
-    const p = document.getElementById('password');
-    const s = document.getElementById('submitBtn');
-    const tp = document.getElementById('togglePw');
-    const eyeOn  = document.getElementById('eye-on');
-    const eyeOff = document.getElementById('eye-off');
-    const c  = document.getElementById('caps');
-    const err= document.getElementById('err');
-
-    const update = () => { s.disabled = !(u.value.trim() && p.value.trim()); };
-    u.addEventListener('input', update);
-    p.addEventListener('input', update);
-    update();
-
-    tp.addEventListener('click', () => {
-      const show = p.type === "password";
-      p.type = show ? "text" : "password";
-      eyeOn.style.display  = show ? "block" : "none";
-      eyeOff.style.display = show ? "none"  : "block";
-    });
-
-    ['keydown','keyup'].forEach(ev => p.addEventListener(ev, e => {
-      try { c.style.display = e.getModifierState('CapsLock') ? 'block' : 'none'; } catch(_){}
-    }));
-
-    if (new URLSearchParams(location.search).get('err')) err.style.display='block';
+    const u=document.getElementById('username'),p=document.getElementById('password'),s=document.getElementById('submitBtn');
+    const tp=document.getElementById('togglePw'),eyeOn=document.getElementById('eye-on'),eyeOff=document.getElementById('eye-off');
+    const c=document.getElementById('caps'),err=document.getElementById('err');
+    const update=()=>{s.disabled=!(u.value.trim()&&p.value.trim());};
+    u.addEventListener('input',update);p.addEventListener('input',update);update();
+    tp.addEventListener('click',()=>{const show=p.type==="password";p.type=show?"text":"password";eyeOn.style.display=show?"block":"none";eyeOff.style.display=show?"none":"block";});
+    ['keydown','keyup'].forEach(ev=>p.addEventListener(ev,e=>{try{c.style.display=e.getModifierState('CapsLock')?'block':'none';}catch(_){}}));
+    if(new URLSearchParams(location.search).get('err'))err.style.display='block';
   </script>
 </body>
 </html>
