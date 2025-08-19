@@ -3,105 +3,123 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login · Hotel‑Dashboard</title>
-  <meta name="color-scheme" content="dark light">
-
-  <!-- Exakte Dateien vorladen -->
+  <title>Login · Hotel-Dashboard</title>
+  <meta name="color-scheme" content="light dark">
+  <!-- Assets vorladen -->
   <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
   <link rel="preload" as="image" href="/HD-Logo.png">
-
   <style>
     :root{
-      --text:#ffffff;
+      --bg:#0b1020;
+      --text:#eef2ff;
       --muted:#b7c0d8;
-      --accent:#E50914;          /* kräftiges Rot für Aktionen */
-      --card:#0b0b0b;            /* tiefschwarze Login-Box */
-      --field:#101010;           /* dunkle Felder, nicht transparent */
-      --field-stroke:#23262b;    /* dezente Kontur */
-      --field-focus:#3f3f46;     /* Fokus-Rand */
-      --radius:22px;
-      --shadow:0 22px 60px rgba(0,0,0,.55);
+      --accent:#d00028;                 /* kräftiges Rot */
+      --stroke:rgba(255,255,255,.16);   /* dezenter Rahmen */
+      --radius:22px;                    /* etwas runder wie im Mock */
+      --card-1:#0c0f15;                 /* tiefschwarz (oben)   */
+      --card-2:#0a0c11;                 /* tiefschwarz (mitte)  */
+      --card-3:#090b10;                 /* tiefschwarz (unten)  */
     }
+    *{box-sizing:border-box} html,body{height:100%}
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
     body{
       margin:0;
-      font:16px/1.45 system-ui,-apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial, "Noto Sans";
+      font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
       color:var(--text);
-
-      /* Nur Bild – keine Gradients/Overlays/Glas */
-      background:#000 url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
+      /* Hintergrundbild: unverändert, ohne Overlays */
+      background:var(--bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
+
+    /* keine body::before-Overlays */
 
     .wrap{min-height:100%; display:grid; place-items:center; padding:clamp(20px,4vw,60px)}
 
+    /* Karte: tiefschwarz mit leichter „Bevel“-Kante, abstehend */
     .card{
-      width:min(520px,92vw);
-      background:var(--card);
-      border:1px solid #121212;
+      width:min(460px,92vw);
       border-radius:var(--radius);
-      box-shadow:var(--shadow);
+      background:linear-gradient(180deg,var(--card-1),var(--card-2) 60%,var(--card-3)); /* keine Glas-Optik, nur Tiefe */
+      border:1px solid var(--stroke);
+      /* außen tiefer Schatten + feine Lichtkante + leichte Unterkante */
+      box-shadow:
+        0 28px 64px rgba(0,0,0,.75),          /* tiefer Drop */
+        0 1px 0 rgba(255,255,255,.06) inset,  /* Top-Highlight */
+        0 -10px 18px rgba(0,0,0,.55) inset,   /* Unterkante innen */
+        0 0 0 1px rgba(255,255,255,.04);      /* feiner Saum */
       overflow:hidden;
+      display:flex; flex-direction:column;
     }
 
-    /* Kopf/Brand */
-    .brand{display:flex; align-items:center; gap:16px; padding:28px 26px 10px}
-    .logo-box{
-      width:78px; height:78px; border-radius:16px;
-      background:#0a0a0a; border:1px solid #1a1a1a;
-      display:flex; align-items:center; justify-content:center; overflow:hidden;
-      flex-shrink:0;
+    /* Branding */
+    .brand{
+      display:flex; align-items:center; gap:16px;
+      padding:24px 22px 10px; justify-content:center
     }
-    .logo-box img{width:100%; height:100%; object-fit:cover}
-    .brand h1{margin:0; font-size:30px; font-weight:900; letter-spacing:.3px}
+    .brand-text h1{
+      margin:0; font-size:24px; font-weight:800; letter-spacing:.5px;
+      text-shadow:
+        0 6px 18px rgba(0,0,0,.7),   /* Tiefe wie im Mock */
+        0 1px 0 rgba(255,255,255,.10);
+    }
 
-    .content{ padding:18px 26px 24px }
-    form{ display:grid; gap:16px }
-    label{ font-size:13px; color:var(--muted); margin:0 0 6px }
+    /* PNG-Logo */
+    .logo-box{ width:72px; height:72px; display:flex; align-items:center; justify-content:center }
+    .logo-img{ width:72px; height:72px; display:block; object-fit:contain }
 
+    /* Formularbereich */
+    .content{ padding:20px 22px 0 }
+    form{ display:grid; gap:14px }
+    label{ font-size:13px; color:var(--muted); display:block; margin:0 0 6px }
+
+    /* Felder: transparent (wie von dir gewünscht) + präzisere Kante */
     .field{
-      display:grid; grid-template-columns:1fr auto; align-items:center; gap:8px;
-      min-height:48px; padding:0 12px;
-      background:var(--field);
-      border:1px solid var(--field-stroke);
+      background:transparent;
+      border:1px solid var(--stroke);
       border-radius:14px;
-      transition:border-color .15s ease, box-shadow .15s ease;
+      display:grid; grid-template-columns:1fr auto; align-items:center;
+      padding:0 8px; min-height:46px;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,.05) inset,  /* zarter Oberlicht-Saum */
+        0 -6px 12px rgba(0,0,0,.45) inset;    /* leichte Mulde wie im Mock */
     }
-    .field:focus-within{ border-color:var(--field-focus); box-shadow:0 0 0 2px var(--field-focus) inset }
-    .field input{ background:transparent; border:0; outline:0; color:var(--text); font-size:15px; padding:12px 6px }
-
-    /* Autofill (Chrome/Safari) neutralisieren */
-    input:-webkit-autofill{
-      -webkit-text-fill-color: var(--text) !important;
-      -webkit-box-shadow: 0 0 0px 1000px var(--field) inset !important;
-      transition: background-color 5000s ease-in-out 0s;
-      caret-color: var(--text);
+    .field input{
+      flex:1; background:transparent; border:0; outline:0;
+      color:var(--text); font-size:15px; padding:10px 8px; width:100%;
     }
-
-    .icon{ all:unset; cursor:pointer; padding:8px; border-radius:10px; color:#9aa3b2 }
+    .field button.icon{ all:unset; cursor:pointer; padding:8px; border-radius:10px; display:grid; place-items:center }
     .icon svg{ width:22px; height:22px; display:block }
 
-    .caps{ display:none; color:#ef4444; font-size:12px; margin-top:6px }
-
-    .link-row{ display:flex; justify-content:flex-start; margin-top:2px }
-    .link-row a{ font-size:13px; color:var(--accent); text-decoration:none; font-weight:700 }
-    .link-row a:hover{ text-decoration:underline }
-
-    .submit{
-      margin-top:6px; background:var(--accent); color:#fff; border:0; border-radius:16px;
-      padding:14px 18px; font-weight:800; font-size:16px; cursor:pointer; letter-spacing:.2px;
-      box-shadow:0 12px 28px rgba(229,9,20,.28);
-      transition: transform .08s ease, filter .15s ease;
+    /* Autofill ohne Gelb */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus{
+      -webkit-text-fill-color:var(--text) !important;
+      box-shadow:0 0 0 1000px transparent inset !important;
+      transition:background-color 5000s ease-in-out 0s;
     }
-    .submit:hover{ filter:brightness(1.03) }
-    .submit:active{ transform:translateY(1px) scale(.997) }
+
+    .caps{ display:none; color:#ef4444; font-size:12px; margin-top:6px }
+    .error{ display:none; background:rgba(239,68,68,.14); border:1px solid rgba(239,68,68,.45); color:#fecaca; padding:10px 12px; border-radius:12px; font-size:13px; margin-bottom:6px }
+
+    /* Link-Reihe */
+    .row-links{ display:flex; justify-content:space-between; align-items:center; font-size:13px; margin-top:4px }
+    .row-links a{ color:var(--accent); text-decoration:none; font-weight:700; border-bottom:1px dashed rgba(255,255,255,.28) }
+    .row-links a:hover{ color:#fff; border-bottom-color:rgba(255,255,255,.5) }
+
+    /* Button: wie vorher */
+    .submit{
+      margin-top:6px;
+      background:linear-gradient(135deg,var(--accent),#b00020);
+      color:#fff; border:0; border-radius:14px; padding:12px 16px; font-weight:800; font-size:15px; cursor:pointer;
+      box-shadow:0 10px 24px rgba(178,0,32,.35); transition:transform .08s ease
+    }
     .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none }
+    .submit:active{ transform:translateY(1px) scale(.997) }
 
-    .help{ text-align:center; color:var(--muted); font-size:12px; padding-top:6px }
+    .help{ text-align:center; margin:10px 0 14px; font-size:13px; color:var(--muted) }
 
-    .divider{ height:1px; background:#151515; margin:10px 0 0 }
-    .foot{ text-align:center; color:var(--muted); font-size:12px; padding:10px 14px 18px; background:var(--card) }
+    /* Footer im Fenster */
+    .foot{ text-align:center; color:var(--muted); font-size:12px; padding:12px 18px 18px; border-top:1px solid rgba(255,255,255,.08) }
     .foot small{ display:block; line-height:1.35 }
   </style>
 </head>
@@ -109,19 +127,23 @@
   <div class="wrap">
     <div class="card" role="group" aria-labelledby="hd-title">
 
+      <!-- BRAND -->
       <div class="brand">
-        <div class="logo-box">
-          <img id="brandLogo" src="/HD-Logo.png" alt="HD Logo">
+        <div class="logo-box" aria-hidden="true">
+          <img src="/HD-Logo.png" alt="HD Logo" class="logo-img">
         </div>
-        <h1 id="hd-title">Hotel‑Dashboard</h1>
+        <div class="brand-text"><h1 id="hd-title">Hotel‑Dashboard</h1></div>
       </div>
 
+      <!-- FORMULAR -->
       <div class="content">
+        <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
+
         <form action="/login" method="POST" id="loginForm" novalidate>
           <div>
             <label for="username">Benutzername</label>
             <div class="field">
-              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
+              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
             </div>
           </div>
 
@@ -137,7 +159,7 @@
                 </svg>
                 <!-- offen -->
                 <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
-                  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
                   <circle cx="12" cy="12" r="3"/>
                 </svg>
               </button>
@@ -145,8 +167,9 @@
             <div class="caps" id="caps">Warnung: Feststelltaste ist aktiv.</div>
           </div>
 
-          <div class="link-row">
+          <div class="row-links">
             <a href="/reset">Passwort vergessen?</a>
+            <span></span>
           </div>
 
           <button class="submit" id="submitBtn" type="submit" disabled>Anmelden</button>
@@ -155,43 +178,44 @@
         </form>
       </div>
 
-      <div class="divider"></div>
+      <!-- FOOTER im Fenster -->
       <div class="foot">
-        <small>© <span id="y"></span> Hotel‑Dashboard</small>
-        <small>Powered by MY HOME HOTEL AM ROTTWEIL GMBH</small>
+        <small>© <span id="y"></span> Hotel‑Dashboard<br>
+        Powered by MY HOME HOTEL AM ROTTWEIL GMBH</small>
       </div>
     </div>
   </div>
 
   <script>
-    // Jahr
+    // Jahr im Footer
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // Elemente
+    // Interaktionen
     const u=document.getElementById('username'),
           p=document.getElementById('password'),
           s=document.getElementById('submitBtn'),
           tp=document.getElementById('togglePw'),
           eyeOn=document.getElementById('eye-on'),
           eyeOff=document.getElementById('eye-off'),
-          caps=document.getElementById('caps');
+          c=document.getElementById('caps'),
+          err=document.getElementById('err');
 
-    // Submit aktivieren, wenn beide Felder befüllt
     const update=()=>{ s.disabled=!(u.value.trim() && p.value.trim()); };
     u.addEventListener('input',update); p.addEventListener('input',update); update();
 
-    // Auge toggeln: geschlossen ↔ offen
     tp.addEventListener('click',()=>{
-      const show = (p.type==="password");
+      const show = p.type==="password";
       p.type = show ? "text" : "password";
       eyeOn.style.display  = show ? "block" : "none";
       eyeOff.style.display = show ? "none"  : "block";
     });
 
-    // Caps-Lock Hinweis
     ['keydown','keyup'].forEach(ev=>p.addEventListener(ev,e=>{
-      try{ caps.style.display=e.getModifierState('CapsLock')?'block':'none'; }catch(_){}
+      try{ c.style.display=e.getModifierState('CapsLock')?'block':'none'; }catch(_){}
     }));
+
+    // Fehlermeldung via /login?err=1 anzeigen
+    if (new URLSearchParams(location.search).get('err')) err.style.display='block';
   </script>
 </body>
 </html>
