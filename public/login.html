@@ -1,198 +1,190 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Hotel-Dashboard Login</title>
-  <style>
-    body {
-      margin:0;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-family:sans-serif;
-      background: url("Hotel-Dashboard-hintergrund.jpg") no-repeat center center fixed;
-      background-size: cover;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Login · Hotel-Dashboard</title>
+<meta name="color-scheme" content="light dark">
+<link rel="preload" as="image" href="/Hotel-Dashboard-hintergrund.jpg">
+<style>
+  :root{
+    --bg:#0b1020;
+    --glass:rgba(255,255,255,.10);
+    --stroke:rgba(255,255,255,.22);
+    --text:#eef2ff;
+    --muted:#b7c0d8;
+    --accent:#d00028;   /* kräftiges Rot */
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+    --radius:24px;
+    --matt:#0a0a0a;
+  }
 
-    .login-box {
-      background: rgba(0,0,0,0.7);
-      padding: 30px;
-      border-radius: 12px;
-      width: 320px;
-      text-align: center;
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    }
+  html,body{height:100%}
+  body{
+    margin:0;
+    display:flex; justify-content:center; align-items:center;
+    background: url("Hotel-Dashboard-hintergrund.jpg") no-repeat center center fixed;
+    background-size: cover;
+    color:var(--text);
+    font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Arial,"Noto Sans";
+  }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
+  .card{
+    width:min(460px,92vw);
+    border-radius:var(--radius);
+    background:linear-gradient(180deg,var(--glass),rgba(255,255,255,.06));
+    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    border:1px solid var(--stroke);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
 
-    .logo-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 12px;
-      background: #d00028;          /* kräftiges modernes Rot */
-      border: 3px solid #111;       /* matte schwarze Umrandung */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 10px;
-      font-weight: bold;
-      color: white;
-      font-size: 18px;
-      font-family: Arial, sans-serif;
-    }
+  .brand{display:flex; align-items:center; gap:18px; padding:26px 24px 10px; justify-content:center}
+  .logo-box{
+    position:relative; width:78px; height:78px; border-radius:18px;
+    background:var(--matt); border:1.5px solid #000;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 10px 24px rgba(0,0,0,.5);
+  }
+  .logo-box::before{
+    content:""; position:absolute; inset:7px; border-radius:12px;
+    background:radial-gradient(90% 120% at 30% 25%, #b00020 0%, #d00028 50%, #8a0015 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12),
+               inset 0 -2px 4px rgba(0,0,0,.45),
+               0 6px 14px rgba(178,0,32,.35);
+  }
+  .logo-box .hd{position:relative; z-index:1; font-weight:900; font-size:30px; color:#fff; user-select:none;}
+  .brand-text h1{ margin:0; font-size:26px; font-weight:800; letter-spacing:.3px }
 
-    h1 {
-      font-size: 20px;
-      margin: 0;
-    }
+  .content{ padding:20px 24px }
+  form{ display:grid; gap:14px }
+  label{ font-size:13px; color:var(--muted); margin-bottom:6px }
 
-    label {
-      display: block;
-      text-align: left;
-      margin: 10px 0 5px;
-      font-size: 14px;
-    }
+  .field{
+    background:transparent;   /* nur Rahmen, kein Hintergrund */
+    border:1px solid var(--stroke);
+    border-radius:14px;
+    display:grid; grid-template-columns:1fr auto; align-items:center;
+    padding:0 8px; min-height:46px;
+  }
+  .field input{
+    background:transparent; border:0; outline:0;
+    color:var(--text); font-size:15px; padding:10px 8px; width:100%;
+  }
+  .field button.icon{ all:unset; cursor:pointer; padding:8px; display:grid; place-items:center }
+  .icon svg{ width:22px; height:22px; display:block }
 
-    .field {
-      position: relative;
-      margin-bottom: 15px;
-    }
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus{
+    -webkit-text-fill-color:var(--text) !important;
+    box-shadow:0 0 0 1000px transparent inset !important;
+    transition:background-color 5000s ease-in-out 0s;
+  }
 
-    input[type="text"],
-    input[type="password"] {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #555;
-      border-radius: 6px;
-      background: transparent;     /* kein gelbes Feld mehr */
-      color: #fff;
-      font-size: 14px;
-    }
+  .caps{ display:none; color:#fecaca; font-size:12px; margin-top:6px }
+  .error{ display:none; background:rgba(239,68,68,.14); border:1px solid rgba(239,68,68,.45); color:#fecaca; padding:10px 12px; border-radius:12px; font-size:13px; margin-bottom:6px }
 
-    .icon {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #ccc;
-    }
+  .row-links{ display:flex; justify-content:space-between; align-items:center; font-size:13px; margin-top:4px }
+  .row-links a{ color:var(--accent); text-decoration:none; font-weight:600; border-bottom:1px dashed rgba(255,255,255,.28) }
+  .row-links a:hover{ color:#ffffff; border-bottom-color:rgba(255,255,255,.6) }
 
-    .links {
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      margin-top: 4px;
-    }
+  .submit{
+    margin-top:6px;
+    background:linear-gradient(135deg,var(--accent),#b00020);
+    color:#fff; border:0; border-radius:14px; padding:12px 16px;
+    font-weight:800; font-size:15px; cursor:pointer;
+    box-shadow:0 10px 24px rgba(178,0,32,.35);
+  }
+  .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none }
 
-    .links a {
-      color: #d00028; /* kräftiges Rot */
-      text-decoration: none;
-    }
+  .help{ text-align:center; margin-top:10px; font-size:13px; color:var(--muted) }
 
-    .submit {
-      width: 100%;
-      padding: 10px;
-      margin-top: 15px;
-      border: none;
-      border-radius: 6px;
-      background: #d00028; /* kräftiges Rot */
-      color: #fff;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .help {
-      margin-top: 10px;
-      font-size: 12px;
-    }
-
-    footer {
-      margin-top: 20px;
-      font-size: 11px;
-      color: #bbb;
-    }
-  </style>
+  .foot{ text-align:center; color:var(--muted); font-size:12px; padding:16px }
+</style>
 </head>
 <body>
-  <div class="login-box">
-    <div class="logo">
-      <div class="logo-icon">HD</div>
-      <h1>Hotel-Dashboard</h1>
+  <div class="card" role="group" aria-labelledby="hd-title">
+    <div class="brand">
+      <div class="logo-box" aria-hidden="true"><div class="hd">HD</div></div>
+      <div class="brand-text"><h1 id="hd-title">Hotel-Dashboard</h1></div>
     </div>
 
-    <form method="post" action="/login">
-      <label for="username">Benutzername</label>
-      <div class="field">
-        <input id="username" name="username" type="text" placeholder="z. B. admin" required>
-      </div>
+    <div class="content">
+      <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
 
-      <label for="password">Passwort</label>
-      <div class="field">
-        <input id="password" name="password" type="password" placeholder="********" required>
-        <button class="icon" type="button" id="togglePw">
-          <!-- geschlossen -->
-          <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M17.94 17.94A10 10 0 0 1 6.06 6.06M1 1l22 22"/>
-          </svg>
-          <!-- offen -->
-          <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M2.05 12a9.94 9.94 0 0 1 19.9 0 9.94 9.94 0 0 1-19.9 0z"/>
-          </svg>
-        </button>
-      </div>
+      <form action="/login" method="POST" id="loginForm" novalidate>
+        <div>
+          <label for="username">Benutzername</label>
+          <div class="field">
+            <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
+          </div>
+        </div>
 
-      <div class="links">
-        <a href="/reset">Passwort vergessen?</a>
-      </div>
+        <div>
+          <label for="password">Passwort</label>
+          <div class="field">
+            <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
+            <button class="icon" type="button" id="togglePw" aria-label="Passwort anzeigen/ausblenden">
+              <!-- geschlossen -->
+              <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.05 0-9.27-3.11-11-8 1.02-2.93 3.03-5.19 5.47-6.53m3.17-1.19A9.77 9.77 0 0112 4c5.05 0 9.27 3.11 11 8a11.73 11.73 0 01-1.41 2.94M9.88 9.88A3 3 0 1112 15a3 3 0 01-2.12-5.12z"/>
+                <line x1="3" y1="3" x2="21" y2="21"/>
+              </svg>
+              <!-- offen -->
+              <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <div class="caps" id="caps">Warnung: Feststelltaste ist aktiv.</div>
+        </div>
 
-      <button class="submit" id="submitBtn" type="submit" disabled>Anmelden</button>
-    </form>
+        <div class="row-links">
+          <a href="/reset">Passwort vergessen?</a>
+          <span></span>
+        </div>
 
-    <div class="help">Bei Problemen wenden Sie sich bitte an den Administrator.</div>
+        <button class="submit" id="submitBtn" type="submit" disabled>Anmelden</button>
 
-    <footer>
-      © 2025 Hotel-Dashboard<br>
-      Powered by MY HOME HOTEL AM ROTTWEIL GMBH
-    </footer>
+        <div class="help">Bei Problemen wenden Sie sich bitte an den Administrator.</div>
+      </form>
+    </div>
+
+    <div class="foot">
+      <small>© <span id="y"></span> Hotel-Dashboard<br>
+      Powered by MY HOME HOTEL AM ROTTWEIL GMBH</small>
+    </div>
   </div>
 
-  <script>
-    const pwField = document.getElementById('password');
-    const toggle = document.getElementById('togglePw');
-    const eyeOff = document.getElementById('eye-off');
-    const eyeOn = document.getElementById('eye-on');
-    const submitBtn = document.getElementById('submitBtn');
-    const userField = document.getElementById('username');
+<script>
+  document.getElementById('y').textContent = new Date().getFullYear();
 
-    toggle.addEventListener('click', () => {
-      if (pwField.type === 'password') {
-        pwField.type = 'text';
-        eyeOff.style.display = 'none';
-        eyeOn.style.display = 'inline';
-      } else {
-        pwField.type = 'password';
-        eyeOn.style.display = 'none';
-        eyeOff.style.display = 'inline';
-      }
-    });
+  const u=document.getElementById('username'),
+        p=document.getElementById('password'),
+        s=document.getElementById('submitBtn'),
+        tp=document.getElementById('togglePw'),
+        eyeOn=document.getElementById('eye-on'),
+        eyeOff=document.getElementById('eye-off'),
+        c=document.getElementById('caps'),
+        err=document.getElementById('err');
 
-    function checkFields() {
-      submitBtn.disabled = !(userField.value.trim() && pwField.value.trim());
-    }
-    userField.addEventListener('input', checkFields);
-    pwField.addEventListener('input', checkFields);
-  </script>
+  const update=()=>{ s.disabled=!(u.value.trim() && p.value.trim()); };
+  u.addEventListener('input',update); p.addEventListener('input',update); update();
+
+  tp.addEventListener('click',()=>{
+    const show = p.type==="password";
+    p.type = show ? "text" : "password";
+    eyeOn.style.display  = show ? "block" : "none";
+    eyeOff.style.display = show ? "none"  : "block";
+  });
+
+  ['keydown','keyup'].forEach(ev=>p.addEventListener(ev,e=>{
+    try{ c.style.display=e.getModifierState('CapsLock')?'block':'none'; }catch(_){}
+  }));
+
+  if (new URLSearchParams(location.search).get('err')) err.style.display='block';
+</script>
 </body>
 </html>
