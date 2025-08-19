@@ -12,16 +12,23 @@
 
   <style>
 :root{
-  --bg:#06080c;              /* Hintergrundbild bleibt */
-  --panel:#2a2d32;           /* neues mattes Grau */
-  --panel-edge:#3a3d43;      /* hellere Kante */
-  --stroke:#4a4e55;          /* Feldrahmen etwas heller */
+  --bg:#06080c;               /* Hintergrund bleibt */
+  --panel:#3b3f46;            /* Helleres Grau, passend zum Hexagon-Look */
+  --panel-edge:#4a4f57;       /* feine Kantenfarbe */
+  --stroke:#5a5f68;           /* Feldrahmen noch heller */
   --text:#e9edf5;
   --muted:#9aa3b2;
   --accent:#e02724;
   --accent-2:#b31517;
   --radius:22px;
 }
+
+.card{
+  ...
+  background:linear-gradient(180deg,#3b3f46,#353940); /* matter Verlauf */
+  ...
+}
+
 
     *{box-sizing:border-box}
     html,body{height:100%}
