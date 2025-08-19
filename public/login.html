@@ -11,7 +11,8 @@
 
   <style>
     :root{
-      --bg:#0a0d12;            /* Fallback-Hintergrund */
+      /* Grundfarben – tief, neutral, kein Graustich */
+      --bg:#0a0d12;            /* Fallback – das Foto liegt drunter */
       --text:#e9edf5;
       --muted:#a2abba;
       --accent:#e02724;
@@ -37,7 +38,7 @@
       padding:clamp(20px,4vw,60px);
     }
 
-    /* ====== Tiefschwarz + matter Glanz ====== */
+    /* ====== Tiefschwarz + „glänzend-matt“ (deutlicher, aber nicht speckig) ====== */
     .card{
       width:min(560px,94vw);
       border-radius:var(--radius);
@@ -45,30 +46,58 @@
       display:flex; flex-direction:column;
       position:relative;
 
+      /* Basis: sehr dunkler Verlauf */
       background:
-        /* dunkler Grundton */
-        linear-gradient(180deg, #131416 0%, #0d0e10 100%),
-        /* sehr matter, zarter Schimmer */
-        linear-gradient(145deg, rgba(255,255,255,.025) 0%, rgba(255,255,255,0) 60%);
+        linear-gradient(180deg, #111216 0%, #0b0c0e 100%);
 
-      border:1px solid rgba(255,255,255,.05);
+      /* Kanten & Tiefe */
+      border:1px solid rgba(255,255,255,.06);
       box-shadow:
         0 28px 60px rgba(0,0,0,.55),
         inset 0 1px 0 rgba(255,255,255,.04),
         inset 0 -1px 0 rgba(0,0,0,.25);
     }
 
+    /* feine, gerade Top-Kante (gefräst) */
     .card::before{
       content:"";
       position:absolute; inset:0 0 auto 0; height:1px;
-      background:linear-gradient(90deg, transparent, rgba(255,255,255,.1), transparent);
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
       pointer-events:none;
+    }
+
+    /* >>> gezielter Glanz-Effekt (specular highlight) – NICHT flächig, nur oben/diagonal */
+    .card::after{
+      content:"";
+      position:absolute; inset:0;
+      pointer-events:none;
+      /* 1) Diagonaler Specular-Streifen
+         2) Weiche elliptische Aufhellung oben links
+         3) Vignette, damit die Ränder dunkler bleiben */
+      background:
+        linear-gradient(115deg,
+          rgba(255,255,255,.18) 0%,
+          rgba(255,255,255,.10) 6%,
+          rgba(255,255,255,0) 14%
+        ),
+        radial-gradient(120% 65% at 18% 0%,
+          rgba(255,255,255,.10) 0%,
+          rgba(255,255,255,.04) 38%,
+          rgba(255,255,255,0) 62%
+        ),
+        radial-gradient(100% 140% at 50% 40%,
+          rgba(0,0,0,.22) 0%,
+          rgba(0,0,0,.12) 40%,
+          rgba(0,0,0,0) 70%
+        );
+      mix-blend-mode:screen;  /* hebt nur Helligkeit an, Farbstich wird vermieden */
+      opacity:.45;            /* Stärke des Glanzes – bei Bedarf feinjustieren (.35–.55) */
     }
 
     .brand{display:flex;align-items:center;justify-content:center;gap:18px;padding:26px 24px 8px;}
     .logo-box{width:92px;height:92px;display:grid;place-items:center}
     .logo-img{width:92px;height:92px;object-fit:contain;display:block}
-    .title{margin:0;font-weight:900;letter-spacing:.2px;font-size:clamp(26px,3.6vw,36px);text-shadow:0 1px 0 rgba(255,255,255,.14),0 4px 12px rgba(0,0,0,.55);}
+    .title{margin:0;font-weight:900;letter-spacing:.2px;font-size:clamp(26px,3.6vw,36px);text-shadow:0 1px 0 rgba(255,255,255,.12),0 4px 12px rgba(0,0,0,.55);}
 
     .content{padding:18px 24px 0}
     label{display:block;font-size:13px;color:var(--muted);margin:0 0 6px;}
