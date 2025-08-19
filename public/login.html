@@ -1,12 +1,3 @@
-# Backup & Replace
-ts=$(date +%Y%m%d_%H%M%S)
-cd /home/steven/hotel_dashboard/public
-
-# Backup der aktuellen Datei
-cp -a login.html login_backup_$ts.html 2>/dev/null || true
-
-# Neue Version schreiben
-cat > login.html <<'HTML'
 <!doctype html>
 <html lang="de">
 <head>
@@ -21,15 +12,14 @@ cat > login.html <<'HTML'
 
   <style>
     :root{
-      /* Hintergrund + Panel-Farben: Fenster = exakt wie Seitenhintergrund */
-      --bg:#06080c;              /* aus deinem 1. Referenzbild (dunkles Anthrazit, leicht bläulich) */
-      --panel:var(--bg);         /* Fenster übernimmt denselben Farbton */
-      --panel-edge:#131922;      /* Kantenabhebung */
-      --stroke:#2a323d;          /* Feldrahmen */
-      --text:#e9edf5;            /* Primärtext (weiches Weiß) */
-      --muted:#9aa3b2;           /* Sekundärtext */
-      --accent:#e02724;          /* Rot (Button) */
-      --accent-2:#b31517;        /* dunklere Verlaufsfarbe */
+      --bg:#1b1e24;             /* mattes Grau-Anthrazit statt Tiefschwarz */
+      --panel:var(--bg);        /* Panel exakt gleiche Farbe wie Hintergrund */
+      --panel-edge:#242830;     /* leicht hellere Kante */
+      --stroke:#363c46;
+      --text:#e9edf5;
+      --muted:#9aa3b2;
+      --accent:#e02724;
+      --accent-2:#b31517;
       --radius:22px;
     }
 
@@ -40,7 +30,6 @@ cat > login.html <<'HTML'
       margin:0;
       font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
       color:var(--text);
-      /* echtes Foto bleibt */
       background:var(--bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
 
@@ -53,20 +42,17 @@ cat > login.html <<'HTML'
 
     .card{
       width:min(560px,94vw);
-      background:var(--panel);                 /* exakt gleiche Farbe wie der Seitenhintergrund */
+      background:var(--panel);
       border-radius:var(--radius);
-      /* dezente Absetzung: feine Kante + doppelte Shadow-Krone wie im 2. Bild */
       border:1px solid rgba(255,255,255,.035);
       box-shadow:
-        0 28px 70px rgba(0,0,0,.65),           /* tiefer Drop-Shadow */
-        0 2px 0 rgba(255,255,255,.02) inset,   /* leichte obere Lichtkante innen */
-        0 -1px 0 rgba(0,0,0,.35) inset;        /* subtile untere Abdunklung */
+        0 26px 60px rgba(0,0,0,.55),
+        0 2px 0 rgba(255,255,255,.02) inset;
       overflow:hidden;
       display:flex; flex-direction:column;
       position:relative;
     }
 
-    /* schmale Top-Lippe (metallische Reflexlinie) */
     .card::before{
       content:"";
       position:absolute; inset:0 0 auto 0; height:1px;
@@ -74,7 +60,6 @@ cat > login.html <<'HTML'
       pointer-events:none;
     }
 
-    /* Logo + Titel */
     .brand{
       display:flex; align-items:center; justify-content:center; gap:18px;
       padding:26px 24px 8px;
@@ -101,7 +86,6 @@ cat > login.html <<'HTML'
       margin:0 0 6px;
     }
 
-    /* Felder – transparent mit dunklem Rahmen */
     .field{
       display:grid;
       grid-template-columns:1fr auto;
@@ -126,7 +110,6 @@ cat > login.html <<'HTML'
     }
     .icon svg{ width:22px; height:22px; display:block }
 
-    /* Autofill ohne Gelb */
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
     input:-webkit-autofill:focus{
@@ -154,7 +137,6 @@ cat > login.html <<'HTML'
     }
     .row-links a:hover{ color:#fff; border-bottom-color:rgba(255,255,255,.45) }
 
-    /* Button im Rot-Verlauf + Lift-Schatten */
     .submit{
       margin-top:12px;
       border:0;
@@ -191,12 +173,11 @@ cat > login.html <<'HTML'
   <div class="wrap">
     <div class="card" role="group" aria-labelledby="hd-title">
 
-      <!-- Logo + Titel -->
       <div class="brand">
         <div class="logo-box" aria-hidden="true">
           <img src="/HD-Logo.png" alt="HD Logo" class="logo-img">
         </div>
-        <h1 class="title" id="hd-title">Hotel‑Dashboard</h1>
+        <h1 class="title" id="hd-title">Hotel-Dashboard</h1>
       </div>
 
       <div class="content">
@@ -206,7 +187,7 @@ cat > login.html <<'HTML'
           <div>
             <label for="username">Benutzername</label>
             <div class="field">
-              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
+              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
             </div>
           </div>
 
@@ -215,13 +196,11 @@ cat > login.html <<'HTML'
             <div class="field">
               <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
               <button class="icon" type="button" id="togglePw" aria-label="Passwort anzeigen/ausblenden">
-                <!-- geschlossen -->
-                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.05 0-9.27-3.11-11-8 1.02-2.93 3.03-5.19 5.47-6.53m3.17-1.19A9.77 9.77 0 0112 4c5.05 0 9.27 3.11 11 8a11.73 11.73 0 01-1.41 2.94M9.88 9.88A3 3 0 1112 15a3 3 0 01-2.12-5.12z"/>
                   <line x1="3" y1="3" x2="21" y2="21"/>
                 </svg>
-                <!-- offen -->
-                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none" aria-hidden="true">
+                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
                   <circle cx="12" cy="12" r="3"/>
                 </svg>
@@ -242,7 +221,7 @@ cat > login.html <<'HTML'
 
       <div class="foot">
         <small>
-          © <span id="y"></span> Hotel‑Dashboard<br>
+          © <span id="y"></span> Hotel-Dashboard<br>
           Powered by MY HOME HOTEL AM ROTTWEIL GMBH
         </small>
       </div>
@@ -250,7 +229,6 @@ cat > login.html <<'HTML'
   </div>
 
   <script>
-    // Footer-Jahr
     document.getElementById('y').textContent = new Date().getFullYear();
 
     const u = document.getElementById('username');
@@ -282,7 +260,3 @@ cat > login.html <<'HTML'
   </script>
 </body>
 </html>
-HTML
-
-# (optional) PM2-Reload, falls du PM2 nutzt:
-# pm2 restart hotel-dashboard
