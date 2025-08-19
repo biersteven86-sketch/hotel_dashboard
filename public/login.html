@@ -4,30 +4,39 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login · Hotel‑Dashboard</title>
-  <meta name="color-scheme" content="light dark" />
-
-  <!-- Assets -->
+  <meta name="color-scheme" content="light dark">
   <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
   <link rel="preload" as="image" href="/HD-Logo.png">
-  <link rel="preload" as="image" href="/Hotel-Dashboard-Schriftzug.png">
 
   <style>
     :root{
-      /* Töne passend zum Foto */
-      --bg:#07090d;
-      --panel-1:#2d333a;
-      --panel-2:#23292f;
-      --edge:#39424c;
-      --text:#e8edf5;
-      --muted:#a3adbb;
+      /* Grundfarben im Stil des Hintergrundfotos (dunkles, leicht warmes Grau) */
+      --bg:#06080c;
+      --panel:#1c2229;          /* mattes, dunkles Grau */
+      --panel-2:#12161b;        /* dunklere Nuance */
+      --edge:#2a323d;           /* Kanten-/Strichfarbe */
+      --stroke:#3a414c;
+      --text:#eef2f8;
+      --muted:#a4aebb;
       --accent:#e02724;
-      --accent-2:#b01517;
+      --accent-2:#b31517;
       --radius:22px;
+      /* Glossy‑Matt: weiche Lichter + dezentes Korn */
+      --card-gloss: radial-gradient(180px 120px at 18% 8%,
+                      rgba(255,255,255,.10) 0%,
+                      rgba(255,255,255,.06) 35%,
+                      rgba(255,255,255,.00) 70%)
+                    ,linear-gradient(180deg,
+                      rgba(255,255,255,.04), rgba(255,255,255,0) 18%),
+                      linear-gradient(180deg, var(--panel), var(--panel-2));
+      --noise: url('data:image/svg+xml;utf8,\
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox=\"0 0 60 60\">\
+        <filter id=\"n\"><feTurbulence type=\"fractalNoise\" baseFrequency=\".9\" numOctaves=\"2\"/></filter>\
+        <rect width=\"100%\" height=\"100%\" filter=\"url(%23n)\" opacity=\".04\"/></svg>');
     }
 
     *{box-sizing:border-box}
     html,body{height:100%}
-
     body{
       margin:0;
       font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
@@ -35,89 +44,116 @@
       background:var(--bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
 
-    /* Bühne: damit das Badge außerhalb der Karte positioniert werden kann */
-    .stage{
-      position:relative;     /* Bezug für das absolute Badge */
+    .wrap{
       min-height:100%;
       display:grid;
       place-items:center;
-      padding:clamp(18px,4vw,60px);
-    }
-
-    /* ===== ÜBERGREIFENDES HD-BADGE (NICHT in der Karte!) ===== */
-    .badge{
-      position:absolute;
-      left:50%;
-      top:18vh;                               /* Position wie auf deinem Referenzbild */
-      transform:translate(-50%,-18%);         /* feines Einsinken */
-      width:clamp(180px,22vw,280px);
-      aspect-ratio:1/1;
-      display:grid; place-items:center;
-      z-index:10;                              /* über der Karte */
-      pointer-events:none;
-      filter:
-        drop-shadow(0 22px 36px rgba(0,0,0,.55))
-        drop-shadow(0 2px 0 rgba(255,255,255,.06));
-    }
-    .badge img{width:100%;height:100%;object-fit:contain;display:block}
-
-    /* ===== Karte: seidenmatt + Glanz, rutscht unter das Badge ===== */
-    .card{
-      width:min(640px,94vw);
-      margin-top:clamp(90px,12vh,180px);      /* genügend Platz unterm Badge, nichts wird abgeschnitten */
-      border-radius:var(--radius);
-      border:1px solid rgba(255,255,255,.06);
-      overflow:hidden;                        /* Button-Glow bleibt innen */
+      padding:clamp(20px,4vw,60px);
       position:relative;
-      isolation:isolate;
-      background:
-        radial-gradient(1200px 600px at 0% 0%, rgba(255,255,255,.06) 0%, rgba(255,255,255,.018) 35%, transparent 60%),
-        radial-gradient(900px 420px at 100% 100%, rgba(0,0,0,.22) 0%, rgba(0,0,0,.08) 40%, transparent 70%),
-        linear-gradient(180deg,var(--panel-1),var(--panel-2));
-      box-shadow:
-        0 22px 60px rgba(0,0,0,.55),
-        0 2px 0 rgba(255,255,255,.05) inset,
-        0 -1px 0 rgba(0,0,0,.35) inset;
     }
+
+    /* Karte */
+    .card{
+      width:min(620px,94vw);
+      border-radius:var(--radius);
+      position:relative;
+      /* WICHTIG: damit das HD‑Badge nicht abgeschnitten wird */
+      overflow:visible;
+      /* „glänzend‑matt“: dezente Highlights + feines Korn */
+      background: var(--card-gloss);
+      background-blend-mode: overlay, normal, normal;
+      box-shadow:
+        0 50px 80px rgba(0,0,0,.55),
+        0 2px 0 rgba(255,255,255,.03) inset,
+        0 -1px 0 rgba(0,0,0,.35) inset;
+      border:1px solid rgba(255,255,255,.05);
+    }
+
+    /* feines Rauschen drüberlegen (sehr subtil) */
+    .card::after{
+      content:"";
+      position:absolute; inset:0;
+      background-image: var(--noise);
+      background-size: 180px 180px;
+      pointer-events:none;
+      border-radius:inherit;
+      mix-blend-mode: soft-light;
+    }
+
+    /* Großes HD‑Badge, überlappend und NICHT abgeschnitten */
     .card::before{
       content:"";
+      position:absolute;
+      left:50%;
+      top:-115px;                   /* Überlappung nach oben */
+      transform:translateX(-50%);
+      width: 172px;                 /* Größe des Badges */
+      height: 172px;
+      background: url("/HD-Logo.png") center/contain no-repeat;
+      filter:
+        drop-shadow(0 10px 18px rgba(0,0,0,.45))
+        drop-shadow(0 2px 0 rgba(255,255,255,.06));
+      z-index:3;                    /* über Karte, unter dem Formular-Content */
+      pointer-events:none;
+    }
+
+    /* zarte Oberkanten-Linie */
+    .lip{
       position:absolute; inset:0 0 auto 0; height:1px;
       background:linear-gradient(90deg, transparent, rgba(255,255,255,.10), transparent);
+      border-radius:inherit;
       pointer-events:none;
-      z-index:2;
     }
 
-    /* Wortmarke (PNG) statt H1-Text */
     .brand{
-      display:flex; justify-content:center; align-items:center;
-      padding:22px 24px 12px;
+      display:flex; align-items:center; justify-content:center; gap:18px;
+      padding:46px 24px 10px;       /* oben mehr Luft wegen Badge */
     }
-    .wordmark{
-      width:min(92%,520px);
-      height:auto; display:block;
-      filter: drop-shadow(0 3px 0 rgba(0,0,0,.45));
+    .title{
+      margin:0;
+      font-weight:900;
+      letter-spacing:.2px;
+      font-size:clamp(28px,3.6vw,40px);
+      text-shadow:
+        0 1px 0 rgba(255,255,255,.28),
+        0 10px 25px rgba(0,0,0,.65);
     }
 
-    .content{ padding:18px 24px 20px }
-    label{ display:block; font-size:13px; color:var(--muted); margin:0 0 6px }
+    .content{ padding:18px 22px 0 }
+
+    label{
+      display:block;
+      font-size:13px;
+      color:var(--muted);
+      margin:0 0 6px;
+    }
 
     .field{
-      display:grid; grid-template-columns:1fr auto; align-items:center;
-      min-height:52px; padding:0 12px;
+      display:grid;
+      grid-template-columns:1fr auto;
+      align-items:center;
+      min-height:50px;
+      padding:0 10px;
       border-radius:14px;
-      border:1px solid var(--edge);
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.06), inset 0 -1px 0 rgba(0,0,0,.35);
+      border:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0) 18%) ,
+                 rgba(0,0,0,.12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
     }
     .field input{
-      background:transparent; border:0; outline:0; color:var(--text);
-      font-size:16px; padding:12px 8px; width:100%;
+      background:transparent; border:0; outline:0;
+      color:var(--text);
+      font-size:16px;
+      padding:12px 8px;
+      width:100%;
     }
     .field button.icon{
-      all:unset; cursor:pointer; border-radius:10px; padding:8px; display:grid; place-items:center; color:#c7cfdb;
+      all:unset; cursor:pointer; border-radius:10px; padding:8px; display:grid; place-items:center;
+      color:#c7cfdb;
     }
     .icon svg{ width:22px; height:22px; display:block }
 
+    /* Autofill neutralisieren */
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
     input:-webkit-autofill:focus{
@@ -126,62 +162,77 @@
       transition:background-color 5000s ease-in-out 0s;
     }
 
-    .row-links{ display:flex; gap:12px; font-size:13px; margin-top:8px }
-    .row-links a{ color:var(--accent); text-decoration:none; font-weight:700; border-bottom:1px dashed rgba(255,255,255,.22) }
+    .caps{ display:none; color:#ef4444; font-size:12px; margin-top:6px }
+    .error{
+      display:none;
+      background:rgba(224,39,36,.12);
+      border:1px solid rgba(224,39,36,.45);
+      color:#ffd6d6;
+      padding:10px 12px; border-radius:12px; font-size:13px; margin:0 0 10px;
+    }
+
+    .row-links{
+      display:flex; align-items:center; gap:12px;
+      font-size:13px; margin-top:6px;
+    }
+    .row-links a{
+      color:var(--accent); text-decoration:none; font-weight:700;
+      border-bottom:1px dashed rgba(255,255,255,.22);
+    }
     .row-links a:hover{ color:#fff; border-bottom-color:rgba(255,255,255,.45) }
 
-    /* Button: Glow gezähmt (bleibt innerhalb der Karte) */
+    /* Button – kompakteres, kontrolliertes Leuchten */
     .submit{
-      margin-top:16px;
-      border:0; border-radius:14px; padding:14px 18px;
-      font-weight:900; font-size:16px; color:#fff; cursor:pointer;
+      margin-top:12px;
+      border:0;
+      border-radius:14px;
+      padding:14px 18px;
+      font-weight:900; font-size:16px;
+      color:#fff; cursor:pointer;
       background:linear-gradient(180deg,var(--accent),var(--accent-2));
+      /* Glow enger, kein Ausbluten */
       box-shadow:
-        0 6px 14px rgba(224,39,36,.25),
-        inset 0 1px 0 rgba(255,255,255,.18);
-      transition:transform .08s ease, box-shadow .12s ease, filter .12s ease;
+        0 10px 18px rgba(224,39,36,.28),
+        0 0 0 1px rgba(0,0,0,.25) inset,
+        0 1px 0 rgba(255,255,255,.06) inset;
+      transition:transform .08s ease, box-shadow .12s ease;
     }
     .submit:hover{
       box-shadow:
-        0 8px 18px rgba(224,39,36,.30),
-        inset 0 1px 0 rgba(255,255,255,.22);
-      filter:saturate(1.05);
+        0 14px 24px rgba(224,39,36,.35),
+        0 0 0 1px rgba(0,0,0,.25) inset,
+        0 1px 0 rgba(255,255,255,.08) inset;
     }
     .submit:active{ transform:translateY(1px) scale(.997) }
-    .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none; filter:none }
+    .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none }
 
-    .help{ text-align:center; margin:12px 0 0; font-size:13px; color:var(--muted) }
+    .help{ text-align:center; margin:12px 0 18px; font-size:13px; color:var(--muted) }
 
     .foot{
-      margin-top:18px;
-      padding:16px 22px 22px;
-      border-top:1px solid rgba(255,255,255,.08);
-      text-align:center; color:var(--muted); font-size:12px; line-height:1.35;
-      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
+      margin-top:10px;
+      padding:16px 20px 20px;
+      border-top:1px solid rgba(255,255,255,.06);
+      text-align:center; color:var(--muted); font-size:12px;
+      border-bottom-left-radius: var(--radius);
+      border-bottom-right-radius: var(--radius);
     }
-    .foot small{ display:block }
-
-    @media (max-width:420px){
-      .badge{ top:16vh; transform:translate(-50%,-16%); width:clamp(150px,34vw,220px); }
-      .card{ margin-top:clamp(76px,10vh,140px); }
-      .content{ padding-inline:16px }
-    }
+    .foot small{ display:block; line-height:1.35 }
   </style>
 </head>
-<body>
-  <div class="stage">
-    <!-- Schwebendes HD‑Logo: liegt NICHT in der Karte, kann nicht mehr abgeschnitten werden -->
-    <div class="badge" aria-hidden="true">
-      <img src="/HD-Logo.png" alt="">
-    </div>
 
+<body>
+  <div class="wrap">
     <div class="card" role="group" aria-labelledby="hd-title">
+      <div class="lip"></div>
+
+      <!-- Kopf -->
       <div class="brand">
-        <img src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel‑Dashboard" class="wordmark" id="hd-title">
+        <!-- Wortmarke bleibt als Text (falls du später auf PNG umstellen willst, sag Bescheid) -->
+        <h1 class="title" id="hd-title">Hotel‑Dashboard</h1>
       </div>
 
       <div class="content">
-        <div class="error" id="err" style="display:none">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
+        <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
 
         <form action="/login" method="POST" id="loginForm" novalidate>
           <div>
@@ -191,27 +242,27 @@
             </div>
           </div>
 
-          <div style="margin-top:12px">
+          <div>
             <label for="password">Passwort</label>
             <div class="field">
               <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
               <button class="icon" type="button" id="togglePw" aria-label="Passwort anzeigen/ausblenden">
                 <!-- geschlossen -->
-                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                   <path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.05 0-9.27-3.11-11-8 1.02-2.93 3.03-5.19 5.47-6.53m3.17-1.19A9.77 9.77 0 0112 4c5.05 0 9.27 3.11 11 8a11.73 11.73 0 01-1.41 2.94M9.88 9.88A3 3 0 1112 15a3 3 0 01-2.12-5.12z"/>
                   <line x1="3" y1="3" x2="21" y2="21"/>
                 </svg>
                 <!-- offen -->
-                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none" aria-hidden="true">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
                   <circle cx="12" cy="12" r="3"/>
                 </svg>
               </button>
             </div>
-            <div class="caps" id="caps" style="display:none;color:#ef4444;font-size:12px;margin-top:6px">Warnung: Feststelltaste ist aktiv.</div>
+            <div class="caps" id="caps">Warnung: Feststelltaste ist aktiv.</div>
           </div>
 
-          <div class="row-links" style="margin-top:10px">
+          <div class="row-links">
             <a href="/reset">Passwort vergessen?</a>
           </div>
 
@@ -231,36 +282,35 @@
   </div>
 
   <script>
+    // Footer-Jahr
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    const u=document.getElementById('username');
-    const p=document.getElementById('password');
-    const s=document.getElementById('submitBtn');
-    const tp=document.getElementById('togglePw');
-    const eyeOn=document.getElementById('eye-on');
-    const eyeOff=document.getElementById('eye-off');
-    const c=document.getElementById('caps');
-    const err=document.getElementById('err');
+    const u = document.getElementById('username');
+    const p = document.getElementById('password');
+    const s = document.getElementById('submitBtn');
+    const tp = document.getElementById('togglePw');
+    const eyeOn  = document.getElementById('eye-on');
+    const eyeOff = document.getElementById('eye-off');
+    const c  = document.getElementById('caps');
+    const err= document.getElementById('err');
 
-    const update=()=>{ s.disabled = !(u.value.trim() && p.value.trim()); };
-    u.addEventListener('input',update);
-    p.addEventListener('input',update);
+    const update = () => { s.disabled = !(u.value.trim() && p.value.trim()); };
+    u.addEventListener('input', update);
+    p.addEventListener('input', update);
     update();
 
-    tp.addEventListener('click',()=>{
+    tp.addEventListener('click', () => {
       const show = p.type === "password";
       p.type = show ? "text" : "password";
-      eyeOn.style.display = show ? "block" : "none";
-      eyeOff.style.display= show ? "none"  : "block";
+      eyeOn.style.display  = show ? "block" : "none";
+      eyeOff.style.display = show ? "none"  : "block";
     });
 
-    ['keydown','keyup'].forEach(ev =>
-      p.addEventListener(ev,e=>{
-        try{ c.style.display = e.getModifierState('CapsLock') ? 'block' : 'none'; }catch(_){}
-      })
-    );
+    ['keydown','keyup'].forEach(ev => p.addEventListener(ev, e => {
+      try { c.style.display = e.getModifierState('CapsLock') ? 'block' : 'none'; } catch(_){}
+    }));
 
-    if(new URLSearchParams(location.search).get('err')) err.style.display='block';
+    if (new URLSearchParams(location.search).get('err')) err.style.display='block';
   </script>
 </body>
 </html>
