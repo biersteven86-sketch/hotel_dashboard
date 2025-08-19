@@ -1,169 +1,99 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login · Hotel-Dashboard</title>
-  <meta name="color-scheme" content="light dark">
-  <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
-  <style>
-    :root{
-      --bg:#0b1020;
-      --glass:rgba(255,255,255,.10);
-      --glass-strong:rgba(255,255,255,.18);
-      --stroke:rgba(255,255,255,.25);
-      --text:#eef2ff;
-      --muted:#b7c0d8;
-      --accent:#22c55e;
-      --accent-2:#16a34a;
-      --shadow:0 10px 30px rgba(0,0,0,.45);
-      --radius:24px;
-      --focus:0 0 0 3px rgba(34,197,94,.45);
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Login · Hotel-Dashboard</title>
+<link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
+<style>
+  :root{
+    --bg:#0b1020;
+    --glass:rgba(255,255,255,.10);
+    --glass-strong:rgba(255,255,255,.18);
+    --stroke:rgba(255,255,255,.25);
+    --text:#eef2ff;
+    --muted:#b7c0d8;
+    --accent:#22c55e;
+    --accent-2:#16a34a;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+    --radius:24px;
 
-      /* Logo-Farben: jetzt voll Rot */
-      --logo-red-1:#ff3b3b;
-      --logo-red-2:#c81e1e;
-      --logo-glow: rgba(255, 60, 60, .55);
-    }
+    --logo-red-1:#ff2d2d;
+    --logo-red-2:#c40000;
+    --logo-border-1:#1e293b;
+    --logo-border-2:#0f172a;
+    --logo-glow:rgba(255,0,0,.65);
+  }
 
-    *{box-sizing:border-box} html,body{height:100%}
-    body{
-      margin:0;
-      font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
-      color:var(--text);
-      background:var(--bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
-    }
-    body::before{
-      content:""; position:fixed; inset:0; pointer-events:none;
-      background:
-        radial-gradient(1200px 600px at 10% 10%, rgba(124,92,255,.18), transparent 60%),
-        radial-gradient(1200px 600px at 90% 90%, rgba(56,189,248,.16), transparent 60%),
-        linear-gradient(to bottom right, rgba(0,0,0,.25), rgba(0,0,0,.35));
-    }
+  body{
+    margin:0; height:100%;
+    font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Arial;
+    color:var(--text);
+    background:var(--bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
+  }
 
-    .wrap{min-height:100%; display:grid; place-items:center; padding:clamp(20px,4vw,60px)}
-    .card{
-      width:min(460px,92vw);
-      border-radius:var(--radius);
-      background:linear-gradient(180deg,var(--glass),rgba(255,255,255,.06));
-      -webkit-backdrop-filter:blur(16px);
-      backdrop-filter:blur(16px);
-      border:1px solid var(--stroke);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      position:relative;
-    }
-    .card::after{content:""; position:absolute; inset:0; border-radius:var(--radius);
-      box-shadow:0 0 0 1px rgba(255,255,255,.18) inset; pointer-events:none}
+  .wrap{min-height:100%; display:grid; place-items:center; padding:40px}
 
-    .brand{display:flex; align-items:center; gap:16px; padding:24px 22px 10px}
+  .card{width:min(460px,92vw); border-radius:var(--radius);
+    background:linear-gradient(180deg,var(--glass),rgba(255,255,255,.06));
+    -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px);
+    border:1px solid var(--stroke); box-shadow:var(--shadow); overflow:hidden}
 
-    /* HD-Logo komplett rot */
-    .logo-box{
-      position:relative;
-      width:72px; height:72px; border-radius:18px;
-      background:linear-gradient(145deg, var(--logo-red-1), var(--logo-red-2));
-      border:1px solid rgba(255,255,255,.18);
-      display:flex; align-items:center; justify-content:center;
-      font-weight:900; font-size:28px; color:#fff;
-      text-shadow:0 2px 6px rgba(0,0,0,.45);
-      box-shadow:
-        0 10px 24px rgba(0,0,0,.45),
-        inset 0 1px 0 rgba(255,255,255,.25),
-        inset 0 -1px 0 rgba(0,0,0,.35);
-    }
-    .logo-box::before{
-      content:""; position:absolute; inset:-4px; border-radius:22px;
-      box-shadow:0 0 24px 6px var(--logo-glow);
-      opacity:.55; pointer-events:none;
-    }
-    .logo-box::after{
-      content:""; position:absolute; inset:6px; border-radius:12px;
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
-      pointer-events:none; opacity:.9;
-    }
+  .brand{display:flex; align-items:center; gap:16px; padding:24px 22px 10px}
 
-    .brand-text h1{margin:0; font-size:28px; font-weight:800; letter-spacing:.3px}
-    .brand-text p{margin:6px 0 0; font-size:13px; color:var(--muted)}
+  /* HD-Logo in matt-schwarz mit kräftigem Rot innen */
+  .logo-box{
+    position:relative;
+    width:72px; height:72px; border-radius:18px;
+    background:linear-gradient(145deg,var(--logo-border-1),var(--logo-border-2));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:900; font-size:28px; color:#fff;
+    text-shadow:0 2px 6px rgba(0,0,0,.55);
+    box-shadow:0 0 0 2px rgba(255,255,255,.05) inset,
+               0 0 0 1px rgba(0,0,0,.8);
+  }
+  .logo-box::before{
+    content:""; position:absolute; inset:6px; border-radius:12px;
+    background:linear-gradient(145deg,var(--logo-red-1),var(--logo-red-2));
+    box-shadow:0 0 24px 6px var(--logo-glow);
+    z-index:0;
+  }
+  .logo-box span{
+    position:relative; z-index:1;
+  }
 
-    .content{ padding:18px 22px 22px }
-    form{ display:grid; gap:14px }
-    label{ font-size:13px; color:var(--muted); display:block; margin:0 0 6px }
-    .field{ background:rgba(255,255,255,.92); border:1px solid rgba(15,23,42,.15);
-      border-radius:12px; display:flex; align-items:center; padding:10px 12px;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.2), inset 0 -1px 0 rgba(0,0,0,.06), 0 6px 14px rgba(2,6,23,.12) }
-    .field:focus-within{ box-shadow:var(--focus), inset 0 1px 0 rgba(255,255,255,.2), inset 0 -1px 0 rgba(0,0,0,.06), 0 6px 14px rgba(2,6,23,.12) }
-    .field input{ flex:1; background:transparent; border:0; outline:0; color:#0f172a; font-size:15px; padding:6px 2px }
-    .field button.icon{ all:unset; cursor:pointer; padding:6px 8px; border-radius:10px }
+  /* Rest wie gehabt */
+  .brand-text h1{margin:0; font-size:28px; font-weight:800}
+  .brand-text p{margin:6px 0 0; font-size:13px; color:var(--muted)}
 
-    .caps{ display:none; color:#fecaca; background:rgba(239,68,68,.14); border:1px solid rgba(239,68,68,.45);
-      padding:8px 10px; border-radius:10px; font-size:12px; margin-top:6px }
-    .error{ display:none; background:rgba(239,68,68,.14); border:1px solid rgba(239,68,68,.45); color:#fecaca; padding:10px 12px; border-radius:12px; font-size:13px }
-
-    .submit{ margin-top:8px; background:linear-gradient(180deg,var(--accent),var(--accent-2));
-      color:#fff; border:0; border-radius:12px; padding:12px 16px; font-weight:800; font-size:15px; cursor:pointer;
-      box-shadow:0 12px 28px rgba(22,163,74,.35); transition:transform .08s ease, filter .15s ease }
-    .submit:disabled{ opacity:.65; cursor:not-allowed; box-shadow:none; filter:saturate(.7) }
-    .submit:active{ transform:translateY(1px) scale(.997) }
-
-    .foot{ text-align:center; color:var(--muted); font-size:12px; padding:10px 18px 18px }
-    a.muted{ color:var(--muted); text-decoration:none; border-bottom:1px dashed rgba(255,255,255,.25) }
-    a.muted:hover{ color:var(--text); border-bottom-color:rgba(255,255,255,.45) }
-
-    @media (prefers-reduced-motion: reduce){ .submit{ transition:none } }
-  </style>
+  .content{padding:18px 22px 22px}
+  .field{background:rgba(255,255,255,.92); border:1px solid rgba(15,23,42,.15);
+    border-radius:12px; display:flex; align-items:center; padding:10px 12px}
+  .field input{flex:1; border:0; background:transparent; outline:0; font-size:15px; color:#0f172a}
+  .submit{margin-top:8px; background:linear-gradient(180deg,var(--accent),var(--accent-2));
+    color:#fff; border:0; border-radius:12px; padding:12px 16px; font-weight:700; font-size:15px}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <div class="brand">
-        <div class="logo-box">HD</div>
-        <div class="brand-text">
-          <h1>Hotel-Dashboard</h1>
-          <p>Bitte anmelden</p>
-        </div>
-      </div>
-
-      <div class="content">
-        <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
-        <form action="/login" method="POST" id="loginForm">
-          <div>
-            <label for="username">Benutzername</label>
-            <div class="field">
-              <input id="username" name="username" type="text" placeholder="z. B. admin" required />
-            </div>
-          </div>
-          <div>
-            <label for="password">Passwort</label>
-            <div class="field">
-              <input id="password" name="password" type="password" placeholder="••••••••" required />
-              <button class="icon" type="button" id="togglePw">👁️</button>
-            </div>
-            <div class="caps" id="caps">Warnung: Feststelltaste ist aktiv.</div>
-          </div>
-          <button class="submit" id="submitBtn" type="submit" disabled>Anmelden</button>
-        </form>
-      </div>
-
-      <div class="foot">
-        <small>© <span id="y"></span> Hotel-Dashboard · <a class="muted" href="/status">Status</a></small>
+<div class="wrap">
+  <div class="card">
+    <div class="brand">
+      <div class="logo-box"><span>HD</span></div>
+      <div class="brand-text">
+        <h1>Hotel-Dashboard</h1>
+        <p>Bitte anmelden</p>
       </div>
     </div>
+    <div class="content">
+      <form action="/login" method="POST">
+        <label for="username">Benutzername</label>
+        <div class="field"><input id="username" name="username" type="text" required></div>
+        <label for="password">Passwort</label>
+        <div class="field"><input id="password" name="password" type="password" required></div>
+        <button class="submit">Anmelden</button>
+      </form>
+    </div>
   </div>
-
-<script>
-  document.getElementById('y').textContent = new Date().getFullYear();
-  const u=document.getElementById('username'),
-        p=document.getElementById('password'),
-        s=document.getElementById('submitBtn'),
-        tp=document.getElementById('togglePw'),
-        c=document.getElementById('caps'),
-        err=document.getElementById('err');
-  const update=()=>{ s.disabled=!(u.value&&p.value); };
-  u.addEventListener('input',update); p.addEventListener('input',update); update();
-  tp.addEventListener('click',()=>{ p.type=p.type==="password"?"text":"password"; });
-  ['keydown','keyup'].forEach(ev=>p.addEventListener(ev,e=>{ try{c.style.display=e.getModifierState('CapsLock')?'block':'none';}catch(_){}}));
-  (function(){try{const q=new URLSearchParams(location.search);if(q.has('err')||q.has('error'))err.style.display='block';}catch(_){}})();
-</script>
+</div>
 </body>
 </html>
