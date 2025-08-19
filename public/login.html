@@ -18,10 +18,9 @@
     --shadow:0 10px 30px rgba(0,0,0,.45);
     --radius:24px;
 
-    /* Logo-Farben */
     --logo-red-1:#ff1a1a;
     --logo-red-2:#b80000;
-    --logo-border:#0a0a0a;  /* matt-schwarz */
+    --logo-border:#0a0a0a;
     --logo-glow:rgba(255,0,0,.55);
   }
 
@@ -41,17 +40,16 @@
 
   .brand{display:flex; align-items:center; gap:16px; padding:24px 22px 10px}
 
-  /* HD-Logo: matt-schwarz + rot innen */
   .logo-box{
     position:relative;
     width:72px; height:72px; border-radius:18px;
-    background:var(--logo-border);   /* satter, matt-schwarzer Rand */
+    background:var(--logo-border);
     display:flex; align-items:center; justify-content:center;
     font-weight:900; font-size:28px; color:#fff;
     text-shadow:0 2px 6px rgba(0,0,0,.65);
   }
   .logo-box::before{
-    content:""; position:absolute; inset:6px; border-radius:12px;
+    content:""; position:absolute; inset:3px; border-radius:15px;
     background:linear-gradient(145deg,var(--logo-red-1),var(--logo-red-2));
     box-shadow:0 0 24px 6px var(--logo-glow);
     z-index:0;
