@@ -1,3 +1,12 @@
+# Backup & Replace
+ts=$(date +%Y%m%d_%H%M%S)
+cd /home/steven/hotel_dashboard/public
+
+# Backup der aktuellen Datei
+cp -a login.html login_backup_$ts.html 2>/dev/null || true
+
+# Neue Version schreiben
+cat > login.html <<'HTML'
 <!doctype html>
 <html lang="de">
 <head>
@@ -12,16 +21,15 @@
 
   <style>
     :root{
-      /* Hintergrund + Panel-Farben im Stil deines Referenzbildes */
-      --bg:#06080c;              /* Seitenhintergrund (sehr dunkel, leicht bläulich) */
-      --panel:#0b0f14;           /* Kartenfläche (tiefschwarz) */
-      --panel-edge:#131922;      /* leicht hellere Kantenfarbe */
+      /* Hintergrund + Panel-Farben: Fenster = exakt wie Seitenhintergrund */
+      --bg:#06080c;              /* aus deinem 1. Referenzbild (dunkles Anthrazit, leicht bläulich) */
+      --panel:var(--bg);         /* Fenster übernimmt denselben Farbton */
+      --panel-edge:#131922;      /* Kantenabhebung */
       --stroke:#2a323d;          /* Feldrahmen */
       --text:#e9edf5;            /* Primärtext (weiches Weiß) */
       --muted:#9aa3b2;           /* Sekundärtext */
-      --accent:#e02724;          /* kräftiges Rot (kein Neon) */
+      --accent:#e02724;          /* Rot (Button) */
       --accent-2:#b31517;        /* dunklere Verlaufsfarbe */
-      --shadow-strong: 0 28px 60px rgba(0,0,0,.65), 0 2px 0 rgba(255,255,255,.02) inset;
       --radius:22px;
     }
 
@@ -32,11 +40,9 @@
       margin:0;
       font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
       color:var(--text);
-      /* Dein echtes Foto bleibt – nur sauber gerendert */
+      /* echtes Foto bleibt */
       background:var(--bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
-    /* KEINE Glas-/Lichteffekte mehr über dem Hintergrund */
-    body::before{ content:none; }
 
     .wrap{
       min-height:100%;
@@ -47,16 +53,20 @@
 
     .card{
       width:min(560px,94vw);
-      background:var(--panel);
+      background:var(--panel);                 /* exakt gleiche Farbe wie der Seitenhintergrund */
       border-radius:var(--radius);
-      border:1px solid rgba(255,255,255,.04);
-      box-shadow:var(--shadow-strong);
+      /* dezente Absetzung: feine Kante + doppelte Shadow-Krone wie im 2. Bild */
+      border:1px solid rgba(255,255,255,.035);
+      box-shadow:
+        0 28px 70px rgba(0,0,0,.65),           /* tiefer Drop-Shadow */
+        0 2px 0 rgba(255,255,255,.02) inset,   /* leichte obere Lichtkante innen */
+        0 -1px 0 rgba(0,0,0,.35) inset;        /* subtile untere Abdunklung */
       overflow:hidden;
       display:flex; flex-direction:column;
       position:relative;
     }
 
-    /* schmale “Top-Lippe” wie im Render-Bild */
+    /* schmale Top-Lippe (metallische Reflexlinie) */
     .card::before{
       content:"";
       position:absolute; inset:0 0 auto 0; height:1px;
@@ -77,7 +87,6 @@
       font-weight:900;
       letter-spacing:.2px;
       font-size:clamp(26px,3.6vw,36px);
-      /* leichte 3D/Prägung */
       text-shadow:
         0 1px 0 rgba(255,255,255,.18),
         0 4px 12px rgba(0,0,0,.55);
@@ -117,7 +126,7 @@
     }
     .icon svg{ width:22px; height:22px; display:block }
 
-    /* Autofill ohne gelben Hintergrund */
+    /* Autofill ohne Gelb */
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
     input:-webkit-autofill:focus{
@@ -145,7 +154,7 @@
     }
     .row-links a:hover{ color:#fff; border-bottom-color:rgba(255,255,255,.45) }
 
-    /* Button im Rot-Verlauf + “Lift”-Schatten */
+    /* Button im Rot-Verlauf + Lift-Schatten */
     .submit{
       margin-top:12px;
       border:0;
@@ -207,12 +216,12 @@
               <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
               <button class="icon" type="button" id="togglePw" aria-label="Passwort anzeigen/ausblenden">
                 <!-- geschlossen -->
-                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                   <path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.05 0-9.27-3.11-11-8 1.02-2.93 3.03-5.19 5.47-6.53m3.17-1.19A9.77 9.77 0 0112 4c5.05 0 9.27 3.11 11 8a11.73 11.73 0 01-1.41 2.94M9.88 9.88A3 3 0 1112 15a3 3 0 01-2.12-5.12z"/>
                   <line x1="3" y1="3" x2="21" y2="21"/>
                 </svg>
                 <!-- offen -->
-                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none" aria-hidden="true">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
                   <circle cx="12" cy="12" r="3"/>
                 </svg>
@@ -273,3 +282,7 @@
   </script>
 </body>
 </html>
+HTML
+
+# (optional) PM2-Reload, falls du PM2 nutzt:
+# pm2 restart hotel-dashboard
