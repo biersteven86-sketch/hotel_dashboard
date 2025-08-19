@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Login · Hotel‑Dashboard</title>
+<title>Login · Hotel-Dashboard</title>
 <meta name="color-scheme" content="light dark">
 <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
 <style>
@@ -14,36 +14,20 @@
     --stroke:rgba(255,255,255,.22);
     --text:#eef2ff;
     --muted:#b7c0d8;
-    --accent:#e60023;              /* kräftiges Rot */
+    --accent:#e60023;    /* kräftiges Rot */
     --shadow:0 10px 30px rgba(0,0,0,.45);
     --radius:24px;
-    --matt:#0a0a0a;                /* matt-schwarz für Logo-Rand */
+    --matt:#0a0a0a;
   }
-
-  /* Seite */
   html,body{height:100%}
   body{
     margin:0;
-    min-height:100svh;
-    display:grid; place-items:center;
-    background:#0b1020; /* Fallback */
+    display:flex; justify-content:center; align-items:center;
+    background:#0b1020 url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     color:var(--text);
     font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Arial,"Noto Sans";
   }
-  /* Bild + farbiges Overlay, ohne das Bild zu verdecken */
-  body::before{
-    content:""; position:fixed; inset:0; z-index:-1;
-    background: url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
-  }
-  body::after{
-    content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
-    background:
-      radial-gradient(1200px 600px at 10% 10%, rgba(239,68,68,.15), transparent 60%),
-      radial-gradient(1200px 600px at 90% 90%, rgba(124,92,255,.12), transparent 60%),
-      linear-gradient(to bottom right, rgba(0,0,0,.25), rgba(0,0,0,.35));
-  }
 
-  /* Karte */
   .card{
     width:min(460px,92vw);
     border-radius:var(--radius);
@@ -52,41 +36,27 @@
     border:1px solid var(--stroke);
     box-shadow:var(--shadow);
     overflow:hidden;
+    display:flex; flex-direction:column; justify-content:space-between;
   }
 
-  /* Branding */
   .brand{display:flex; align-items:center; gap:18px; padding:26px 24px 10px; justify-content:center}
   .logo-box{
-    position:relative;
-    width:78px; height:78px; border-radius:18px;
-    background:var(--matt);                /* matte schwarze Umrandung */
-    border:1.5px solid #000;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 10px 24px rgba(0,0,0,.5);
+    position:relative; width:78px; height:78px; border-radius:18px;
+    background:var(--matt); border:1.5px solid #000;
     display:flex; align-items:center; justify-content:center;
   }
   .logo-box::before{
-    /* rotes Innenfeld */
     content:""; position:absolute; inset:7px; border-radius:12px;
-    background:
-      radial-gradient(90% 120% at 30% 25%, #ff4d4d 0%, #e60023 55%, #b60018 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.18),
-      inset 0 -2px 6px rgba(0,0,0,.35),
-      0 8px 18px rgba(230,0,35,.32);
+    background:radial-gradient(90% 120% at 30% 25%, #ff4d4d 0%, #e60023 55%, #b60018 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), 0 8px 18px rgba(230,0,35,.32);
   }
-  .logo-box .hd{
-    position:relative; z-index:1;
-    font-weight:900; font-size:30px; letter-spacing:.5px;
-    color:#fff; text-shadow:0 2px 6px rgba(0,0,0,.4);
-    user-select:none;
-  }
+  .logo-box .hd{position:relative; z-index:1; font-weight:900; font-size:30px; color:#fff;}
+
   .brand-text h1{ margin:0; font-size:26px; font-weight:800; letter-spacing:.3px }
 
-  /* Inhalt */
-  .content{ padding:20px 24px 24px }
+  .content{ padding:20px 24px }
   form{ display:grid; gap:14px }
   label{ font-size:13px; color:var(--muted); margin-bottom:6px }
-
   .field{
     background:var(--glass-strong);
     border:1px solid var(--stroke);
@@ -95,13 +65,12 @@
     padding:0 8px; min-height:46px;
   }
   .field input{
-    width:100%; background:transparent; border:0; outline:0;
-    color:var(--text); font-size:15px; padding:10px 8px;
+    background:transparent; border:0; outline:0;
+    color:var(--text); font-size:15px; padding:10px 8px; width:100%;
   }
-  .field button.icon{ all:unset; cursor:pointer; padding:8px; border-radius:10px; display:grid; place-items:center }
+  .field button.icon{ all:unset; cursor:pointer; padding:8px; display:grid; place-items:center }
   .icon svg{ width:22px; height:22px; display:block }
-
-  .caps{ display:none; color:#fecaca; background:rgba(239,68,68,.14); border:1px solid rgba(239,68,68,.35); padding:8px 10px; border-radius:10px; font-size:12px; margin-top:6px }
+  .caps{ display:none; color:#fecaca; font-size:12px; margin-top:6px }
   .error{ display:none; background:rgba(239,68,68,.14); border:1px solid rgba(239,68,68,.45); color:#fecaca; padding:10px 12px; border-radius:12px; font-size:13px; margin-bottom:6px }
 
   .submit{
@@ -109,82 +78,72 @@
     background:linear-gradient(135deg,var(--accent),#ff3355);
     color:#fff; border:0; border-radius:14px; padding:12px 16px;
     font-weight:800; font-size:15px; cursor:pointer;
-    box-shadow:0 10px 24px rgba(230,0,35,.35); transition:transform .08s ease
+    box-shadow:0 10px 24px rgba(230,0,35,.35);
   }
   .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none }
-  .submit:active{ transform:translateY(1px) scale(.997) }
-
-  .row-links{ display:flex; justify-content:space-between; align-items:center; font-size:13px; margin-top:4px }
-  .row-links a{ color:var(--muted); text-decoration:none; border-bottom:1px dashed rgba(255,255,255,.25) }
-  .row-links a:hover{ color:#fff; border-bottom-color:rgba(255,255,255,.45) }
 
   .help{ text-align:center; margin-top:10px; font-size:13px; color:var(--muted) }
 
-  /* Footer ganz unten */
-  .page-foot{ margin-top:18px; text-align:center; color:var(--muted); font-size:12px }
+  .foot{ text-align:center; color:var(--muted); font-size:12px; padding:16px }
 </style>
 </head>
 <body>
+  <div class="card">
+    <div>
+      <div class="brand">
+        <div class="logo-box"><div class="hd">HD</div></div>
+        <div class="brand-text"><h1>Hotel-Dashboard</h1></div>
+      </div>
 
-  <div class="card" role="group" aria-labelledby="hd-title">
-    <div class="brand">
-      <div class="logo-box" aria-hidden="true"><div class="hd">HD</div></div>
-      <div class="brand-text"><h1 id="hd-title">Hotel‑Dashboard</h1></div>
+      <div class="content">
+        <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
+        <form action="/login" method="POST" id="loginForm" novalidate>
+          <div>
+            <label for="username">Benutzername</label>
+            <div class="field">
+              <input id="username" name="username" type="text" placeholder="z. B. admin" required />
+            </div>
+          </div>
+
+          <div>
+            <label for="password">Passwort</label>
+            <div class="field">
+              <input id="password" name="password" type="password" placeholder="••••••••" required />
+              <button class="icon" type="button" id="togglePw">
+                <!-- geschlossen -->
+                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.05 0-9.27-3.11-11-8 1.02-2.93 3.03-5.19 5.47-6.53m3.17-1.19A9.77 9.77 0 0112 4c5.05 0 9.27 3.11 11 8a11.73 11.73 0 01-1.41 2.94M9.88 9.88A3 3 0 1112 15a3 3 0 01-2.12-5.12z"/>
+                  <line x1="3" y1="3" x2="21" y2="21"/>
+                </svg>
+                <!-- offen -->
+                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+            <div class="caps" id="caps">Warnung: Feststelltaste ist aktiv.</div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-top:4px">
+            <a href="/reset">Passwort vergessen?</a>
+          </div>
+
+          <button class="submit" id="submitBtn" type="submit" disabled>Anmelden</button>
+
+          <div class="help">Bei Problemen wenden Sie sich bitte an den Administrator.</div>
+        </form>
+      </div>
     </div>
 
-    <div class="content">
-      <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
-
-      <form action="/login" method="POST" id="loginForm" novalidate>
-        <div>
-          <label for="username">Benutzername</label>
-          <div class="field">
-            <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
-          </div>
-        </div>
-
-        <div>
-          <label for="password">Passwort</label>
-          <div class="field">
-            <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
-            <button class="icon" type="button" id="togglePw" aria-label="Passwort anzeigen/ausblenden">
-              <!-- geschlossenes Auge -->
-              <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.05 0-9.27-3.11-11-8 1.02-2.93 3.03-5.19 5.47-6.53m3.17-1.19A9.77 9.77 0 0112 4c5.05 0 9.27 3.11 11 8a11.73 11.73 0 01-1.41 2.94M9.88 9.88A3 3 0 1112 15a3 3 0 01-2.12-5.12z"/>
-                <line x1="3" y1="3" x2="21" y2="21"/>
-              </svg>
-              <!-- offenes Auge -->
-              <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
-                <circle cx="12" cy="12" r="3"/>
-              </svg>
-            </button>
-          </div>
-          <div class="caps" id="caps">Warnung: Feststelltaste ist aktiv.</div>
-        </div>
-
-        <div class="row-links">
-          <a href="/reset">Passwort vergessen?</a>
-          <span></span>
-        </div>
-
-        <button class="submit" id="submitBtn" type="submit" disabled>Anmelden</button>
-
-        <div class="help">Bei Problemen wenden Sie sich bitte an den Administrator.</div>
-      </form>
+    <div class="foot">
+      <small>© <span id="y"></span> Hotel-Dashboard<br>
+      Powered by MY HOME HOTEL ROTTWEIL GMBH</small>
     </div>
-  </div>
-
-  <div class="page-foot">
-    <small>© <span id="y"></span> Hotel‑Dashboard<br>
-    Powered by MY HOME HOTEL ROTTWEIL GMBH</small>
   </div>
 
 <script>
-  // Jahr
   document.getElementById('y').textContent = new Date().getFullYear();
-
-  // Elemente
   const u=document.getElementById('username'),
         p=document.getElementById('password'),
         s=document.getElementById('submitBtn'),
@@ -194,26 +153,20 @@
         c=document.getElementById('caps'),
         err=document.getElementById('err');
 
-  // Button aktivieren, wenn beide Felder befüllt sind
-  const update=()=>{ s.disabled = !(u.value.trim() && p.value.trim()); };
+  const update=()=>{ s.disabled=!(u.value.trim() && p.value.trim()); };
   u.addEventListener('input',update); p.addEventListener('input',update); update();
 
-  // Passwort anzeigen/ausblenden + Icon wechseln
   tp.addEventListener('click',()=>{
-    const show = p.type === "password";
+    const show = p.type==="password";
     p.type = show ? "text" : "password";
-    eyeOn.style.display  = show ? "block" : "none";
-    eyeOff.style.display = show ? "none"  : "block";
+    eyeOn.style.display = show ? "block" : "none";
+    eyeOff.style.display = show ? "none" : "block";
   });
 
-  // Caps-Lock Hinweis
-  ['keydown','keyup'].forEach(ev =>
-    p.addEventListener(ev, e => {
-      try { c.style.display = e.getModifierState('CapsLock') ? 'block' : 'none'; } catch(_){}
-    })
-  );
+  ['keydown','keyup'].forEach(ev=>p.addEventListener(ev,e=>{
+    try{ c.style.display=e.getModifierState('CapsLock')?'block':'none'; }catch(_){}
+  }));
 
-  // Fehleranzeige (?err=1)
   if (new URLSearchParams(location.search).get('err')) err.style.display='block';
 </script>
 </body>
