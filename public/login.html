@@ -3,26 +3,45 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login · Hotel-Dashboard</title>
+  <title>Login · Hotel‑Dashboard</title>
   <meta name="color-scheme" content="light dark">
 
-  <!-- Assets -->
+  <!-- Assets vorladen für schnelleres Rendering -->
   <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
   <link rel="preload" as="image" href="/HD-Logo.png">
-  <link rel="preload" as="image" href="/hotel-dashboard.png">
+  <link rel="preload" as="image" href="/Hotel-Dashboard-Schriftzug.png">
 
   <style>
+    /* ========= DESIGN-VARIABLEN – hier passt du Größen/Farben zentral an ========= */
     :root{
-      /* Farbpalette */
-      --bg:#06080c;           /* Seitenhintergrund */
-      --panel:#0b0d11;        /* Login-Panel (tiefschwarz) */
-      --stroke:#2a323d;       /* Feldrahmen */
-      --text:#e9edf5;         /* Primärtext */
-      --muted:#9aa3b2;        /* Sekundärtext */
-      --accent:#c3201e;       /* Button-Rot (matter) */
-      --accent-2:#8a1718;     /* dunkler Verlauf */
-      --radius:20px;
-      --shadow:0 22px 42px rgba(0,0,0,.6);
+      /* Panel / Text */
+      --bg: #06080c;            /* Seitenhintergrund */
+      --panel: #0b0d11;         /* Kartenfläche (tiefschwarz, nicht reines #000) */
+      --text: #e9edf5;          /* Primärtext */
+      --muted: #a4adbb;         /* Sekundärtext */
+      --stroke: #2a323d;        /* Rahmen der Eingabefelder */
+      --radius: 20px;           /* Rundung der Karte */
+
+      /* Akzentfarbe (Button) – mattes Rot */
+      --accent: #c3201e;
+      --accent-2: #8a1718;
+
+      /* Schatten & Glanz */
+      --shadow-strong: 0 28px 60px rgba(0,0,0,.65);
+      --gloss-top: rgba(255,255,255,.05);   /* gleichmäßiger „Weißfilter“ */
+      --gloss-spot: rgba(255,255,255,.08);  /* leichte Spot-Reflexion */
+
+      /* Größen der Logos – hier drehst du später nur diese zwei Werte */
+      --hd-size: 200px;           /* HD-Sechseck (doppelt groß) */
+      --title-width: 420px;       /* „Hotel‑Dashboard“-Schriftzug */
+
+      /* Abstände Logo → Titel → Formular */
+      --gap-logo-title: 8px;      /* Abstand HD-Logo zu Titel */
+      --gap-title-form: 14px;     /* Abstand Titel zum Formular */
+      --card-top-padding: 120px;  /* „Luft“ oben in der Karte, damit nichts klemmt */
+
+      /* Breite der Karte (schmal) */
+      --card-width: 460px;
     }
 
     *{box-sizing:border-box}
@@ -42,51 +61,77 @@
       padding:clamp(20px,4vw,60px);
     }
 
+    /* ======= Karte ======= */
     .card{
-      width:min(460px, 90vw);  /* SCHMALER gemacht */
+      width:min(var(--card-width), 92vw);
       background:var(--panel);
       border-radius:var(--radius);
       border:1px solid rgba(255,255,255,.05);
-      box-shadow:var(--shadow);
-      overflow:hidden;
+      box-shadow:var(--shadow-strong);
       position:relative;
-      padding-top:140px; /* Platz für Logo + Schriftzug */
+      overflow:visible;                 /* wichtig: Logo darf überlappen, NICHT abgeschnitten werden */
+      padding: var(--card-top-padding) 22px 16px;
+      isolation:isolate;                /* sichert die Ebenenkomposition */
     }
 
-    /* Glanz-Effekt über die ganze Fläche */
-    .card::after{
+    /* Gleichmäßiger, matter Glanz über die GANZE Fläche (keine hellen Ecken) */
+    .card::before{
       content:"";
       position:absolute; inset:0;
       background:
-        radial-gradient(circle at 50% 15%, rgba(255,255,255,.08), transparent 70%),
-        linear-gradient(to bottom, rgba(255,255,255,.05), transparent 40%);
+        radial-gradient(120% 70% at 50% 10%, var(--gloss-spot), transparent 60%),
+        linear-gradient(to bottom, var(--gloss-top), transparent 36%);
+      border-radius:inherit;
       pointer-events:none;
+      z-index:0;
     }
 
-    /* Logo oben */
-    .logo-box{
+    /* Dünne Oberkante (dezente Lichtkante) */
+    .card::after{
+      content:"";
+      position:absolute; inset:0 0 auto 0; height:1px;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
+      pointer-events:none;
+      border-top-left-radius:inherit;
+      border-top-right-radius:inherit;
+    }
+
+    /* ======= Logo-Block (HD + Titel) ======= */
+    .brand{
       position:absolute;
-      top:-60px;
       left:50%;
+      top:0;                           /* Bezugspunkt: Kartenoberkante */
       transform:translateX(-50%);
-      text-align:center;
-      z-index:2;
-    }
-    .logo-box img{
-      display:block;
-      margin:0 auto;
-    }
-    .logo-hd{
-      width:clamp(90px, 12vw, 120px);
-      height:auto;
-    }
-    .logo-title{
-      width:clamp(240px, 50vw, 360px);
-      margin-top:8px;
-      height:auto;
+      display:flex; flex-direction:column; align-items:center;
+      z-index:2;                        /* über dem Glanz */
+      translate: 0 calc(-1 * (var(--hd-size) * 0.35)); /* überlappen lassen, bündig zur Wabenkante */
     }
 
-    .content{ padding:20px 24px 0 }
+    .logo-hd{
+      width:var(--hd-size);
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.75)); /* hebt sich vom BG ab */
+    }
+
+    .logo-title{
+      margin-top:var(--gap-logo-title);
+      width:min(var(--title-width), calc(var(--card-width) - 40px));
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,.45));
+    }
+
+    /* ======= Inhalt ======= */
+    .content{ padding-top: var(--gap-title-form); position:relative; z-index:1; }
+
+    .error{
+      display:none;
+      background:rgba(224,39,36,.12);
+      border:1px solid rgba(224,39,36,.45);
+      color:#ffd6d6;
+      padding:10px 12px; border-radius:12px; font-size:13px; margin:0 0 12px;
+    }
 
     label{
       display:block;
@@ -95,7 +140,6 @@
       margin:0 0 6px;
     }
 
-    /* Eingabefelder */
     .field{
       display:grid;
       grid-template-columns:1fr auto;
@@ -104,7 +148,8 @@
       padding:0 10px;
       border-radius:14px;
       border:1px solid var(--stroke);
-      background:rgba(0,0,0,.25);
+      background:rgba(0,0,0,.22);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
     }
     .field input{
       background:transparent; border:0; outline:0;
@@ -114,24 +159,45 @@
       width:100%;
     }
 
-    /* Button */
+    /* Autofill ohne Gelb */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus{
+      -webkit-text-fill-color:var(--text);
+      transition:background-color 9999s ease-in-out 0s;
+      box-shadow:0 0 0 1000px transparent inset;
+      caret-color:var(--text);
+    }
+
+    .row-links{
+      display:flex; gap:12px; align-items:center;
+      font-size:13px; margin-top:6px;
+    }
+    .row-links a{
+      color:var(--accent); text-decoration:none; font-weight:700;
+      border-bottom:1px dashed rgba(255,255,255,.22);
+    }
+    .row-links a:hover{ color:#fff; border-bottom-color:rgba(255,255,255,.45) }
+
     .submit{
-      margin-top:16px;
-      border:0;
-      border-radius:14px;
+      margin-top:14px;
+      border:0; border-radius:14px;
       padding:14px 18px;
       font-weight:900; font-size:16px;
       color:#fff; cursor:pointer;
       background:linear-gradient(180deg,var(--accent),var(--accent-2));
-      box-shadow:0 12px 28px rgba(195,32,30,.35);
+      box-shadow:0 16px 30px rgba(195,32,30,.30);   /* Glow bleibt innerhalb */
+      transition:transform .08s ease, box-shadow .12s ease, opacity .12s ease;
     }
-    .submit:hover{ opacity:0.9 }
+    .submit:hover{ opacity:.95; box-shadow:0 18px 36px rgba(195,32,30,.36); }
+    .submit:active{ transform:translateY(1px) scale(.997) }
+    .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none }
 
-    .help{ text-align:center; margin:12px 0; font-size:13px; color:var(--muted) }
+    .help{ text-align:center; margin:12px 0 16px; font-size:13px; color:var(--muted) }
 
     .foot{
       margin-top:8px;
-      padding:14px 20px 18px;
+      padding:14px 6px 18px;
       border-top:1px solid rgba(255,255,255,.06);
       text-align:center; color:var(--muted); font-size:12px;
     }
@@ -140,43 +206,71 @@
 </head>
 <body>
   <div class="wrap">
-    <div class="card">
+    <div class="card" role="group" aria-labelledby="hd-title">
 
-      <!-- Logo + Schriftzug -->
-      <div class="logo-box">
+      <!-- HD-Logo + Titel als EIN Block (stabil, wandert nicht) -->
+      <div class="brand">
         <img src="/HD-Logo.png" alt="HD Logo" class="logo-hd">
-        <img src="/hotel-dashboard.png" alt="Hotel-Dashboard" class="logo-title">
+        <img src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel‑Dashboard" class="logo-title">
       </div>
 
       <div class="content">
-        <form action="/login" method="POST">
+        <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
+
+        <form action="/login" method="POST" id="loginForm" novalidate>
           <div>
             <label for="username">Benutzername</label>
             <div class="field">
-              <input id="username" name="username" type="text" required />
+              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
             </div>
           </div>
 
           <div>
             <label for="password">Passwort</label>
             <div class="field">
-              <input id="password" name="password" type="password" required />
+              <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
             </div>
           </div>
 
-          <button class="submit" type="submit">Anmelden</button>
+          <div class="row-links">
+            <a href="/reset">Passwort vergessen?</a>
+          </div>
+
+          <button class="submit" id="submitBtn" type="submit">Anmelden</button>
+
           <div class="help">Bei Problemen wenden Sie sich bitte an den Administrator.</div>
         </form>
       </div>
 
       <div class="foot">
-        <small>© <span id="y"></span> Hotel-Dashboard<br>Powered by MY HOME HOTEL AM ROTTWEIL GMBH</small>
+        <small>
+          © <span id="y"></span> Hotel‑Dashboard<br>
+          Powered by MY HOME HOTEL AM ROTTWEIL GMBH
+        </small>
       </div>
     </div>
   </div>
 
   <script>
+    // Footer-Jahr
     document.getElementById('y').textContent = new Date().getFullYear();
+
+    // ?err=1 -> Fehlermeldung zeigen
+    (()=>{
+      const params = new URLSearchParams(location.search);
+      if (params.get('err')) document.getElementById('err').style.display = 'block';
+    })();
+
+    // Submit-Button nur aktivieren, wenn beide Felder Text haben
+    (()=>{
+      const u = document.getElementById('username');
+      const p = document.getElementById('password');
+      const s = document.getElementById('submitBtn');
+      const update = () => { s.disabled = !(u.value.trim() && p.value.trim()); };
+      u.addEventListener('input', update);
+      p.addEventListener('input', update);
+      update();
+    })();
   </script>
 </body>
 </html>
