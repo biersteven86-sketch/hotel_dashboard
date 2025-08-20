@@ -4,224 +4,110 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login · Hotel‑Dashboard</title>
-  <meta name="color-scheme" content="light dark" />
+  <meta name="color-scheme" content="light dark">
 
-  <!-- WICHTIG: Assets vorladen (Dateinamen ggf. anpassen) -->
+  <!-- Assets -->
   <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
   <link rel="preload" as="image" href="/HD-Logo.png">
-  <link rel="preload" as="image" href="/hotel-dashboard-wordmark.png">
+  <link rel="preload" as="image" href="/Hotel-Dashboard-Schriftzug.png">
 
   <style>
-    /* ==========================================================
-       STEUERZENTRALE – hier drehst du an allen "Reglern"
-       ========================================================== */
     :root{
-      /* Hintergrund (Seite) – tiefschwarz mit leichtem Blaustich */
-      --page-bg:        #06080c;
+      /* Farben / Look */
+      --page:#06080c;        /* Seitenhintergrund */
+      --panel:#0b0f14;       /* tiefschwarze Karte */
+      --text:#eef2f8;
+      --muted:#aab4c0;
+      --accent:#e02824;
+      --accent-2:#b31618;
 
-      /* Panel-/Kartenfarbe – tiefes Schwarz; Matteffekt kommt über Overlays */
-      --panel:          #07090e;
+      /* Größen (hier einfach feinjustieren) */
+      --card-w: 720px;       /* max Breite der Karte */
+      --radius:22px;
 
-      /* Kanten / Linien */
-      --panel-edge:     #10151d;
-      --stroke:         #2a323d;
-
-      /* Texte */
-      --text:           #e9edf5;
-      --muted:          #9aa3b2;
-
-      /* Akzent (Button) */
-      --accent:         #e02724;
-      --accent-2:       #b31517;
-
-      /* Rundungen / Schatten */
-      --radius:         22px;
-      --shadow-strong:  0 28px 60px rgba(0,0,0,.65), 0 2px 0 rgba(255,255,255,.02) inset;
-
-      /* ===== Metallic / Glossy-Matt Steuerung (nur Optik, keine Farbe) =====
-         - Stärke & Ausbreitung der hellen "Weißfilter"-Schicht
-         - Du kannst hiermit Glanz (gloss) und mattes "brushed" Feeling feinjustieren */
-      --gloss-strength:        0.55;  /* 0.0 – 1.0   -> wie stark die helle Schicht wirkt */
-      --gloss-uniformity:      0.75;  /* 0.0 – 1.0   -> 1.0 = gleichmäßig über die ganze Fläche */
-      --gloss-grain:           0.14;  /* 0.0 – 0.3   -> feines "Brushed"-Rauschen (dezent halten!) */
-      --gloss-direction-deg:   18;    /* Winkel der subtilen Strichrichtung (°) */
-
-      /* ===== HD-Logo (Hex-Wabe) übergreifend zwischen Hintergrund & Card =====
-         Größe/Position: wird als Hintergrund-Layer gerendert und schwebt hinter dem Inhalt */
-      --hd-logo-size:          clamp(260px, 36vw, 440px); /* gesamt Größe der Wabe */
-      --hd-logo-offset-x:      0px;   /* fein links/rechts: + nach rechts | - nach links */
-      --hd-logo-offset-y:     -14px;  /* fein hoch/runter: - höher  | + tiefer */
-      --hd-logo-opacity:       0.22;  /* globale Deckkraft der Wabe */
-
-      /* ===== Wortmarke "Hotel‑Dashboard" unter dem HD‑Logo ===== */
-      --wordmark-width:        clamp(280px, 44vw, 520px); /* Breite des PNG-Schriftzugs */
-      --wordmark-gap:          8px;   /* vertikaler Abstand unter der Wabe */
-      --wordmark-opacity:      0.88;  /* 0–1 Deckkraft */
-
-      /* ===== Innenabstände & Format ===== */
-      --card-width:            min(560px, 92vw);  /* Gesamtbreite der Card */
-      --card-padding-x:        24px;
-      --card-padding-top:      26px;  /* oberes Padding, beeinflusst Abstand zu Logos */
-      --card-padding-bottom:   20px;
-
-      /* ===== Formularabstände ===== */
-      --brand-gap:             10px;  /* Abstand zwischen Logo-Layer & Wortmarke */
-      --form-top-gap:          18px;  /* Abstand von Brand-Bereich zu Formular */
-      --field-min-h:           50px;  /* Feldhöhe */
-      --field-radius:          14px;
-
-      /* ===== Button-Licht (kein "Leuchten über Rand") ===== */
-      --btn-shadow-outer:      0 18px 34px rgba(224,39,36,.28);  /* reduzierter Saum */
-      --btn-shadow-hover:      0 22px 42px rgba(224,39,36,.34);
-      --btn-inner:             0 1px 0 rgba(255,255,255,.06) inset;
-
-      /* ===== Footer (unten) ===== */
-      --foot-text:             #aab3c1;
-      --foot-size:             13px;  /* größer stellen, wie gewünscht */
+      --hd:108px;            /* HD‑Logo-Größe */
+      --word-gap:8px;        /* Abstand HD → Schriftzug */
+      --title-w: clamp(300px, 78%, 540px); /* Breite Schriftzug-PNG */
+      --title-gap:18px;      /* Abstand Schriftzug → Formular */
     }
 
-    /* Basis-Setup */
-    *{ box-sizing:border-box }
-    html,body{ height:100% }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+
     body{
       margin:0;
       font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
       color:var(--text);
-      background: var(--page-bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
-      /* kein zusätzlicher Glasfilter über dem Seitenhintergrund */
+      background:var(--page) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
 
-    /* Zentrier-Wrapper – enthält sowohl die Card als auch den HD-Logo-Layer */
     .wrap{
       min-height:100%;
       display:grid;
       place-items:center;
-      padding:clamp(20px,4vw,60px);
-      position:relative; /* wichtig für absolute Layer (HD-Logo) */
-      overflow:hidden;   /* verhindert, dass Button-Glow/Layer überläuft */
-      isolation:isolate; /* eigene Stacking-Context für saubere z-index Steuerung */
+      padding:clamp(18px,4vw,60px);
     }
 
-    /* ==========================================================
-       HD-LOGO-LAYER (übergreifend, hinter dem Card-Inhalt)
-       ========================================================== */
-    .hd-layer{
-      position:absolute;
-      inset:0 auto auto 0;        /* oben/links ausgerichtet */
-      width:100%;
-      display:grid;
-      place-items:center;
-      z-index:0;                  /* HINTER dem Card-Inhalt */
-      pointer-events:none;        /* nie anklickbar */
-    }
-    .hd-group{
-      position:relative;
-      display:grid;
-      place-items:center;
-      translate: var(--hd-logo-offset-x) var(--hd-logo-offset-y);
-    }
-    .hd-logo{
-      width:var(--hd-logo-size);
-      aspect-ratio: 1 / 1;
-      object-fit:contain;
-      opacity:var(--hd-logo-opacity);
-      filter: saturate(.9) contrast(1.05);
-      display:block;
-    }
-    .hd-wordmark{
-      width:var(--wordmark-width);
-      margin-top:var(--wordmark-gap);
-      opacity:var(--wordmark-opacity);
-      object-fit:contain;
-      display:block;
-    }
-
-    /* ==========================================================
-       CARD – Panel mit „glossy-matt“ Oberfläche
-       ========================================================== */
+    /* ===== Karte ===== */
     .card{
-      width:var(--card-width);
+      position:relative;
+      width:min(var(--card-w), 94vw);
       background:var(--panel);
       border-radius:var(--radius);
-      border:1px solid rgba(255,255,255,.04);
-      box-shadow:var(--shadow-strong);
-      overflow:hidden;           /* Glow bleibt innerhalb */
-      position:relative;
-      z-index:1;                 /* VOR dem HD-Logo-Layer */
-      display:flex;
-      flex-direction:column;
+      border:1px solid rgba(255,255,255,.05);
+      box-shadow:
+        0 26px 70px rgba(0,0,0,.68),
+        0 2px 0 rgba(255,255,255,.03) inset;
+      /* Platz für Logo-Stack einplanen */
+      padding: clamp(18px,2.6vw,26px);
+      padding-top: calc(var(--hd) * .65 + var(--title-gap) + 20px);
+      overflow: visible; /* damit HD-Wabe überstehen darf */
     }
 
-    /* Dünne Top‑Lippe */
+    /* “glänzend‑matt” über die gesamte Fläche */
     .card::before{
       content:"";
-      position:absolute; inset:0 0 auto 0; height:1px;
-      background:linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
-      pointer-events:none;
-      z-index:2;
+      position:absolute; inset:0; pointer-events:none;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.06) 14%, rgba(0,0,0,0) 26%),
+        radial-gradient(120% 140% at 50% -10%, rgba(255,255,255,.20) 0%, rgba(255,255,255,.10) 28%, rgba(0,0,0,0) 60%),
+        radial-gradient(140% 120% at 50% 120%, rgba(0,0,0,.45) 0%, rgba(0,0,0,.28) 40%, rgba(0,0,0,.0) 60%);
+      mix-blend-mode:normal;
     }
-
-    /* GESAMT-WEISSFILTER/GLANZ: gleichmäßig über die gesamte Card-Fläche
-       Kombination aus:
-       - radialer weicher Lichtkuppe
-       - schräger "Brushed"-Feinstruktur (sehr subtil)
-       Stellschrauben: --gloss-strength, --gloss-uniformity, --gloss-grain, --gloss-direction-deg
-    */
     .card::after{
       content:"";
-      position:absolute; inset:0;
-      z-index:1; /* liegt ÜBER der reinen Panel-Farbe, aber UNTER dem Inhalt */
+      position:absolute; inset:0 0 auto 0; height:1px;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.10), transparent);
       pointer-events:none;
-      mix-blend-mode: screen; /* hellt an – für "glänzend matt" */
-      opacity: calc(var(--gloss-strength) * 1);
-      background:
-        /* feines, schräges "Brushed"-Banding (sehr dezent halten) */
-        linear-gradient(
-          calc(var(--gloss-direction-deg) * 1deg),
-          rgba(255,255,255, calc(var(--gloss-grain) * .9)) 0%,
-          rgba(255,255,255, 0) 20%,
-          rgba(255,255,255, calc(var(--gloss-grain) * .6)) 40%,
-          rgba(255,255,255, 0) 60%,
-          rgba(255,255,255, calc(var(--gloss-grain) * .45)) 80%,
-          rgba(255,255,255, 0) 100%
-        ),
-        /* breite, weiche Aufhellung (über die ganze Fläche) */
-        radial-gradient(180% 120% at 0% 0%,
-          rgba(255,255,255, .22 * var(--gloss-uniformity)) 0%,
-          rgba(255,255,255, .14 * var(--gloss-uniformity)) 35%,
-          rgba(255,255,255, .08 * var(--gloss-uniformity)) 60%,
-          rgba(255,255,255, .02 * var(--gloss-uniformity)) 85%,
-          transparent 100%
-        );
     }
 
-    /* BRAND-Bereich – enthält KEIN Bild, nur als Anker für Abstände;
-       Die echten Bilder liegen im .hd-layer dahinter */
-    .brand{
-      display:flex; align-items:center; justify-content:center;
-      gap:var(--brand-gap);
-      padding: var(--card-padding-top) var(--card-padding-x) 0;
-      position:relative;
-      z-index:3; /* vor dem Gloss-Overlay */
-      min-height: clamp(60px, 10vh, 120px); /* reserviert Platz unter der Wabe */
+    /* ===== Logo-Stack (HD + Schriftzug) ===== */
+    .brand-stack{
+      position:absolute; left:50%; top:0;
+      transform:translate(-50%, calc(-50% + 4px)); /* Wabe steht über */
+      display:grid; place-items:center;
+      pointer-events:none; z-index:5;
+      width:min(32vw, 520px);
+    }
+    .brand-stack .hd{
+      width:var(--hd); height:var(--hd); object-fit:contain; display:block;
+      filter:
+        drop-shadow(0 24px 40px rgba(0,0,0,.55))
+        drop-shadow(0 1px 0 rgba(255,255,255,.08));
+    }
+    .brand-stack .wordmark{
+      margin-top:var(--word-gap);
+      width:var(--title-w); height:auto; display:block;
+      filter:
+        drop-shadow(0 2px 0 rgba(255,255,255,.12))
+        drop-shadow(0 18px 28px rgba(0,0,0,.55));
     }
 
-    /* optionaler Titel – aktuell ausgeblendet, da PNG-Wortmarke genutzt wird */
-    .title{ display:none }
+    /* Spacer verhindert, dass Formular unter das PNG rutscht */
+    .title-spacer{ height: var(--title-gap); }
 
-    .content{
-      padding: var(--form-top-gap) var(--card-padding-x) 0;
-      position:relative; z-index:3;
-    }
-
-    /* Fehlermeldung */
-    .error{
-      display:none;
-      background:rgba(224,39,36,.12);
-      border:1px solid rgba(224,39,36,.45);
-      color:#ffd6d6;
-      padding:10px 12px; border-radius:12px; font-size:13px; margin:0 0 10px;
-    }
+    /* ===== Formular ===== */
+    .content{ display:grid; gap:14px; }
 
     label{
       display:block;
@@ -230,17 +116,22 @@
       margin:0 0 6px;
     }
 
-    /* Formularfelder – transparent, tiefe Panelfarben scheinen durch */
     .field{
-      display:grid;
-      grid-template-columns:1fr auto;
-      align-items:center;
-      min-height:var(--field-min-h);
-      padding:0 10px;
-      border-radius:var(--field-radius);
-      border:1px solid var(--stroke);
-      background:rgba(0,0,0,.12);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.02);
+      display:grid; grid-template-columns:1fr auto; align-items:center;
+      min-height:50px; padding:0 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.09);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.06));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.08),
+        inset 0 0 0 1px rgba(255,255,255,.08),
+        0 10px 28px rgba(0,0,0,.45);
+    }
+    .field:focus-within{
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.12),
+        inset 0 0 0 1px rgba(255,255,255,.12),
+        0 14px 36px rgba(0,0,0,.55);
     }
     .field input{
       background:transparent; border:0; outline:0;
@@ -248,96 +139,86 @@
       font-size:16px;
       padding:12px 8px;
       width:100%;
-      caret-color: var(--text);
+      caret-color:#fff;
     }
-    /* Platzhalter & Autofill sauber: kein Gelb, Texte weiß */
-    ::placeholder{ color: #cfd6e3; opacity:.75 }
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover,
-    input:-webkit-autofill:focus{
-      -webkit-text-fill-color: var(--text) !important;
-      caret-color: var(--text);
-      box-shadow: 0 0 0 1000px transparent inset !important;
-      transition: background-color 9999s ease-in-out 0s;
-    }
-
-    /* Passwort-Icon */
     .field button.icon{
       all:unset; cursor:pointer; border-radius:10px; padding:8px; display:grid; place-items:center;
       color:#c7cfdb;
     }
     .icon svg{ width:22px; height:22px; display:block }
 
-    .caps{ display:none; color:#ef4444; font-size:12px; margin-top:6px }
-
-    .row-links{
-      display:flex; justify-content:flex-start; align-items:center; gap:12px;
-      font-size:13px; margin-top:6px;
+    /* Autofill (gelb) neutralisieren */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus{
+      -webkit-text-fill-color:var(--text) !important;
+      transition:background-color 9999s ease-in-out 0s;
+      box-shadow:0 0 0 1000px transparent inset !important;
+      caret-color:#fff !important;
+      filter:none !important;
     }
+
+    .error{
+      display:none;
+      background:rgba(224,39,36,.12);
+      border:1px solid rgba(224,39,36,.45);
+      color:#ffd6d6;
+      padding:10px 12px; border-radius:12px; font-size:13px; margin:0 0 8px;
+    }
+
+    .row-links{ display:flex; gap:12px; font-size:13px; margin-top:4px }
     .row-links a{
       color:var(--accent); text-decoration:none; font-weight:700;
       border-bottom:1px dashed rgba(255,255,255,.22);
     }
     .row-links a:hover{ color:#fff; border-bottom-color:rgba(255,255,255,.45) }
 
-    /* Button – Glow im Zaum halten (kein Überstrahlen über Card-Rand) */
     .submit{
-      margin-top:12px;
-      border:0;
-      border-radius:14px;
-      padding:14px 18px;
-      font-weight:900; font-size:16px;
-      color:#fff; cursor:pointer;
+      margin-top:10px;
+      border:0; border-radius:14px; padding:14px 18px;
+      font-weight:900; font-size:16px; color:#fff; cursor:pointer;
       background:linear-gradient(180deg,var(--accent),var(--accent-2));
-      box-shadow: var(--btn-shadow-outer), var(--btn-inner);
-      transition:transform .08s ease, box-shadow .12s ease, filter .12s ease;
-      filter: saturate(.95);
+      box-shadow:
+        0 14px 28px rgba(224,39,36,.32),
+        0 1px 0 rgba(255,255,255,.06) inset;
+      transition:transform .08s ease, box-shadow .12s ease;
     }
     .submit:hover{
-      box-shadow: var(--btn-shadow-hover), var(--btn-inner);
-      filter: saturate(1);
+      box-shadow:
+        0 18px 38px rgba(224,39,36,.40),
+        0 1px 0 rgba(255,255,255,.08) inset;
     }
     .submit:active{ transform:translateY(1px) scale(.997) }
     .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none }
 
-    .help{ text-align:center; margin:12px 0 16px; font-size:13px; color:var(--muted) }
+    .help{ text-align:center; margin:10px 0 12px; font-size:13px; color:var(--muted) }
 
     .foot{
       margin-top:8px;
-      padding:14px var(--card-padding-x) var(--card-padding-bottom);
+      padding:14px 6px 8px;
       border-top:1px solid rgba(255,255,255,.06);
-      text-align:center; color:var(--foot-text); font-size:var(--foot-size);
-      position:relative; z-index:3;
+      text-align:center; color:var(--muted); font-size:12.5px; line-height:1.45;
     }
-    .foot small{ display:block; line-height:1.35 }
+    .foot small{ display:block }
 
-    /* Responsive Feintuning */
-    @media (max-width:420px){
-      :root{
-        --card-padding-top: 20px;
-        --form-top-gap: 14px;
-        --wordmark-width: clamp(220px, 68vw, 360px);
-      }
+    /* Mobile Tweaks */
+    @media (max-width:560px){
+      :root{ --hd:92px; --title-w: 86%; }
+      .card{ padding-top: calc(var(--hd) * .7 + var(--title-gap) + 16px); }
     }
   </style>
 </head>
 <body>
-  <!-- HD-Logo-Layer: sitzt HINTER der Card, damit nichts abgeschnitten wird -->
   <div class="wrap">
-    <div class="hd-layer" aria-hidden="true">
-      <div class="hd-group">
-        <!-- WABE/HEX-LOGO (PNG/SVG): Größe/Position per --hd-* Variablen -->
-        <img src="/HD-Logo.png" alt="" class="hd-logo">
-        <!-- WORTMARKE (PNG): Breite/Abstand per --wordmark-* Variablen -->
-        <img src="/hotel-dashboard-wordmark.png" alt="Hotel‑Dashboard" class="hd-wordmark">
-      </div>
-    </div>
-
     <div class="card" role="group" aria-labelledby="hd-title">
-      <!-- "Brand" dient hier nur als Abstandshalter zum HD-Layer -->
-      <div class="brand">
-        <h1 class="title" id="hd-title">Hotel‑Dashboard</h1>
+      <!-- Feste Markenebene (verschiebt NICHT das Formular) -->
+      <div class="brand-stack" aria-hidden="true">
+        <img class="hd" src="/HD-Logo.png" alt="HD">
+        <img class="wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel‑Dashboard" id="hd-title">
       </div>
+
+      <!-- Abstand, damit Formular nicht unter den Schriftzug rutscht -->
+      <div class="title-spacer" aria-hidden="true"></div>
 
       <div class="content">
         <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
@@ -367,7 +248,6 @@
                 </svg>
               </button>
             </div>
-            <div class="caps" id="caps">Warnung: Feststelltaste ist aktiv.</div>
           </div>
 
           <div class="row-links">
@@ -390,17 +270,15 @@
   </div>
 
   <script>
-    // Footer-Jahr dynamisch
+    // Jahr
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // Formular-Logik
     const u = document.getElementById('username');
     const p = document.getElementById('password');
     const s = document.getElementById('submitBtn');
     const tp = document.getElementById('togglePw');
     const eyeOn  = document.getElementById('eye-on');
     const eyeOff = document.getElementById('eye-off');
-    const c  = document.getElementById('caps');
     const err= document.getElementById('err');
 
     const update = () => { s.disabled = !(u.value.trim() && p.value.trim()); };
@@ -415,62 +293,7 @@
       eyeOff.style.display = show ? "none"  : "block";
     });
 
-    ['keydown','keyup'].forEach(ev => p.addEventListener(ev, e => {
-      try { c.style.display = e.getModifierState('CapsLock') ? 'block' : 'none'; } catch(_){}
-    }));
-
     if (new URLSearchParams(location.search).get('err')) err.style.display='block';
   </script>
-
-  <!-- ==========================================================
-       CHEAT SHEET – Was ändere ich wo?
-       ==========================================================
-       1) HD-Logo (Wabe) größer/kleiner:
-          -> :root { --hd-logo-size: 380px; }
-             Feintuning Position: --hd-logo-offset-x / --hd-logo-offset-y
-             Deckkraft: --hd-logo-opacity
-
-       2) Wortmarke "Hotel‑Dashboard" näher an die Wabe / größer:
-          -> :root { --wordmark-gap: 6px; --wordmark-width: 520px; --wordmark-opacity: .95; }
-
-       3) Panel-Farbe (tiefschwarz) oder wärmer/kühler:
-          -> :root { --panel: #07090e; } // dunkler = mehr Schwarz, etwas Blau = kühler
-
-       4) Glänzend-matt (Weißfilter/Gloss):
-          - Stärke insgesamt:    --gloss-strength (0.35 – 0.9 üblich)
-          - Gleichmäßigkeit:     --gloss-uniformity (0.5 – 1.0; 1 = sehr gleichmäßig)
-          - "Brushed"-Feinstruktur: --gloss-grain (0.08 – 0.18)
-          - Richtung der Struktur:   --gloss-direction-deg (z. B. 12, 18, 24)
-
-       5) Button-Leuchten zähmen:
-          -> :root { --btn-shadow-outer, --btn-shadow-hover }
-             Reduzieren (kleinere Alpha) verhindert Überstrahlen an Rändern.
-
-       6) Card-Größe / Breite und Innenabstände:
-          -> :root { --card-width, --card-padding-top, --form-top-gap, --card-padding-bottom }
-             Tipp: --card-padding-top beeinflusst Abstand Logos ↔ Formular.
-
-       7) Feldhöhe / Rundungen:
-          -> :root { --field-min-h, --field-radius }
-
-       8) Footer lesbarer:
-          -> :root { --foot-size: 14px; --foot-text: #bcc5d4; }
-
-       9) Platzhalter-/Autofill-Farbe:
-          - Placeholder: in CSS `::placeholder`
-          - Autofill: bereits neutralisiert; nichts Gelbes mehr
-
-       10) Wortmarke/Logo austauschen (Dateinamen):
-           - <img src="/HD-Logo.png" ...>
-           - <img src="/hotel-dashboard-wordmark.png" ...>
-           Dateien einfach unter /public/images/… ablegen und Pfad anpassen.
-
-       11) „Logo sitzt oben, wird aber abgeschnitten“:
-           - HD-Layer liegt VOR der Card (z-index 0 vs. Card z-index 1) und die Card hat overflow:hidden.
-             Wir haben die Layer außerhalb der Card platziert → nichts wird abgeschnitten.
-             Feintuning bei sehr kleinen Displays via @media möglich.
-
-       Viel Spaß beim Tweaken! :)
-  -->
 </body>
 </html>
