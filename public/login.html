@@ -13,22 +13,20 @@
 
   <style>
     :root{
-      /* Farben / Look */
-      --page:#06080c;        /* Seitenhintergrund */
-      --panel:#0b0f14;       /* tiefschwarze Karte */
+      --page:#06080c;
+      --panel:#0b0f14;
       --text:#eef2f8;
       --muted:#aab4c0;
       --accent:#e02824;
       --accent-2:#b31618;
 
-      /* Größen (hier einfach feinjustieren) */
-      --card-w: 720px;       /* max Breite der Karte */
+      --card-w: 720px;
       --radius:22px;
 
-      --hd:108px;            /* HD‑Logo-Größe */
-      --word-gap:8px;        /* Abstand HD → Schriftzug */
-      --title-w: clamp(300px, 78%, 540px); /* Breite Schriftzug-PNG */
-      --title-gap:18px;      /* Abstand Schriftzug → Formular */
+      --hd:108px;
+      --word-gap:8px;
+      --title-w: clamp(300px, 78%, 540px);
+      --title-gap:18px;
     }
 
     *{box-sizing:border-box}
@@ -58,13 +56,10 @@
       box-shadow:
         0 26px 70px rgba(0,0,0,.68),
         0 2px 0 rgba(255,255,255,.03) inset;
-      /* Platz für Logo-Stack einplanen */
       padding: clamp(18px,2.6vw,26px);
       padding-top: calc(var(--hd) * .65 + var(--title-gap) + 20px);
-      overflow: visible; /* damit HD-Wabe überstehen darf */
+      overflow: visible;
     }
-
-    /* “glänzend‑matt” über die gesamte Fläche */
     .card::before{
       content:"";
       position:absolute; inset:0; pointer-events:none;
@@ -81,10 +76,10 @@
       pointer-events:none;
     }
 
-    /* ===== Logo-Stack (HD + Schriftzug) ===== */
+    /* ===== Logo-Stack ===== */
     .brand-stack{
       position:absolute; left:50%; top:0;
-      transform:translate(-50%, calc(-50% + 4px)); /* Wabe steht über */
+      transform:translate(-50%, calc(-50% + 4px));
       display:grid; place-items:center;
       pointer-events:none; z-index:5;
       width:min(32vw, 520px);
@@ -102,8 +97,6 @@
         drop-shadow(0 2px 0 rgba(255,255,255,.12))
         drop-shadow(0 18px 28px rgba(0,0,0,.55));
     }
-
-    /* Spacer verhindert, dass Formular unter das PNG rutscht */
     .title-spacer{ height: var(--title-gap); }
 
     /* ===== Formular ===== */
@@ -147,7 +140,7 @@
     }
     .icon svg{ width:22px; height:22px; display:block }
 
-    /* Autofill (gelb) neutralisieren */
+    /* Autofill neutralisieren */
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
     input:-webkit-autofill:focus{
@@ -181,7 +174,7 @@
       box-shadow:
         0 14px 28px rgba(224,39,36,.32),
         0 1px 0 rgba(255,255,255,.06) inset;
-      transition:transform .08s ease, box-shadow .12s ease;
+      transition:transform .08s ease, box-shadow .12s ease, opacity .12s ease;
     }
     .submit:hover{
       box-shadow:
@@ -201,33 +194,44 @@
     }
     .foot small{ display:block }
 
-    /* Mobile Tweaks */
     @media (max-width:560px){
       :root{ --hd:92px; --title-w: 86%; }
       .card{ padding-top: calc(var(--hd) * .7 + var(--title-gap) + 16px); }
+    }
+
+    /* noscript Hinweis */
+    .noscript{
+      background:#311; color:#ffd6d6; border:1px solid rgba(224,39,36,.45);
+      border-radius:12px; padding:10px 12px; font-size:13px; margin-bottom:8px;
+      text-align:center;
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card" role="group" aria-labelledby="hd-title">
-      <!-- Feste Markenebene (verschiebt NICHT das Formular) -->
+      <!-- Feste Markenebene -->
       <div class="brand-stack" aria-hidden="true">
         <img class="hd" src="/HD-Logo.png" alt="HD">
         <img class="wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel‑Dashboard" id="hd-title">
       </div>
 
-      <!-- Abstand, damit Formular nicht unter den Schriftzug rutscht -->
       <div class="title-spacer" aria-hidden="true"></div>
 
       <div class="content">
-        <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
+        <noscript><div class="noscript">JavaScript ist deaktiviert. Die Anmeldung benötigt JavaScript.</div></noscript>
+
+        <!-- Fehlerbereich (Screenreader-freundlich) -->
+        <div class="error" id="err" role="alert" aria-live="assertive">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
 
         <form action="/login" method="POST" id="loginForm" novalidate>
+          <!-- Honeypot gegen Bots (wird vom Server ignoriert) -->
+          <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;height:0;width:0" aria-hidden="true">
+
           <div>
             <label for="username">Benutzername</label>
             <div class="field">
-              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
+              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required inputmode="text" />
             </div>
           </div>
 
@@ -235,14 +239,14 @@
             <label for="password">Passwort</label>
             <div class="field">
               <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
-              <button class="icon" type="button" id="togglePw" aria-label="Passwort anzeigen/ausblenden">
+              <button class="icon" type="button" id="togglePw" aria-label="Passwort anzeigen/ausblenden" aria-pressed="false">
                 <!-- geschlossen -->
-                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                   <path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.05 0-9.27-3.11-11-8 1.02-2.93 3.03-5.19 5.47-6.53m3.17-1.19A9.77 9.77 0 0112 4c5.05 0 9.27 3.11 11 8a11.73 11.73 0 01-1.41 2.94M9.88 9.88A3 3 0 1112 15a3 3 0 01-2.12-5.12z"/>
                   <line x1="3" y1="3" x2="21" y2="21"/>
                 </svg>
                 <!-- offen -->
-                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none" aria-hidden="true">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
                   <circle cx="12" cy="12" r="3"/>
                 </svg>
@@ -273,6 +277,7 @@
     // Jahr
     document.getElementById('y').textContent = new Date().getFullYear();
 
+    const form = document.getElementById('loginForm');
     const u = document.getElementById('username');
     const p = document.getElementById('password');
     const s = document.getElementById('submitBtn');
@@ -286,14 +291,34 @@
     p.addEventListener('input', update);
     update();
 
+    // Passwortsichtbarkeit
     tp.addEventListener('click', () => {
       const show = p.type === "password";
       p.type = show ? "text" : "password";
       eyeOn.style.display  = show ? "block" : "none";
       eyeOff.style.display = show ? "none"  : "block";
+      tp.setAttribute('aria-pressed', String(show));
+      p.focus();
     });
 
-    if (new URLSearchParams(location.search).get('err')) err.style.display='block';
+    // Fehlermeldung via Query (?err=1)
+    const qs = new URLSearchParams(location.search);
+    if (qs.get('err')) {
+      err.style.display='block';
+    }
+
+    // ESC blendet Fehlermeldung aus
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && err.style.display === 'block') {
+        err.style.display = 'none';
+      }
+    });
+
+    // Submit: Button sperren & Zustand anzeigen
+    form.addEventListener('submit', () => {
+      s.disabled = true;
+      s.textContent = 'Anmelden…';
+    });
   </script>
 </body>
 </html>
