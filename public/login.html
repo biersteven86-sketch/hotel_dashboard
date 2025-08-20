@@ -5,25 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login · Hotel-Dashboard</title>
   <meta name="color-scheme" content="light dark">
+
+  <!-- Assets -->
   <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
   <link rel="preload" as="image" href="/HD-Logo.png">
   <link rel="preload" as="image" href="/Hotel-Dashboard-Schriftzug.png">
+
   <style>
     :root{
-      /* Grundlook */
-      --bg:#06080c;              /* Seitenhintergrund */
-      --panel:#0a0b0d;           /* Tiefschwarz fürs Panel */
-      --stroke:#2a323d;          /* Linien / Felder */
-      --text:#eef2f7;            /* Primärtext */
-      --muted:#b7c0cc;           /* Sekundärtext */
-      --accent:#e02724;          /* Rot */
+      --bg:#06080c;   /* Seitenhintergrund */
+      --panel:#000;   /* Tiefschwarz */
+      --text:#fff;    /* Primärtext */
+      --muted:#a4aebb;
+      --accent:#e02724;
       --accent-2:#b31517;
       --radius:22px;
-
-      /* Größensteuerung Logo + Wortmarke */
-      --badge-size: 132px;       /* HD-Wabe – bei Bedarf feinjustieren */
-      --wordmark-max: 560px;     /* maximale Breite des PNG-Schriftzugs */
-      --wordmark-gap: 6px;       /* Abstand HD-Wabe → Schriftzug */
     }
 
     *{box-sizing:border-box}
@@ -39,174 +35,159 @@
       min-height:100%;
       display:grid;
       place-items:center;
-      padding:clamp(18px,4vw,60px);
+      padding:clamp(20px,4vw,60px);
+      position:relative;
     }
 
     .card{
-      width:min(720px,94vw);
-      background:var(--panel);
+      width:min(620px,94vw);
+      margin-top:28px;
       border-radius:var(--radius);
-      border:1px solid rgba(255,255,255,.06);
       position:relative;
-      overflow:clip; /* verhindert Glow-Überstand */
+      overflow:visible;
+      background:var(--panel);
       box-shadow:
-        0 40px 80px rgba(0,0,0,.55),
-        0 2px 0 rgba(255,255,255,.04) inset;
-      padding-top:calc(var(--badge-size)/2 + 20px); /* Platz für überlappendes HD-Logo */
+        0 50px 90px rgba(0,0,0,.9),
+        0 1px 0 rgba(255,255,255,.06) inset,
+        0 -1px 0 rgba(0,0,0,.85) inset;
+      border:1px solid rgba(255,255,255,.08);
     }
 
-    /* Globaler „glänzend‑matt“-Überzug über die KOMPLETTE Fläche */
+    /* HD-Logo – kleiner & höher */
     .card::before{
       content:"";
-      position:absolute; inset:0;
-      background:
-        radial-gradient(140% 90% at 10% 0% , rgba(255,255,255,.20) 0%, rgba(255,255,255,.06) 28%, rgba(255,255,255,.02) 52%, rgba(255,255,255,0) 62%),
-        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.00) 32% 68%, rgba(255,255,255,.08)),
-        radial-gradient(120% 80% at 85% 10%, rgba(255,255,255,.14), transparent 40%);
-      mix-blend-mode:screen;
+      position:absolute;
+      left:50%;
+      top:-120px;
+      transform:translateX(-50%);
+      width:180px;
+      height:180px;
+      background:url("/HD-Logo.png") center/contain no-repeat;
+      filter:
+        drop-shadow(0 8px 14px rgba(0,0,0,.65))
+        drop-shadow(0 1px 0 rgba(255,255,255,.08));
+      z-index:3;
       pointer-events:none;
     }
 
-    /* HD-Badge (übergreifend) */
-    .badge{
-      position:absolute;
-      left:50%;
-      top:calc(var(--badge-size) * -0.42);
-      width:var(--badge-size);
-      height:var(--badge-size);
-      transform:translateX(-50%);
-      display:block;
-      filter:
-        drop-shadow(0 10px 16px rgba(0,0,0,.65))
-        drop-shadow(0 2px 0 rgba(255,255,255,.06));
+    /* Glanz über die gesamte Fläche (glänzend-matt) */
+    .card > .shine{
+      content:"";
+      position:absolute; inset:0;
+      border-radius:inherit;
+      background:
+        linear-gradient(135deg,
+          rgba(255,255,255,.40) 0%,
+          rgba(255,255,255,.25) 40%,
+          rgba(255,255,255,0) 80%
+        ),
+        radial-gradient(circle at 50% 50%,
+          rgba(255,255,255,.25) 0%,
+          rgba(255,255,255,.12) 45%,
+          rgba(255,255,255,0) 85%
+        );
+      background-blend-mode:screen;
+      mix-blend-mode:screen;
+      opacity:.75;
       pointer-events:none;
       z-index:2;
     }
 
-    /* Schriftzug-PNG direkt unter die Badge „andocken“ */
+    /* PNG-Schriftzug – dicht unters Logo */
     .brand{
-      display:flex; flex-direction:column; align-items:center; gap:var(--wordmark-gap);
-      margin:-6px 0 6px; /* dichter an die Wabe */
+      display:flex; justify-content:center;
+      padding:110px 24px 10px;
     }
     .wordmark{
-      width:min(var(--wordmark-max), 88%);
-      height:auto; display:block;
-      filter:
-        drop-shadow(0 5px 14px rgba(0,0,0,.6))
-        drop-shadow(0 1px 0 rgba(255,255,255,.20));
-    }
-
-    .content{ padding:18px 24px 0 }
-
-    .error{
-      display:none;
-      background:rgba(224,39,36,.12);
-      border:1px solid rgba(224,39,36,.38);
-      color:#ffd6d6;
-      padding:10px 12px; border-radius:12px; font-size:14px; margin:0 0 12px;
-    }
-
-    label{
       display:block;
-      font-size:13px;
-      color:#ffffff;
-      margin:0 0 6px;
+      width:min(94%,500px);
+      height:auto;
+      margin-top:-28px; /* enger an das Hexagon-Logo */
+      filter:drop-shadow(0 3px 0 rgba(0,0,0,.75));
     }
+
+    .content{padding:18px 22px 0}
+    label{display:block;font-size:13px;color:#fff;margin:0 0 6px}
 
     .field{
-      display:grid;
-      grid-template-columns:1fr auto;
+      display:grid; grid-template-columns:1fr auto;
       align-items:center;
-      min-height:50px;
-      padding:0 10px;
+      min-height:50px; padding:0 10px;
       border-radius:14px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.02);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.12);
+      background:#000;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
     }
     .field input{
       background:transparent; border:0; outline:0;
-      color:var(--text);
-      font-size:16px;
+      color:#fff; font-size:16px;
       padding:12px 8px; width:100%;
     }
-    /* Kein Gelb bei Autofill */
+
+    /* Autofill-Gelb vollständig entfernen */
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
-    input:-webkit-autofill:focus{
-      -webkit-text-fill-color:var(--text) !important;
-      box-shadow:0 0 0 1000px rgba(255,255,255,0) inset !important;
-      transition:background-color 9999s ease-in-out 0s;
-      caret-color:var(--text);
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active{
+      -webkit-box-shadow:0 0 0 1000px #000 inset !important;
+      -webkit-text-fill-color:#fff !important;
+      caret-color:#fff !important;
+      transition:background-color 99999s ease-in-out 0s !important;
     }
 
     .field button.icon{
-      all:unset; cursor:pointer; border-radius:10px; padding:8px; display:grid; place-items:center;
-      color:#c7cfdb;
+      all:unset; cursor:pointer; border-radius:10px;
+      padding:8px; display:grid; place-items:center; color:#c7cfdb;
     }
-    .icon svg{ width:22px; height:22px; display:block }
+    .icon svg{width:22px;height:22px;display:block}
 
-    .row-links{
-      display:flex; gap:12px; align-items:center;
-      font-size:13px; margin-top:8px;
-    }
-    .row-links a{
-      color:var(--accent); text-decoration:none; font-weight:800;
-      border-bottom:1px dashed rgba(255,255,255,.25);
-    }
-    .row-links a:hover{
-      color:#fff; border-bottom-color:rgba(255,255,255,.55)
-    }
+    .row-links{display:flex;gap:12px;font-size:13px;margin-top:8px}
+    .row-links a{color:var(--accent);text-decoration:none;font-weight:700;border-bottom:1px dashed rgba(255,255,255,.22)}
+    .row-links a:hover{color:#fff;border-bottom-color:rgba(255,255,255,.45)}
 
     .submit{
-      margin-top:12px;
-      border:0; border-radius:14px;
-      padding:14px 18px;
-      font-weight:900; font-size:16px; color:#fff; cursor:pointer;
+      margin-top:12px; border:0; border-radius:14px;
+      padding:14px 18px; font-weight:900; font-size:16px;
+      color:#fff; cursor:pointer;
       background:linear-gradient(180deg,var(--accent),var(--accent-2));
-      /* kontrollierter Glow – kein Überlauf */
-      box-shadow: 0 10px 18px rgba(224,39,36,.28), 0 1px 0 rgba(255,255,255,.06) inset;
+      box-shadow:0 10px 18px rgba(224,39,36,.28),
+                 0 0 0 1px rgba(0,0,0,.25) inset,
+                 0 1px 0 rgba(255,255,255,.06) inset;
       transition:transform .08s ease, box-shadow .12s ease;
     }
-    .submit:hover{
-      box-shadow: 0 14px 24px rgba(224,39,36,.36), 0 1px 0 rgba(255,255,255,.08) inset;
-    }
-    .submit:active{ transform:translateY(1px) scale(.997) }
-    .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none }
+    .submit:hover{box-shadow:0 14px 24px rgba(224,39,36,.35),
+                             0 0 0 1px rgba(0,0,0,.25) inset,
+                             0 1px 0 rgba(255,255,255,.08) inset}
+    .submit:active{transform:translateY(1px) scale(.997)}
+    .submit:disabled{opacity:.6;cursor:not-allowed;box-shadow:none}
 
-    .help{ text-align:center; margin:14px 0 18px; font-size:13px; color:#c7cfdb }
+    .help{text-align:center;margin:12px 0 18px;font-size:13px;color:var(--muted)}
 
     .foot{
-      margin-top:8px;
-      padding:16px 20px 22px;
-      border-top:1px solid rgba(255,255,255,.08);
+      margin-top:12px;
+      padding:20px 22px 26px;
+      border-top:1px solid rgba(255,255,255,.06);
       text-align:center;
-      color:#cfd6e0;
-      font-size:13px;
-      line-height:1.45;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
     }
-
-    /* Layout: etwas mehr Luft unten, damit Footer nicht gequetscht wirkt */
-    @media (min-width: 720px){
-      .content{ padding:22px 28px 2px }
-      .foot{ font-size:13.5px }
-    }
+    .foot small{display:block}
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="card" role="group" aria-labelledby="hd-title">
+      <div class="shine"></div>
 
-      <!-- HD-Logo übergreifend -->
-      <img class="badge" src="/HD-Logo.png" alt="HD Logo">
-
-      <!-- Wortmarke (PNG) direkt unter der Wabe -->
+      <!-- PNG-Schriftzug statt <h1>-Text -->
       <div class="brand">
-        <img class="wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel‑Dashboard" id="hd-title">
+        <img src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel-Dashboard" class="wordmark" id="hd-title">
       </div>
 
       <div class="content">
-        <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
+        <div class="error" id="err" style="display:none">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
 
         <form action="/login" method="POST" id="loginForm" novalidate>
           <div>
@@ -221,18 +202,11 @@
             <div class="field">
               <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
               <button class="icon" type="button" id="togglePw" aria-label="Passwort anzeigen/ausblenden">
-                <!-- geschlossen -->
-                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.05 0-9.27-3.11-11-8 1.02-2.93 3.03-5.19 5.47-6.53m3.17-1.19A9.77 9.77 0 0112 4c5.05 0 9.27 3.11 11 8a11.73 11.73 0 01-1.41 2.94M9.88 9.88A3 3 0 1112 15a3 3 0 01-2.12-5.12z"/>
-                  <line x1="3" y1="3" x2="21" y2="21"/>
-                </svg>
-                <!-- offen -->
-                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
-                  <circle cx="12" cy="12" r="3"/>
-                </svg>
+                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.05 0-9.27-3.11-11-8 1.02-2.93 3.03-5.19 5.47-6.53m3.17-1.19A9.77 9.77 0 0112 4c5.05 0 9.27 3.11 11 8a11.73 11.73 0 01-1.41 2.94M9.88 9.88A3 3 0 1112 15a3 3 0 01-2.12-5.12z"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </div>
+            <div class="caps" id="caps" style="display:none">Warnung: Feststelltaste ist aktiv.</div>
           </div>
 
           <div class="row-links">
@@ -240,43 +214,44 @@
           </div>
 
           <button class="submit" id="submitBtn" type="submit" disabled>Anmelden</button>
-
           <div class="help">Bei Problemen wenden Sie sich bitte an den Administrator.</div>
         </form>
       </div>
 
       <div class="foot">
-        <small>
-          © <span id="y"></span> Hotel‑Dashboard<br>
-          Powered by MY HOME HOTEL AM ROTTWEIL GMBH
-        </small>
+        <small>© <span id="y"></span> Hotel‑Dashboard<br>
+          Powered by MY HOME HOTEL AM ROTTWEIL GMBH</small>
       </div>
     </div>
   </div>
 
   <script>
-    // Jahr
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    const u = document.getElementById('username');
-    const p = document.getElementById('password');
-    const s = document.getElementById('submitBtn');
-    const tp = document.getElementById('togglePw');
-    const eyeOn  = document.getElementById('eye-on');
-    const eyeOff = document.getElementById('eye-off');
-    const err= document.getElementById('err');
+    const u=document.getElementById('username'),
+          p=document.getElementById('password'),
+          s=document.getElementById('submitBtn'),
+          tp=document.getElementById('togglePw'),
+          eyeOn=document.getElementById('eye-on'),
+          eyeOff=document.getElementById('eye-off'),
+          c=document.getElementById('caps'),
+          err=document.getElementById('err');
 
-    const update = () => { s.disabled = !(u.value.trim() && p.value.trim()); };
-    u.addEventListener('input', update);
-    p.addEventListener('input', update);
+    const update=()=>{ s.disabled=!(u.value.trim() && p.value.trim()); };
+    u.addEventListener('input',update);
+    p.addEventListener('input',update);
     update();
 
-    tp.addEventListener('click', () => {
-      const show = p.type === "password";
-      p.type = show ? "text" : "password";
-      eyeOn.style.display  = show ? "block" : "none";
-      eyeOff.style.display = show ? "none"  : "block";
+    tp.addEventListener('click',()=>{
+      const show=p.type==="password";
+      p.type=show?"text":"password";
+      eyeOn.style.display=show?"block":"none";
+      eyeOff.style.display=show?"none":"block";
     });
+
+    ['keydown','keyup'].forEach(ev => p.addEventListener(ev, e => {
+      try{ c.style.display = e.getModifierState('CapsLock') ? 'block' : 'none'; }catch(_){}
+    }));
 
     if (new URLSearchParams(location.search).get('err')) err.style.display='block';
   </script>
