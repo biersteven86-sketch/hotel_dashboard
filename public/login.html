@@ -4,273 +4,344 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login · Hotel‑Dashboard</title>
-  <meta name="color-scheme" content="light dark">
+  <meta name="color-scheme" content="light dark" />
 
-  <!-- Assets vorladen für schnelleres Rendering -->
+  <!-- Bild-Assets werden gecacht/vorgeladen -->
   <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
   <link rel="preload" as="image" href="/HD-Logo.png">
   <link rel="preload" as="image" href="/Hotel-Dashboard-Schriftzug.png">
 
   <style>
-    /* ========= DESIGN-VARIABLEN – hier passt du Größen/Farben zentral an ========= */
+    /* ===========================
+       THEME-VARS – HIER DREHST DU
+       =========================== */
     :root{
-      /* Panel / Text */
-      --bg: #06080c;            /* Seitenhintergrund */
-      --panel: #0b0d11;         /* Kartenfläche (tiefschwarz, nicht reines #000) */
-      --text: #e9edf5;          /* Primärtext */
-      --muted: #a4adbb;         /* Sekundärtext */
-      --stroke: #2a323d;        /* Rahmen der Eingabefelder */
-      --radius: 20px;           /* Rundung der Karte */
+      /* Hintergrund (wie auf deinem Foto: dunkles Graphit, nicht „pures“ Schwarz) */
+      --page-bg: #0a0d11;
 
-      /* Akzentfarbe (Button) – mattes Rot */
-      --accent: #c3201e;
-      --accent-2: #8a1718;
+      /* Kartenbreite: Ziel ist „schmal & edel“ */
+      --card-max-w: 720px;          /* Breite der Karte */
+      --card-radius: 20px;          /* Eckradius */
 
-      /* Schatten & Glanz */
-      --shadow-strong: 0 28px 60px rgba(0,0,0,.65);
-      --gloss-top: rgba(255,255,255,.05);   /* gleichmäßiger „Weißfilter“ */
-      --gloss-spot: rgba(255,255,255,.08);  /* leichte Spot-Reflexion */
+      /* Panel-Farben & Tiefenwirkung */
+      --card-fill: #0e1116;         /* Tiefes Graphit (statt 100% Schwarz) */
+      --card-stroke: #242a33;       /* feine Kantenlinie */
+      --card-shadow: 0 30px 80px rgba(0,0,0,.65);
 
-      /* Größen der Logos – hier drehst du später nur diese zwei Werte */
-      --hd-size: 200px;           /* HD-Sechseck (doppelt groß) */
-      --title-width: 420px;       /* „Hotel‑Dashboard“-Schriftzug */
+      /* Seidenmatt-Glanz (weißer Schimmer über die GESAMTE Fläche) */
+      --gloss-strength: .12;        /* 0.00 – .25 */
+      --gloss-falloff:  70%;        /* wie weit der Schimmer „läuft“ */
 
-      /* Abstände Logo → Titel → Formular */
-      --gap-logo-title: 8px;      /* Abstand HD-Logo zu Titel */
-      --gap-title-form: 14px;     /* Abstand Titel zum Formular */
-      --card-top-padding: 120px;  /* „Luft“ oben in der Karte, damit nichts klemmt */
+      /* HD‑Badge (Hexagon) – GRÖSSE & „Anlegen“ an die Oberkante */
+      --hd-size: 116px;             /* gesamt Größe (mach 10–15px rauf/runter) */
+      --hd-overlap: 6px;            /* wie weit die Spitze in die Karte „sticht“ */
 
-      /* Breite der Karte (schmal) */
-      --card-width: 460px;
+      /* Schriftzug PNG unter dem Badge */
+      --title-max-w: 520px;         /* maximale Breite vom Schriftzug */
+      --title-gap:   8px;           /* Abstand Badge → Schriftzug */
+
+      /* Abstand Schriftzug → Formular */
+      --section-gap: 18px;
+
+      /* Eingabefelder */
+      --field-radius: 12px;
+      --field-stroke: #323a46;
+      --field-bg: rgba(255,255,255,.02);
+
+      /* Button / Akzentrot (dein Ton) */
+      --red-1: #e02724;
+      --red-2: #b31517;
+      --btn-shadow: 0 18px 34px rgba(224,39,36,.36);
+
+      /* Typo */
+      --text: #e9edf5;
+      --muted: #a7b1c0;
     }
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
-
+    /* Grundlayout */
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
     body{
       margin:0;
-      font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
       color:var(--text);
-      background:var(--bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
+      font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
+      background: var(--page-bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
 
-    .wrap{
+    /* zentrierte Bühne */
+    .stage{
       min-height:100%;
       display:grid;
       place-items:center;
-      padding:clamp(20px,4vw,60px);
+      padding:clamp(16px,3.5vw,40px);
     }
 
-    /* ======= Karte ======= */
+    /* Stapel: Wir hängen Badge & Karte zusammen – Badge ist Pseudo der Karte,
+       dadurch „wandert“ nichts mehr. */
     .card{
-      width:min(var(--card-width), 92vw);
-      background:var(--panel);
-      border-radius:var(--radius);
-      border:1px solid rgba(255,255,255,.05);
-      box-shadow:var(--shadow-strong);
       position:relative;
-      overflow:visible;                 /* wichtig: Logo darf überlappen, NICHT abgeschnitten werden */
-      padding: var(--card-top-padding) 22px 16px;
-      isolation:isolate;                /* sichert die Ebenenkomposition */
+      width:min(var(--card-max-w), 92vw);
+      border-radius:var(--card-radius);
+      background: var(--card-fill);
+      border:1px solid var(--card-stroke);
+      box-shadow: var(--card-shadow);
+      overflow:hidden;                 /* verhindert helle Ecken */
+      isolation:isolate;               /* eigene Stacking-Context → sauberer Glanz */
     }
 
-    /* Gleichmäßiger, matter Glanz über die GANZE Fläche (keine hellen Ecken) */
+    /* 1) SEIDENMATT-GLANZ – flächendeckend (kein harter Spot) */
     .card::before{
       content:"";
       position:absolute; inset:0;
-      background:
-        radial-gradient(120% 70% at 50% 10%, var(--gloss-spot), transparent 60%),
-        linear-gradient(to bottom, var(--gloss-top), transparent 36%);
-      border-radius:inherit;
       pointer-events:none;
+      /* weiche, breite Glanzlage: oben heller → nach unten auslaufend */
+      background:
+        linear-gradient(180deg,
+          rgba(255,255,255,var(--gloss-strength)) 0%,
+          rgba(255,255,255,calc(var(--gloss-strength)*.35)) var(--gloss-falloff),
+          rgba(255,255,255,0) 100%);
+      mix-blend-mode: screen;          /* seidenmatt statt „nass“ */
+      border-radius:inherit;
       z-index:0;
     }
 
-    /* Dünne Oberkante (dezente Lichtkante) */
+    /* 2) HD‑BADGE – sitzt RELATIV zur Karte und „sticht“ minimal in die Oberkante */
     .card::after{
       content:"";
-      position:absolute; inset:0 0 auto 0; height:1px;
-      background:linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
-      pointer-events:none;
-      border-top-left-radius:inherit;
-      border-top-right-radius:inherit;
-    }
-
-    /* ======= Logo-Block (HD + Titel) ======= */
-    .brand{
       position:absolute;
-      left:50%;
-      top:0;                           /* Bezugspunkt: Kartenoberkante */
-      transform:translateX(-50%);
-      display:flex; flex-direction:column; align-items:center;
-      z-index:2;                        /* über dem Glanz */
-      translate: 0 calc(-1 * (var(--hd-size) * 0.35)); /* überlappen lassen, bündig zur Wabenkante */
+      width:var(--hd-size); height:var(--hd-size);
+      left:50%; transform: translate(-50%, calc(-100% + var(--hd-overlap)));
+      top:0;
+      background: url("/HD-Logo.png") center/cover no-repeat;
+      filter: drop-shadow(0 12px 16px rgba(0,0,0,.55));
+      z-index:2;                        /* über dem Glanz & Inhalt */
+      pointer-events:none;
     }
 
-    .logo-hd{
-      width:var(--hd-size);
+    /* Innenabstände: Wir reservieren oben Platz für den Schriftzug + Abstande */
+    .inner{
+      position:relative;
+      z-index:1;                       /* Inhalt über dem Glanz */
+      padding:
+        clamp(16px,2.2vw,22px)         /* top  – kleiner Grundabstand */
+        clamp(18px,2.4vw,24px)         /* right */
+        clamp(18px,2.6vw,28px)         /* bottom */
+        clamp(18px,2.4vw,24px);        /* left */
+      padding-top: calc(var(--hd-size) * 0.36 + var(--title-gap) + var(--section-gap) + 8px);
+      /* Erklärung: 0.36 ≈ optische Höhe der Badge-Spitze innerhalb des Sechsecks,
+         so sitzt der PNG-Titel direkt unterm Badge – ohne zu „kleben“. */
+    }
+
+    /* PNG-Schriftzug – blockig, mittig, skaliert, bleibt IMMER unter dem Badge */
+    .title-wrap{
+      display:flex;
+      justify-content:center;
+      margin-top: calc(-1 * (var(--section-gap) + 8px)); /* etwas näher an die Badge ziehen */
+      margin-bottom: var(--section-gap);
+    }
+    .title-img{
+      max-width:min(92%, var(--title-max-w));
       height:auto;
       display:block;
-      filter: drop-shadow(0 8px 14px rgba(0,0,0,.75)); /* hebt sich vom BG ab */
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.55));
+      pointer-events:none;
+      user-select:none;
     }
 
-    .logo-title{
-      margin-top:var(--gap-logo-title);
-      width:min(var(--title-width), calc(var(--card-width) - 40px));
-      height:auto;
-      display:block;
-      filter: drop-shadow(0 3px 6px rgba(0,0,0,.45));
-    }
-
-    /* ======= Inhalt ======= */
-    .content{ padding-top: var(--gap-title-form); position:relative; z-index:1; }
-
-    .error{
-      display:none;
-      background:rgba(224,39,36,.12);
-      border:1px solid rgba(224,39,36,.45);
-      color:#ffd6d6;
-      padding:10px 12px; border-radius:12px; font-size:13px; margin:0 0 12px;
-    }
-
+    /* Felder + Labels */
     label{
       display:block;
       font-size:13px;
       color:var(--muted);
-      margin:0 0 6px;
+      margin: 0 0 6px;
     }
-
     .field{
       display:grid;
-      grid-template-columns:1fr auto;
+      grid-template-columns: 1fr auto;
       align-items:center;
-      min-height:50px;
-      padding:0 10px;
-      border-radius:14px;
-      border:1px solid var(--stroke);
-      background:rgba(0,0,0,.22);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      min-height:52px;
+      padding:0 12px;
+      border-radius: var(--field-radius);
+      border:1px solid var(--field-stroke);
+      background: var(--field-bg);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
     }
     .field input{
-      background:transparent; border:0; outline:0;
+      width:100%;
+      background:transparent;
+      border:0; outline:0;
       color:var(--text);
       font-size:16px;
       padding:12px 8px;
-      width:100%;
     }
+    .icon-btn{
+      all:unset; cursor:pointer;
+      display:grid; place-items:center;
+      padding:10px; border-radius:10px; color:#c8cfdb;
+    }
+    .icon-btn svg{ width:22px; height:22px; display:block }
 
-    /* Autofill ohne Gelb */
+    /* Autofill neutralisieren (gelb in Chrome/Edge) */
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
     input:-webkit-autofill:focus{
-      -webkit-text-fill-color:var(--text);
-      transition:background-color 9999s ease-in-out 0s;
-      box-shadow:0 0 0 1000px transparent inset;
-      caret-color:var(--text);
+      -webkit-text-fill-color:var(--text) !important;
+      transition: background-color 9999s ease-out 0s;
+      box-shadow: 0 0 0px 1000px transparent inset !important;
+      caret-color: var(--text);
     }
 
-    .row-links{
-      display:flex; gap:12px; align-items:center;
-      font-size:13px; margin-top:6px;
+    .row{
+      display:flex; justify-content:flex-start; gap:12px;
+      font-size:13px; margin-top:8px;
     }
-    .row-links a{
-      color:var(--accent); text-decoration:none; font-weight:700;
+    .row a{
+      color:var(--red-1); text-decoration:none; font-weight:700;
       border-bottom:1px dashed rgba(255,255,255,.22);
     }
-    .row-links a:hover{ color:#fff; border-bottom-color:rgba(255,255,255,.45) }
+    .row a:hover{ color:#fff; border-bottom-color:rgba(255,255,255,.45) }
 
+    /* Button */
     .submit{
-      margin-top:14px;
+      margin-top:12px;
       border:0; border-radius:14px;
       padding:14px 18px;
       font-weight:900; font-size:16px;
       color:#fff; cursor:pointer;
-      background:linear-gradient(180deg,var(--accent),var(--accent-2));
-      box-shadow:0 16px 30px rgba(195,32,30,.30);   /* Glow bleibt innerhalb */
-      transition:transform .08s ease, box-shadow .12s ease, opacity .12s ease;
+      background: linear-gradient(180deg,var(--red-1),var(--red-2));
+      box-shadow: var(--btn-shadow), 0 1px 0 rgba(255,255,255,.06) inset;
+      transition: transform .08s ease, box-shadow .12s ease, filter .12s ease;
     }
-    .submit:hover{ opacity:.95; box-shadow:0 18px 36px rgba(195,32,30,.36); }
-    .submit:active{ transform:translateY(1px) scale(.997) }
+    .submit:hover{
+      box-shadow: 0 22px 44px rgba(224,39,36,.46), 0 1px 0 rgba(255,255,255,.08) inset;
+      filter: saturate(1.05);
+    }
+    .submit:active{ transform: translateY(1px) scale(.998) }
     .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none }
 
-    .help{ text-align:center; margin:12px 0 16px; font-size:13px; color:var(--muted) }
-
+    /* Fußbereich */
     .foot{
-      margin-top:8px;
-      padding:14px 6px 18px;
+      margin-top:10px;
+      padding:14px 20px 18px;
       border-top:1px solid rgba(255,255,255,.06);
       text-align:center; color:var(--muted); font-size:12px;
     }
     .foot small{ display:block; line-height:1.35 }
+
+    /* Fehlerbanner & Caps-Warnung */
+    .error{
+      display:none;
+      background:rgba(224,39,36,.12);
+      border:1px solid rgba(224,39,36,.45);
+      color:#ffd8d8;
+      padding:10px 12px; border-radius:12px; font-size:13px; margin:0 0 10px;
+    }
+    .caps{ display:none; color:#ef5555; font-size:12px; margin-top:6px }
+
+    /* Kleinere Screens – Karte schmaler, Schriftzug automatisch kleiner */
+    @media (max-width: 480px){
+      :root{
+        --card-max-w: 94vw;
+        --hd-size: 96px;
+        --title-max-w: 86vw;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <div class="stage">
     <div class="card" role="group" aria-labelledby="hd-title">
+      <!-- Inhalt -->
+      <div class="inner">
+        <!-- PNG-Schriftzug direkt unter dem Hex-Badge -->
+        <div class="title-wrap">
+          <img src="/Hotel-Dashboard-Schriftzug.png"
+               alt="Hotel‑Dashboard"
+               class="title-img" id="hd-title">
+        </div>
 
-      <!-- HD-Logo + Titel als EIN Block (stabil, wandert nicht) -->
-      <div class="brand">
-        <img src="/HD-Logo.png" alt="HD Logo" class="logo-hd">
-        <img src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel‑Dashboard" class="logo-title">
-      </div>
-
-      <div class="content">
         <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
 
         <form action="/login" method="POST" id="loginForm" novalidate>
-          <div>
+          <div class="block">
             <label for="username">Benutzername</label>
             <div class="field">
-              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
+              <input id="username" name="username" type="text"
+                     placeholder="z. B. admin"
+                     autocomplete="username" required />
             </div>
           </div>
 
-          <div>
+          <div class="block" style="margin-top:12px">
             <label for="password">Passwort</label>
             <div class="field">
-              <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
+              <input id="password" name="password" type="password"
+                     placeholder="••••••••" autocomplete="current-password" required />
+              <button class="icon-btn" type="button" id="togglePw" aria-label="Passwort anzeigen/ausblenden">
+                <!-- geschlossen -->
+                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.05 0-9.27-3.11-11-8 1.02-2.93 3.03-5.19 5.47-6.53m3.17-1.19A9.77 9.77 0 0112 4c5.05 0 9.27 3.11 11 8a11.73 11.73 0 01-1.41 2.94M9.88 9.88A3 3 0 1112 15a3 3 0 01-2.12-5.12z"/>
+                  <line x1="3" y1="3" x2="21" y2="21"/>
+                </svg>
+                <!-- offen -->
+                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
             </div>
+            <div class="caps" id="caps">Warnung: Feststelltaste ist aktiv.</div>
           </div>
 
-          <div class="row-links">
+          <div class="row" style="margin-top:10px">
             <a href="/reset">Passwort vergessen?</a>
           </div>
 
-          <button class="submit" id="submitBtn" type="submit">Anmelden</button>
+          <button class="submit" id="submitBtn" type="submit" disabled>Anmelden</button>
 
-          <div class="help">Bei Problemen wenden Sie sich bitte an den Administrator.</div>
+          <div class="foot">
+            <small>
+              © <span id="y"></span> Hotel‑Dashboard<br>
+              Powered by MY HOME HOTEL AM ROTTWEIL GMBH
+            </small>
+          </div>
         </form>
-      </div>
-
-      <div class="foot">
-        <small>
-          © <span id="y"></span> Hotel‑Dashboard<br>
-          Powered by MY HOME HOTEL AM ROTTWEIL GMBH
-        </small>
       </div>
     </div>
   </div>
 
   <script>
-    // Footer-Jahr
+    // Jahr im Footer
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // ?err=1 -> Fehlermeldung zeigen
-    (()=>{
-      const params = new URLSearchParams(location.search);
-      if (params.get('err')) document.getElementById('err').style.display = 'block';
-    })();
+    // Form‑Interaktion
+    const u = document.getElementById('username');
+    const p = document.getElementById('password');
+    const s = document.getElementById('submitBtn');
+    const tp = document.getElementById('togglePw');
+    const eyeOn  = document.getElementById('eye-on');
+    const eyeOff = document.getElementById('eye-off');
+    const caps  = document.getElementById('caps');
+    const err= document.getElementById('err');
 
-    // Submit-Button nur aktivieren, wenn beide Felder Text haben
-    (()=>{
-      const u = document.getElementById('username');
-      const p = document.getElementById('password');
-      const s = document.getElementById('submitBtn');
-      const update = () => { s.disabled = !(u.value.trim() && p.value.trim()); };
-      u.addEventListener('input', update);
-      p.addEventListener('input', update);
-      update();
-    })();
+    const update = () => { s.disabled = !(u.value.trim() && p.value.trim()); };
+    u.addEventListener('input', update);
+    p.addEventListener('input', update);
+    update();
+
+    tp.addEventListener('click', () => {
+      const show = p.type === "password";
+      p.type = show ? "text" : "password";
+      eyeOn.style.display  = show ? "block" : "none";
+      eyeOff.style.display = show ? "none"  : "block";
+    });
+
+    ['keydown','keyup'].forEach(ev => p.addEventListener(ev, e => {
+      try { caps.style.display = e.getModifierState('CapsLock') ? 'block' : 'none'; } catch(_){}
+    }));
+
+    // Fehlermeldung via ?err=1
+    if (new URLSearchParams(location.search).get('err')) err.style.display='block';
   </script>
 </body>
 </html>
