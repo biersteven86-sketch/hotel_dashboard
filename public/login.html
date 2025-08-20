@@ -10,23 +10,21 @@
   <link rel="preload" as="image" href="/Hotel-Dashboard-Schriftzug.png">
   <style>
     :root{
-      /* Grundlook */
-      --page:#080b10;           /* Seitenhintergrund */
-      --panel:#0b0f14;          /* Kartenfläche (tiefschwarz, neutral) */
-      --panel-edge:#141a22;
-      --text:#eef2f7;
-      --muted:#b7c0cc;
-      --stroke:#2a323d;
-      --accent:#e02724;
-      --accent-2:#b31517;
-      --radius:22px;
+      /* Grundfarben */
+      --bg:#06080c;             /* Seitenhintergrund */
+      --panel:#0b0f14;          /* Kartenfläche (tiefschwarz) */
+      --stroke:#2b323c;         /* zarte Linien */
+      --text:#eef2f8;           /* Primärtext */
+      --muted:#aab4c0;          /* Sekundärtext */
+      --accent:#e02824;         /* Rot */
+      --accent-2:#b31618;
 
-      /* Steuerwerte – hier kannst du später feinjustieren */
-      --card-w: min(680px, 94vw);
-      --badge: 116px;           /* HD‑Logo-Größe (bei Bedarf auf 112/120 ändern) */
-      --stack-gap: 14px;        /* vertikale Abstände im Formular */
-      --title-w: clamp(300px, 78%, 540px); /* Breite des Schriftzug‑PNGs */
-      --title-gap: 8px;         /* Abstand Wordmark zur Badge */
+      /* Größen-Abstimmung */
+      --radius:20px;
+      --card-w:  720px;         /* Maxbreite Karte */
+      --hd:      108px;         /* Größe HD-Logo (kannst du hier feintunen) */
+      --gap-top:  22px;         /* Lücke HD → Schriftzug */
+      --gap-title:18px;         /* Lücke Schriftzug → Formular */
     }
 
     *{box-sizing:border-box}
@@ -36,93 +34,87 @@
       margin:0;
       font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
       color:var(--text);
-      background:var(--page) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
+      background:var(--bg) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
 
     .wrap{
       min-height:100%;
       display:grid;
       place-items:center;
-      padding:clamp(20px,4vw,60px);
+      padding:clamp(16px,4vw,64px);
     }
 
-    /* ==== Karte ======================================================== */
+    /* ----------------- Karte (Panel) ----------------- */
     .card{
-      width:var(--card-w);
-      background:var(--panel);
-      border-radius:var(--radius);
-      border:1px solid rgba(255,255,255,.05);
       position:relative;
-      overflow:hidden;
+      width:min(var(--card-w),94vw);
+      border-radius:calc(var(--radius) + 2px);
+      background:var(--panel);
+      border:1px solid rgba(255,255,255,.05);
       box-shadow:
-        0 30px 80px rgba(0,0,0,.7),
-        0 1px 0 rgba(255,255,255,.04) inset;
-      /* Platz im oberen Bereich für unseren Logo-Stack einplanen */
-      padding-top: calc(var(--badge) + 42px); /* Badge + Wordmark + etwas Luft */
+        0 20px 60px rgba(0,0,0,.65),
+        0 2px 0 rgba(255,255,255,.02) inset;
+      overflow:hidden;
+      padding: clamp(18px,2.6vw,26px);
+      padding-top: calc(var(--hd) * .65 + 24px); /* Platz unter dem schwebenden Logo */
     }
 
-    /* Glänzend‑matt über die GESAMTE Fläche (verschiebt nichts) */
+    /* gleichmäßiger „glossy-matt“-Sheen über die GESAMTE Fläche */
     .card::before{
       content:"";
-      position:absolute; inset:0; pointer-events:none;
+      position:absolute; inset:0;
       background:
-        linear-gradient(135deg,
-          rgba(255,255,255,.22) 0%,
-          rgba(255,255,255,.10) 30%,
-          rgba(255,255,255,.04) 55%,
-          rgba(255,255,255,.02) 78%,
-          rgba(0,0,0,.25) 100%),
-        radial-gradient(120% 100% at 50% 0%,
-          rgba(255,255,255,.08), transparent 60%),
-        radial-gradient(120% 100% at 50% 100%,
-          rgba(0,0,0,.35), transparent 55%);
-      mix-blend-mode:screen;
-      opacity:.75;
+        /* weicher Top-Glanz */
+        linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.06) 14%, rgba(0,0,0,0) 26%) ,
+        /* breite, matte Lichtkuppel */
+        radial-gradient(120% 140% at 50% -10%, rgba(255,255,255,.20) 0%, rgba(255,255,255,.10) 28%, rgba(0,0,0,0) 60%) ,
+        /* sanfte Vignette */
+        radial-gradient(140% 120% at 50% 120%, rgba(0,0,0,.45) 0%, rgba(0,0,0,.28) 40%, rgba(0,0,0,.0) 60%);
+      pointer-events:none;
+      mix-blend-mode:normal;
     }
-    /* leichte „gebürstete“ Körnung */
+    /* dezente Ober-/Unterkante */
     .card::after{
       content:"";
-      position:absolute; inset:0; pointer-events:none;
-      background-image:
-        repeating-linear-gradient(90deg, rgba(255,255,255,.012) 0 1px, rgba(0,0,0,0) 1px 3px),
-        repeating-linear-gradient(0deg,  rgba(255,255,255,.008) 0 1px, rgba(0,0,0,0) 1px 3px);
-      opacity:.32;
+      position:absolute; inset:0 0 auto 0; height:1px;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.10), transparent);
+      pointer-events:none;
     }
 
-    /* ==== Logo-Stack (HD + Wordmark) – FIXIERT & unabhängig vom Formular == */
-    .logo-stack{
-      position:absolute; left:0; right:0; top:0;
-      transform:translateY(calc(-.5 * var(--badge))); /* Badge halb über der Kante */
-      display:grid; place-items:center;
-      z-index:2; pointer-events:none;
+    /* ----------------- Logo-Stack (fixiert zur Karte) ----------------- */
+    .brand-stack{
+      position:absolute;
+      top:0; left:50%;
+      transform:translate(-50%, calc(-50% + 4px)); /* steht sichtbar über der Karte */
+      width:min(32vw, 480px);
+      display:grid;
+      justify-items:center;
+      align-items:start;
+      pointer-events:none;         /* keine Klicks abfangen */
+      z-index:3;
     }
-    .hd{
-      width:var(--badge); height:var(--badge); object-fit:contain; display:block;
-      filter: drop-shadow(0 24px 28px rgba(0,0,0,.55))
-              drop-shadow(0 2px 0 rgba(255,255,255,.06));
-    }
-    .wordmark{
-      margin-top:var(--title-gap);
-      width:var(--title-w); height:auto; display:block;
+    .brand-stack .hd{
+      width:var(--hd);
+      height:var(--hd);
+      object-fit:contain;
       filter:
-        drop-shadow(0 1px 0 rgba(255,255,255,.65))
-        drop-shadow(0 14px 22px rgba(0,0,0,.55));
+        drop-shadow(0 6px 12px rgba(0,0,0,.55))
+        drop-shadow(0 1px 0 rgba(255,255,255,.08));
+    }
+    .brand-stack .wordmark{
+      margin-top:var(--gap-top);
+      width:min(78%, 520px);
+      height:auto;
+      object-fit:contain;
+      filter:
+        drop-shadow(0 2px 0 rgba(0,0,0,.35))
+        drop-shadow(0 10px 26px rgba(0,0,0,.45));
     }
 
-    /* ==== Inhalt / Formular ========================================== */
-    .content{
-      padding: 10px 22px 0;
-      display:grid; gap:var(--stack-gap);
-      position:relative; z-index:1;
-    }
+    /* ----------------- Titelersatz (PNG) + Formular ----------------- */
+    .title-spacer{ height: calc(24px + var(--gap-title)); }
 
-    .error{
-      display:none;
-      background:rgba(224,39,36,.12);
-      border:1px solid rgba(224,39,36,.45);
-      color:#ffd6d6;
-      padding:10px 12px; border-radius:12px; font-size:13px; margin:0;
-    }
+    .content{ display:grid; gap:14px; }
 
     label{
       display:block;
@@ -132,15 +124,16 @@
     }
 
     .field{
-      display:grid; grid-template-columns:1fr auto; align-items:center;
-      min-height:50px; padding:0 10px;
+      display:grid; grid-template-columns:1fr auto;
+      align-items:center;
+      min-height:50px;
+      padding:0 12px;
       border-radius:14px;
-      border:1px solid rgba(255,255,255,.14);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.09);
+      background:rgba(10,12,16,.48);
       box-shadow:
-        inset 0 2px 8px rgba(0,0,0,.55),
-        0 1px 0 rgba(255,255,255,.04);
+        inset 0 1px 0 rgba(255,255,255,.05),
+        0 10px 26px rgba(0,0,0,.25);
     }
     .field input{
       background:transparent; border:0; outline:0;
@@ -148,24 +141,36 @@
       font-size:16px;
       padding:12px 8px;
       width:100%;
+      caret-color:#fff;
     }
-    /* Autofill konsequent neutralisieren */
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover,
-    input:-webkit-autofill:focus{
-      -webkit-text-fill-color:var(--text) !important;
-      box-shadow:0 0 0 1000px transparent inset !important;
-      transition:background-color 9999s ease-in-out 0s;
-      caret-color:var(--text) !important;
-    }
-
     .field button.icon{
       all:unset; cursor:pointer; border-radius:10px; padding:8px; display:grid; place-items:center;
       color:#c7cfdb;
     }
     .icon svg{ width:22px; height:22px; display:block }
 
-    .row-links{ display:flex; gap:12px; font-size:13px; margin-top:2px }
+    /* Autofill neutralisieren (kein Gelb) */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus{
+      -webkit-text-fill-color:var(--text) !important;
+      transition:background-color 5000s ease-in-out 0s;
+      box-shadow:0 0 0 1000px transparent inset !important;
+      caret-color:#fff;
+    }
+
+    .error{
+      display:none;
+      background:rgba(224,39,36,.12);
+      border:1px solid rgba(224,39,36,.45);
+      color:#ffd6d6;
+      padding:10px 12px; border-radius:12px; font-size:13px; margin:0 0 6px;
+    }
+
+    .row-links{
+      display:flex; gap:12px; align-items:center;
+      font-size:13px; margin-top:4px;
+    }
     .row-links a{
       color:var(--accent); text-decoration:none; font-weight:700;
       border-bottom:1px dashed rgba(255,255,255,.22);
@@ -173,39 +178,41 @@
     .row-links a:hover{ color:#fff; border-bottom-color:rgba(255,255,255,.45) }
 
     .submit{
-      margin-top:6px;
-      border:0; border-radius:14px; padding:14px 18px;
-      font-weight:900; font-size:16px; color:#fff; cursor:pointer;
+      margin-top:10px;
+      border:0;
+      border-radius:14px;
+      padding:14px 18px;
+      font-weight:900; font-size:16px;
+      color:#fff; cursor:pointer;
       background:linear-gradient(180deg,var(--accent),var(--accent-2));
       box-shadow:
-        0 12px 24px rgba(224,39,36,.28),
+        0 14px 28px rgba(224,39,36,.32),
         0 1px 0 rgba(255,255,255,.06) inset;
       transition:transform .08s ease, box-shadow .12s ease;
     }
     .submit:hover{
       box-shadow:
-        0 16px 30px rgba(224,39,36,.34),
+        0 18px 38px rgba(224,39,36,.40),
         0 1px 0 rgba(255,255,255,.08) inset;
     }
     .submit:active{ transform:translateY(1px) scale(.997) }
     .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none }
 
-    .help{ text-align:center; margin:10px 0 12px; font-size:13px; color:var(--muted) }
+    .help{ text-align:center; margin:10px 0 10px; font-size:13px; color:var(--muted) }
 
-    /* Fußbereich etwas größer/lesbarer */
     .foot{
-      margin-top:10px;
-      padding:16px 20px 22px;
+      margin-top:6px;
+      padding:12px 4px 4px;
       border-top:1px solid rgba(255,255,255,.06);
-      text-align:center; color:var(--muted);
-      font-size:13.5px; line-height:1.5;
+      text-align:center; color:var(--muted); font-size:12px;
     }
-    .foot small{ display:block }
+    .foot small{ display:block; line-height:1.35 }
 
-    /* Mobile Tweaks */
-    @media (max-width:520px){
-      :root{ --badge: 104px; --title-gap: 6px; }
-      .content{ padding:10px 16px 0 }
+    /* --------- Responsive Feinschliff --------- */
+    @media (max-width: 560px){
+      :root{ --hd: 86px; }
+      .brand-stack .wordmark{ width:86%; }
+      .card{ padding-top: calc(var(--hd) * .7 + 18px); }
     }
   </style>
 </head>
@@ -213,11 +220,14 @@
   <div class="wrap">
     <div class="card" role="group" aria-labelledby="hd-title">
 
-      <!-- Fester Logo-Stack: verschiebt NICHTS im Formular -->
-      <div class="logo-stack" aria-hidden="true">
-        <img class="hd" src="/HD-Logo.png" alt="HD">
-        <img class="wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel‑Dashboard" id="hd-title">
+      <!-- Feste, nicht-verschiebbare Markenebene -->
+      <div class="brand-stack" aria-hidden="true">
+        <img class="hd" src="/HD-Logo.png" alt="">
+        <img class="wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="">
       </div>
+
+      <!-- Platzhalter, damit Formular nicht unter das Wordmark rutscht -->
+      <div class="title-spacer" id="hd-title" aria-hidden="true"></div>
 
       <div class="content">
         <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
@@ -235,10 +245,12 @@
             <div class="field">
               <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
               <button class="icon" type="button" id="togglePw" aria-label="Passwort anzeigen/ausblenden">
+                <!-- geschlossen -->
                 <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.05 0-9.27-3.11-11-8 1.02-2.93 3.03-5.19 5.47-6.53m3.17-1.19A9.77 9.77 0 0112 4c5.05 0 9.27 3.11 11 8a11.73 11.73 0 01-1.41 2.94M9.88 9.88A3 3 0 1112 15a3 3 0 01-2.12-5.12z"/>
                   <line x1="3" y1="3" x2="21" y2="21"/>
                 </svg>
+                <!-- offen -->
                 <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
                   <circle cx="12" cy="12" r="3"/>
@@ -254,14 +266,14 @@
           <button class="submit" id="submitBtn" type="submit" disabled>Anmelden</button>
 
           <div class="help">Bei Problemen wenden Sie sich bitte an den Administrator.</div>
-
-          <div class="foot">
-            <small>
-              © <span id="y"></span> Hotel‑Dashboard<br>
-              Powered by MY HOME HOTEL AM ROTTWEIL GMBH
-            </small>
-          </div>
         </form>
+      </div>
+
+      <div class="foot">
+        <small>
+          © <span id="y"></span> Hotel‑Dashboard<br>
+          Powered by MY HOME HOTEL AM ROTTWEIL GMBH
+        </small>
       </div>
     </div>
   </div>
@@ -276,13 +288,15 @@
     const tp = document.getElementById('togglePw');
     const eyeOn  = document.getElementById('eye-on');
     const eyeOff = document.getElementById('eye-off');
-    const err    = document.getElementById('err');
+    const err= document.getElementById('err');
 
+    // Submit-Enable
     const update = () => { s.disabled = !(u.value.trim() && p.value.trim()); };
     u.addEventListener('input', update);
     p.addEventListener('input', update);
     update();
 
+    // Toggle Passwort
     tp.addEventListener('click', () => {
       const show = p.type === "password";
       p.type = show ? "text" : "password";
@@ -290,6 +304,7 @@
       eyeOff.style.display = show ? "none"  : "block";
     });
 
+    // Fehleranzeige via URL ?err=1
     if (new URLSearchParams(location.search).get('err')) err.style.display='block';
   </script>
 </body>
