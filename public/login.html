@@ -13,26 +13,27 @@
 
   <style>
     :root{
-      /* Farben / Look */
+      /* Look & Farben */
       --page:#06080c;
-      --text:#ffffff;
-      --muted:#d5d7da;
+      --text:#eef2f8;
+      --muted:#cfd6de;
       --accent:#e02824;
       --accent-2:#b31618;
 
-      /* Karte (Glas, basierend auf deinem #676767) */
-      --panel-r:103; --panel-g:103; --panel-b:103; --panel-alpha:.28;
-      --panel-border:rgba(255,255,255,.10);
+      /* Panel-Farbe nach deinem Swatch (#676767) als Glas */
+      --panel-r:103; --panel-g:103; --panel-b:103;
+      --panel-alpha: .28;                 /* Transparenz der Fläche */
+      --panel-border: rgba(255,255,255,.10);
 
       /* Größen */
-      --card-w:640px;
+      --card-w: 640px;                    /* Karte bewusst kleiner */
       --radius:22px;
 
       /* Brand-Stack */
-      --hd:140px;                        /* Logo-Größe (Zwischenmaß) */
-      --word-gap:0px;                    /* HD ↔ Wordmark praktisch 0 */
-      --title-w: clamp(320px, 78vw, 580px);
-      --title-gap:8px;                   /* Wordmark → Formular sehr eng */
+      --hd:100px;                         /* Logo-Größe (Zwischending) */
+      --word-gap:6px;                     /* HD ↔ Schriftzug: sehr nah */
+      --title-w: clamp(300px, 78%, 540px);
+      --title-gap:8px;                    /* Schriftzug ↔ Formular: eng */
     }
 
     *{box-sizing:border-box}
@@ -52,52 +53,107 @@
       padding:clamp(18px,4vw,60px);
     }
 
-    /* ===== Karte (Glas) ===== */
+    /* ===== Karte (Glas mit deiner Farbe) ===== */
     .card{
       position:relative;
       width:min(var(--card-w), 94vw);
       border-radius:var(--radius);
-      background:rgba(var(--panel-r),var(--panel-g),var(--panel-b),var(--panel-alpha));
+      background: rgba(var(--panel-r),var(--panel-g),var(--panel-b),var(--panel-alpha));
       backdrop-filter: blur(8px) saturate(120%);
       -webkit-backdrop-filter: blur(8px) saturate(120%);
       border:1px solid var(--panel-border);
-      box-shadow:0 26px 70px rgba(0,0,0,.68);
-      padding:clamp(18px,2.2vw,24px);
-      /* Platz für Brand-Stack: Logo sitzt an der Oberkante */
-      padding-top: calc(var(--hd) * .62 + var(--title-gap) + 14px);
-      overflow:visible;
+      box-shadow:
+        0 26px 70px rgba(0,0,0,.68),
+        0 1px 0 rgba(255,255,255,.05) inset;
+      padding: clamp(18px,2.2vw,24px);
+      padding-top: calc(var(--hd) * .66 + var(--title-gap) + 14px);
+      overflow: visible;
     }
     .card::after{
-      content:""; position:absolute; inset:0 0 auto 0; height:1px; pointer-events:none;
+      content:"";
+      position:absolute; inset:0 0 auto 0; height:1px; pointer-events:none;
       background:linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
     }
 
-    /* ===== Brand: Logo bündig oben, Wordmark direkt darunter ===== */
+    /* ===== Logo-Stack (sehr nah zusammen) ===== */
     .brand-stack{
       position:absolute; left:50%; top:0;
-      transform:translateX(-50%);  /* nur horizontal zentrieren */
-      display:grid; place-items:center; pointer-events:none; z-index:5;
-      width:min(42vw, 640px);
+      transform:translate(-50%, calc(-48% + 2px)); /* optisch etwas tiefer */
+      display:grid; place-items:center;
+      pointer-events:none; z-index:5;
+      width:min(32vw, 520px);
     }
     .brand-stack .hd{
       width:var(--hd); height:var(--hd); object-fit:contain; display:block;
-      margin-top:-6px;                   /* leicht an die Kartenkante ziehen */
-      margin-bottom:var(--word-gap);
-      filter: drop-shadow(0 22px 38px rgba(0,0,0,.55));
+      filter:
+        drop-shadow(0 22px 38px rgba(0,0,0,.55))
+        drop-shadow(0 1px 0 rgba(255,255,255,.08));
     }
     .brand-stack .wordmark{
+      margin-top:var(--word-gap);
       width:var(--title-w); height:auto; display:block;
-      margin-top:-8px;                   /* „klebt“ ans Logo */
       filter:
         drop-shadow(0 1px 0 rgba(255,255,255,.10))
         drop-shadow(0 16px 26px rgba(0,0,0,.50));
     }
 
-    /* verhindert, dass das Formular mit dem Wordmark kollidiert */
+    /* Spacer verhindert Kollision mit Schriftzug */
     .title-spacer{ height: var(--title-gap); }
 
     /* ===== Formular ===== */
     .content{ display:grid; gap:10px; }
+
+    label{
+      display:block;
+      font-size:13px;
+      color:#fff;                 /* Labels weiß, wie gewünscht */
+      margin:0 0 4px;
+    }
+
+    /* Nur Umrandung, keine Fläche */
+    .field{
+      display:grid; grid-template-columns:1fr auto; align-items:center;
+      min-height:48px; padding:0 12px;
+      border-radius:14px;
+      background: transparent;
+      border:1.2px solid rgba(255,255,255,.25);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.06),
+        0 10px 26px rgba(0,0,0,.40);
+      transition: box-shadow .15s ease, border-color .15s ease;
+    }
+    .field:focus-within{
+      border-color: rgba(255,255,255,.42);
+      box-shadow:
+        0 0 0 3px rgba(224,40,36,.18),
+        0 14px 34px rgba(0,0,0,.55);
+    }
+    .field input{
+      background:transparent; border:0; outline:0;
+      color:#fff;                 /* Eingabetext weiß */
+      font-size:16px;
+      padding:10px 8px;
+      width:100%;
+      caret-color:#fff;
+    }
+    .field input::placeholder{ color:rgba(255,255,255,.90); }
+
+    .field button.icon{
+      all:unset; cursor:pointer; border-radius:10px; padding:8px; display:grid; place-items:center;
+      color:#c7cfdb;
+    }
+    .icon svg{ width:22px; height:22px; display:block }
+
+    /* Autofill (Gelb) neutralisieren */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus{
+      -webkit-text-fill-color:#fff !important;
+      transition:background-color 9999s ease-in-out 0s;
+      box-shadow:0 0 0 1000px transparent inset !important;
+      caret-color:#fff !important;
+      filter:none !important;
+    }
 
     .error{
       display:none;
@@ -107,56 +163,6 @@
       padding:10px 12px; border-radius:12px; font-size:13px; margin:0 0 8px;
     }
 
-    label{
-      display:block; font-size:13px; color:#fff; font-weight:600;
-      margin:0 0 4px;
-    }
-
-    /* Felder: transparent, nur Outline */
-    .field{
-      display:grid; grid-template-columns:1fr auto; align-items:center;
-      min-height:48px; padding:0 12px;
-      border-radius:14px;
-      background:transparent;                 /* << kein Flächenhintergrund */
-      border:1.2px solid rgba(255,255,255,.45);
-      transition:border-color .15s ease, box-shadow .15s ease;
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.06),
-        0 10px 26px rgba(0,0,0,.35);
-    }
-    .field:focus-within{
-      border-color:#fff;
-      box-shadow:
-        0 0 0 2px rgba(255,255,255,.45),
-        0 14px 34px rgba(0,0,0,.55);
-    }
-    .field input{
-      background:transparent; border:0; outline:0;
-      color:#fff; font-size:16px; padding:10px 8px; width:100%;
-      caret-color:#fff;
-    }
-    .field input::placeholder{ color:rgba(255,255,255,.85); }
-    .field button.icon{
-      all:unset; cursor:pointer; border-radius:10px; padding:6px; display:grid; place-items:center;
-      color:#c7cfdb;
-    }
-    .icon svg{ width:22px; height:22px; display:block }
-
-    /* === Autofill/Passwort-Manager GELB neutralisieren (alle) === */
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover,
-    input:-webkit-autofill:focus,
-    input:-webkit-autofill:active{
-      -webkit-text-fill-color:#fff !important;
-      caret-color:#fff !important;
-      background-color: transparent !important;
-      -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
-      box-shadow: 0 0 0 1000px transparent inset !important;
-      filter:none !important;
-    }
-    /* Firefox */
-    input:autofill { background-color: transparent !important; color:#fff !important; }
-
     .row-links{ display:flex; gap:12px; font-size:13px; margin-top:2px }
     .row-links a{
       color:var(--accent); text-decoration:none; font-weight:700;
@@ -165,53 +171,54 @@
     .row-links a:hover{ color:#fff; border-bottom-color:rgba(255,255,255,.45) }
 
     .submit{
-      margin-top:8px; border:0; border-radius:14px; padding:12px 18px;
+      margin-top:8px;
+      border:0; border-radius:14px; padding:12px 18px;
       font-weight:900; font-size:16px; color:#fff; cursor:pointer;
       background:linear-gradient(180deg,var(--accent),var(--accent-2));
-      box-shadow: 0 14px 28px rgba(224,39,36,.32), 0 1px 0 rgba(255,255,255,.06) inset;
+      box-shadow:
+        0 14px 28px rgba(224,39,36,.32),
+        0 1px 0 rgba(255,255,255,.06) inset;
       transition:transform .08s ease, box-shadow .12s ease;
     }
     .submit:hover{
-      box-shadow: 0 18px 38px rgba(224,39,36,.40), 0 1px 0 rgba(255,255,255,.08) inset;
+      box-shadow:
+        0 18px 38px rgba(224,39,36,.40),
+        0 1px 0 rgba(255,255,255,.08) inset;
     }
     .submit:active{ transform:translateY(1px) scale(.997) }
     .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none }
 
     .help{ text-align:center; margin:8px 0 10px; font-size:13px; color:var(--muted) }
 
-    /* ===== dunkler Footer-Balken ===== */
     .foot{
-      margin-top:8px;
-      padding:12px 10px 8px;
-      border-top:1px solid rgba(255,255,255,.12);
-      text-align:center; font-size:12.5px; line-height:1.45;
-      background:rgba(0,0,0,.65);
-      border-radius:0 0 var(--radius) var(--radius);
-      color:#fff;
+      margin-top:4px;
+      padding:12px 6px 6px;
+      border-top:1px solid rgba(255,255,255,.10);
+      text-align:center; color:#d6dde6; font-size:12.5px; line-height:1.45;
     }
     .foot small{ display:block }
 
     /* Mobile Tweaks */
     @media (max-width:560px){
-      :root{ --card-w:92vw; --hd:128px; --title-w: clamp(280px, 90vw, 540px); }
-      .card{ padding-top: calc(var(--hd) * .64 + var(--title-gap) + 12px); }
-      .brand-stack .wordmark{ margin-top:-6px; }
+      :root{ --hd:92px; --title-w: 86%; --word-gap:6px; --title-gap:10px }
+      .card{ padding-top: calc(var(--hd) * .7 + var(--title-gap) + 12px); }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card" role="group" aria-labelledby="hd-title">
-      <!-- Brand oben bündig -->
+      <!-- Feste Markenebene -->
       <div class="brand-stack" aria-hidden="true">
         <img class="hd" src="/HD-Logo.png" alt="HD">
         <img class="wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel‑Dashboard" id="hd-title">
       </div>
 
+      <!-- Abstand, damit das Formular nicht unter den Schriftzug rutscht -->
       <div class="title-spacer" aria-hidden="true"></div>
 
       <div class="content">
-        <div class="error" id="err" role="alert" aria-live="assertive">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
+        <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
 
         <form action="/login" method="POST" id="loginForm" novalidate>
           <div>
@@ -240,7 +247,9 @@
             </div>
           </div>
 
-          <div class="row-links"><a href="/reset">Passwort vergessen?</a></div>
+          <div class="row-links">
+            <a href="/reset">Passwort vergessen?</a>
+          </div>
 
           <button class="submit" id="submitBtn" type="submit" disabled>Anmelden</button>
 
@@ -250,17 +259,17 @@
 
       <div class="foot">
         <small>
-          © <span id="y"></span> Hotel‑Dashboard · Powered by MY HOME HOTEL AM ROTTWEIL GMBH
+          © <span id="y"></span> Hotel‑Dashboard<br>
+          Powered by MY HOME HOTEL AM ROTTWEIL GMBH
         </small>
       </div>
     </div>
   </div>
 
   <script>
-    // Jahr
+    // © Jahr
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    const form = document.getElementById('loginForm');
     const u = document.getElementById('username');
     const p = document.getElementById('password');
     const s = document.getElementById('submitBtn');
@@ -279,14 +288,9 @@
       p.type = show ? "text" : "password";
       eyeOn.style.display  = show ? "block" : "none";
       eyeOff.style.display = show ? "none"  : "block";
-      p.focus();
     });
 
-    // Fehlermeldung via ?err=1
     if (new URLSearchParams(location.search).get('err')) err.style.display='block';
-
-    // Submit-Feedback
-    form.addEventListener('submit', () => { s.disabled = true; s.textContent = 'Anmelden…'; });
   </script>
 </body>
 </html>
