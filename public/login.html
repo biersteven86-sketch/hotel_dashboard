@@ -17,23 +17,23 @@
       --page:#06080c;
       --text:#eef2f8;
       --muted:#cfd6de;
-      --accent:#e02824;     /* Rot für Button & Link */
+      --accent:#e02824;
       --accent-2:#b31618;
 
-      /* Panel-Glas (dein Swatch #676767) */
+      /* Panel-Farbe (Glas-Optik in deinem Grau-Swatch) */
       --panel-r:103; --panel-g:103; --panel-b:103;
-      --panel-alpha:.28;
-      --panel-border:rgba(255,255,255,.10);
+      --panel-alpha: .28;
+      --panel-border: rgba(255,255,255,.10);
 
       /* Größen */
       --card-w: 640px;
       --radius:22px;
 
       /* Brand-Stack */
-      --hd:108px;            /* etwas größer als vorher */
-      --word-overlap:-10px;  /* NEGATIVER Wert = dichter zusammen */
+      --hd:112px;                       /* Logo minimal größer */
+      --word-gap:4px;                   /* Feintuning-Abstand */
       --title-w: clamp(300px, 78%, 540px);
-      --title-gap:8px;       /* Schriftzug ↔ Formular */
+      --title-gap:8px;                  /* Schriftzug ↔ Formular */
     }
 
     *{box-sizing:border-box}
@@ -41,7 +41,7 @@
 
     body{
       margin:0;
-      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
+      font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
       color:var(--text);
       background:var(--page) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
@@ -53,7 +53,7 @@
       padding:clamp(18px,4vw,60px);
     }
 
-    /* ===== Karte (Glas) ===== */
+    /* ===== Karte (Glas mit deinem Grau) ===== */
     .card{
       position:relative;
       width:min(var(--card-w), 94vw);
@@ -66,8 +66,8 @@
         0 26px 70px rgba(0,0,0,.68),
         0 1px 0 rgba(255,255,255,.05) inset;
       padding: clamp(18px,2.2vw,24px);
-      /* Platz für Logos oben einkalkulieren */
-      padding-top: calc(var(--hd) * .70 + var(--title-gap) + 14px);
+      /* Reserve über der Karte für den Brand-Stack */
+      padding-top: calc(var(--hd) * .66 + var(--title-gap) + 14px);
       overflow: visible;
     }
     .card::after{
@@ -76,11 +76,11 @@
       background:linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
     }
 
-    /* ===== Logo-Stack ===== */
+    /* ===== Logo-Stack — Schriftzug „hineinschieben“ ===== */
     .brand-stack{
       position:absolute; left:50%; top:0;
-      /* minimal weiter runter (Logo saß zu hoch) */
-      transform:translate(-50%, calc(-45% + 2px));
+      /* leicht nach unten, damit die Oberkante der Wabe optisch sauber sitzt */
+      transform:translate(-50%, calc(-47% + 2px));
       display:grid; place-items:center;
       pointer-events:none; z-index:5;
       width:min(32vw, 520px);
@@ -92,8 +92,8 @@
         drop-shadow(0 1px 0 rgba(255,255,255,.08));
     }
     .brand-stack .wordmark{
-      /* dichter an das HD-Logo rücken */
-      margin-top: var(--word-overlap);
+      /* NEGATIVE margin-top bringt den Schriftzug näher ans Logo */
+      margin-top:-14px;                 /* >>> hier enger/weiter stellen <<< */
       width:var(--title-w); height:auto; display:block;
       filter:
         drop-shadow(0 1px 0 rgba(255,255,255,.10))
@@ -108,10 +108,9 @@
 
     label{
       display:block;
-      font-size:14.5px;          /* etwas größer */
+      font-size:14px;                   /* etwas größer für Lesbarkeit */
       color:#fff;
       margin:0 0 4px;
-      letter-spacing:.2px;
     }
 
     /* Nur Umrandung, keine Fläche */
@@ -126,17 +125,16 @@
         0 10px 26px rgba(0,0,0,.40);
       transition: box-shadow .15s ease, border-color .15s ease;
     }
-    /* Fokus-Ring beibehalten, aber dezenter und wärmer */
     .field:focus-within{
       border-color: rgba(255,255,255,.42);
       box-shadow:
-        0 0 0 2px rgba(224,40,36,.14),
-        0 12px 28px rgba(0,0,0,.55);
+        0 0 0 3px rgba(224,40,36,.18),    /* dezenter Fokusring (rot-toned) */
+        0 14px 34px rgba(0,0,0,.55);
     }
     .field input{
       background:transparent; border:0; outline:0;
       color:#fff;
-      font-size:16.5px;          /* etwas größer */
+      font-size:16px;
       padding:10px 8px;
       width:100%;
       caret-color:#fff;
@@ -149,7 +147,7 @@
     }
     .icon svg{ width:22px; height:22px; display:block }
 
-    /* Autofill (Gelb) neutralisieren */
+    /* Autofill neutralisieren */
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
     input:-webkit-autofill:focus{
@@ -168,62 +166,58 @@
       padding:10px 12px; border-radius:12px; font-size:13px; margin:0 0 8px;
     }
 
-    .row-links{ display:flex; gap:12px; font-size:15px; margin-top:2px }
+    .row-links{ display:flex; gap:12px; font-size:14px; margin-top:2px }
     .row-links a{
-      /* Rot, ohne gepunktete Unterlinie */
-      color:var(--accent);
+      color:var(--accent);              /* rot statt blau */
+      text-decoration:none;             /* keine Punkte/Unterstreichung */
       font-weight:800;
-      text-decoration:none;
-      border:0;
+      border-bottom:none;
     }
     .row-links a:hover{
       color:#fff;
-      text-decoration:underline;
-      text-underline-offset:2px;
+      text-decoration:underline;        /* optionaler Hover-Kontrast */
+      text-underline-offset:3px;
     }
 
-    /* Anmelden-Button: ohne „Leuchten“ */
     .submit{
       margin-top:8px;
       border:0; border-radius:14px; padding:12px 18px;
-      font-weight:900; font-size:16.5px; color:#fff; cursor:pointer;
+      font-weight:900; font-size:16px; color:#fff; cursor:pointer;
       background:linear-gradient(180deg,var(--accent),var(--accent-2));
-      box-shadow:none;                   /* <- Leuchten entfernt */
-      transition:transform .08s ease, box-shadow .12s ease, filter .12s ease;
+      /* dezenter, kein starkes „Leuchten“ */
+      box-shadow:
+        0 10px 20px rgba(224,39,36,.22),
+        0 1px 0 rgba(255,255,255,.06) inset;
+      transition:transform .08s ease, box-shadow .12s ease;
     }
     .submit:hover{
-      filter: brightness(1.06);
+      box-shadow:
+        0 14px 28px rgba(224,39,36,.28),
+        0 1px 0 rgba(255,255,255,.08) inset;
     }
     .submit:active{ transform:translateY(1px) scale(.997) }
     .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none }
 
-    .help{
-      text-align:center; margin:8px 0 10px;
-      font-size:14px;                  /* besser lesbar */
-      color:var(--muted);
-      letter-spacing:.2px;
-    }
+    .help{ text-align:center; margin:8px 0 10px; font-size:13.5px; color:var(--muted) }
 
     .foot{
-      margin-top:6px;
+      margin-top:4px;
       padding:12px 6px 6px;
       border-top:1px solid rgba(255,255,255,.10);
-      text-align:center; color:#dce3ea;
-      font-size:13.5px; line-height:1.5;  /* besser lesbar ohne Karte zu vergrößern */
-      letter-spacing:.2px;
+      text-align:center; color:#d6dde6; font-size:13.5px; line-height:1.45;
     }
     .foot small{ display:block }
 
     /* Mobile Tweaks */
     @media (max-width:560px){
       :root{
-        --hd:100px;
+        --hd:96px;
         --title-w: 86%;
-        --word-overlap:-8px;
+        --word-gap:4px;
         --title-gap:10px;
       }
-      .card{ padding-top: calc(var(--hd) * .72 + var(--title-gap) + 12px); }
-      .row-links{ font-size:14.5px }
+      .card{ padding-top: calc(var(--hd) * .7 + var(--title-gap) + 12px); }
+      .brand-stack .wordmark{ margin-top:-10px; } /* etwas weniger Überlappung mobil */
     }
   </style>
 </head>
@@ -282,7 +276,7 @@
       <div class="foot">
         <small>
           © <span id="y"></span> Hotel‑Dashboard<br>
-          Powered by HOTEL LAMM‑ROTTWEIL GMBH
+          Powered by MY HOME HOTEL AM ROTTWEIL GMBH
         </small>
       </div>
     </div>
