@@ -19,20 +19,18 @@
       --accent:#e02824;
       --accent-2:#b31618;
 
-      /* Panel */
       --panel-r:103; --panel-g:103; --panel-b:103;
       --panel-alpha:.28;
       --panel-border:rgba(255,255,255,.10);
 
-      /* Größen */
       --card-w:640px;
       --radius:22px;
 
       /* Brand-Stack */
-      --hd:140px;         /* Logo nochmal größer */
-      --word-gap:-20px;   /* Schriftzug deutlich näher ans Logo */
+      --hd:132px;        /* Logo minimal kleiner */
+      --word-gap:-80px;  /* Schriftzug 4× enger */
       --title-w:clamp(300px,78%,540px);
-      --title-gap:6px;    /* Abstand Schriftzug ↔ Formular enger */
+      --title-gap:6px;
     }
 
     *{box-sizing:border-box}
@@ -63,7 +61,7 @@
 
     .brand-stack{
       position:absolute;left:50%;top:0;
-      transform:translate(-50%,-44%); /* Logo etwas tiefer */
+      transform:translate(-50%,-42%); /* enger positioniert */
       display:grid;place-items:center;
       pointer-events:none;z-index:5;
       width:min(32vw,520px);
@@ -137,7 +135,7 @@
     .foot small{display:block}
 
     @media (max-width:560px){
-      :root{--hd:120px;--title-w:86%;--word-gap:-14px;--title-gap:8px}
+      :root{--hd:116px;--title-w:86%;--word-gap:-60px;--title-gap:8px}
       .card{padding-top:calc(var(--hd) * .7 + var(--title-gap) + 12px)}
     }
   </style>
