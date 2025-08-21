@@ -21,15 +21,15 @@
       --accent:#e02824;
       --accent-2:#b31618;
 
-      /* Größen */
+      /* Karte */
       --card-w: 720px;
       --radius:22px;
 
-      /* Brand-Größen & Abstände (einfach feinjustieren) */
-      --hd:108px;                 /* Größe HD‑Logo */
-      --title-w: clamp(300px, 78%, 540px); /* Breite Schriftzug-PNG */
-      --logo-gap:10px;            /* Abstand Logo → Schriftzug */
-      --title-gap:18px;           /* Abstand Schriftzug → Formular */
+      /* BRAND (angepasst) */
+      --hd:216px;                      /* HD-Logo: doppelt so groß wie vorher (108 → 216) */
+      --title-w: clamp(360px, 84vw, 680px); /* Schriftzug breiter für bessere Proportionen */
+      --logo-gap:6px;                  /* sehr dichter Abstand Logo → Schriftzug */
+      --title-gap:16px;                /* Abstand Schriftzug → Formular */
     }
 
     *{box-sizing:border-box}
@@ -60,8 +60,8 @@
         0 26px 70px rgba(0,0,0,.68),
         0 2px 0 rgba(255,255,255,.03) inset;
       padding: clamp(18px,2.6vw,26px);
-      /* Platz für die fixierte Brand-Ebene einplanen: Logo + (Gap) + Wordmark + (Gap) */
-      padding-top: calc(var(--hd) + var(--logo-gap) + var(--title-gap) + 24px);
+      /* Platz nach oben: großes Logo + dichter Wordmark + Abstand zum Formular */
+      padding-top: calc(var(--hd) + var(--logo-gap) + var(--title-gap) + 28px);
       overflow: visible;
     }
     .card::before{
@@ -79,20 +79,19 @@
       pointer-events:none;
     }
 
-    /* ===== Fixierte Markenebene (zwei getrennte Elemente) ===== */
+    /* ===== Fixierte Markenebene: Logo + Schriftzug ===== */
     .brand-stack{
       position:absolute; left:50%; top:0;
-      transform:translate(-50%, calc(-50% + 4px)); /* Logo darf leicht überstehen */
+      transform:translate(-50%, calc(-50% + 6px)); /* Logo darf leicht überstehen */
       display:grid; place-items:center;
       pointer-events:none; z-index:5;
-      width:min(32vw, 520px);
-      /* Kein Grid-Gap hier – wir steuern Abstände präziser über eigene Variablen */
+      width:min(42vw, 720px); /* etwas breiter, damit der Schriftzug Luft hat */
     }
     .brand-logo{
       width:var(--hd); height:var(--hd);
       display:block; object-fit:contain;
       filter:
-        drop-shadow(0 24px 40px rgba(0,0,0,.55))
+        drop-shadow(0 26px 44px rgba(0,0,0,.60))
         drop-shadow(0 1px 0 rgba(255,255,255,.08));
       margin-bottom: var(--logo-gap);
     }
@@ -103,7 +102,7 @@
         drop-shadow(0 18px 28px rgba(0,0,0,.55));
     }
 
-    /* Spacer verhindert, dass Formular unter das PNG rutscht */
+    /* Spacer verhindert, dass Formular unter den Schriftzug rutscht */
     .title-spacer{ height: var(--title-gap); }
 
     /* ===== Formular ===== */
@@ -201,10 +200,16 @@
     }
     .foot small{ display:block }
 
-    /* Mobile Tweaks */
+    /* Mobile Tweaks: große Brand kompakter rechnen */
     @media (max-width:560px){
-      :root{ --hd:92px; --title-w: 86%; }
+      :root{
+        --hd: 168px;                   /* etwas kleiner auf sehr schmalen Screens */
+        --title-w: clamp(300px, 92vw, 640px);
+        --logo-gap:6px;
+        --title-gap:14px;
+      }
       .card{ padding-top: calc(var(--hd) + var(--logo-gap) + var(--title-gap) + 18px); }
+      .brand-stack{ width:min(88vw, 640px); }
     }
 
     /* noscript Hinweis */
