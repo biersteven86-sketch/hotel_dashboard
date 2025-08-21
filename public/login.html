@@ -25,11 +25,11 @@
       --card-w: 720px;
       --radius:22px;
 
-      /* BRAND (angepasst) */
-      --hd:216px;                      /* HD-Logo: doppelt so groß wie vorher (108 → 216) */
-      --title-w: clamp(360px, 84vw, 680px); /* Schriftzug breiter für bessere Proportionen */
-      --logo-gap:6px;                  /* sehr dichter Abstand Logo → Schriftzug */
-      --title-gap:16px;                /* Abstand Schriftzug → Formular */
+      /* BRAND (Zwischenmaß) */
+      --hd:160px;                          /* Logo-Größe: Mittelweg */
+      --title-w: clamp(340px, 80vw, 640px);/* Schriftzug etwas breiter */
+      --logo-gap:4px;                      /* Logo → Schriftzug sehr nah */
+      --title-gap:14px;                    /* Schriftzug → Formular kompakt */
     }
 
     *{box-sizing:border-box}
@@ -60,8 +60,8 @@
         0 26px 70px rgba(0,0,0,.68),
         0 2px 0 rgba(255,255,255,.03) inset;
       padding: clamp(18px,2.6vw,26px);
-      /* Platz nach oben: großes Logo + dichter Wordmark + Abstand zum Formular */
-      padding-top: calc(var(--hd) + var(--logo-gap) + var(--title-gap) + 28px);
+      /* Platz nach oben: Logo + enger Wordmark + Abstand zum Formular */
+      padding-top: calc(var(--hd) + var(--logo-gap) + var(--title-gap) + 26px);
       overflow: visible;
     }
     .card::before{
@@ -82,16 +82,17 @@
     /* ===== Fixierte Markenebene: Logo + Schriftzug ===== */
     .brand-stack{
       position:absolute; left:50%; top:0;
-      transform:translate(-50%, calc(-50% + 6px)); /* Logo darf leicht überstehen */
+      /* etwas tiefer als zuvor, damit das Logo nicht zu hoch hängt */
+      transform:translate(-50%, calc(-40% + 2px));
       display:grid; place-items:center;
       pointer-events:none; z-index:5;
-      width:min(42vw, 720px); /* etwas breiter, damit der Schriftzug Luft hat */
+      width:min(42vw, 720px);
     }
     .brand-logo{
       width:var(--hd); height:var(--hd);
       display:block; object-fit:contain;
       filter:
-        drop-shadow(0 26px 44px rgba(0,0,0,.60))
+        drop-shadow(0 24px 40px rgba(0,0,0,.60))
         drop-shadow(0 1px 0 rgba(255,255,255,.08));
       margin-bottom: var(--logo-gap);
     }
@@ -200,16 +201,16 @@
     }
     .foot small{ display:block }
 
-    /* Mobile Tweaks: große Brand kompakter rechnen */
+    /* Mobile Tweaks */
     @media (max-width:560px){
       :root{
-        --hd: 168px;                   /* etwas kleiner auf sehr schmalen Screens */
-        --title-w: clamp(300px, 92vw, 640px);
-        --logo-gap:6px;
-        --title-gap:14px;
+        --hd:148px; /* leicht kleiner auf sehr schmalen Screens */
+        --title-w: clamp(300px, 92vw, 620px);
+        --logo-gap:4px;
+        --title-gap:12px;
       }
       .card{ padding-top: calc(var(--hd) + var(--logo-gap) + var(--title-gap) + 18px); }
-      .brand-stack{ width:min(88vw, 640px); }
+      .brand-stack{ width:min(88vw, 640px); transform:translate(-50%, calc(-38% + 2px)); }
     }
 
     /* noscript Hinweis */
@@ -223,7 +224,7 @@
 <body>
   <div class="wrap">
     <div class="card" role="group" aria-labelledby="hd-title">
-      <!-- Feste Markenebene: ZWEI EINZELNE ELEMENTE -->
+      <!-- Feste Markenebene: zwei getrennte Elemente -->
       <div class="brand-stack" aria-hidden="true">
         <img class="brand-logo" src="/HD-Logo.png" alt="HD Logo">
         <img class="brand-wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel‑Dashboard" id="hd-title">
