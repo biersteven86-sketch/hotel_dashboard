@@ -15,7 +15,7 @@
     :root{
       /* Farben / Look */
       --page:#06080c;
-      --panel:#686868;
+      --panel:#141a22;  /* wieder helleres Dunkelgrau */
       --text:#eef2f8;
       --muted:#aab4c0;
       --accent:#e02824;
@@ -26,10 +26,10 @@
       --radius:22px;
 
       /* BRAND (kompakter) */
-      --hd:140px;                        /* Logo etwas kleiner */
-      --title-w: clamp(320px, 78vw, 580px);/* Schriftzug etwas schmaler */
-      --logo-gap:2px;                    /* Logo → Schriftzug extrem nah */
-      --title-gap:14px;                  /* Schriftzug → Formular kompakt */
+      --hd:140px;
+      --title-w: clamp(320px, 78vw, 580px);
+      --logo-gap:2px;
+      --title-gap:14px;
     }
 
     *{box-sizing:border-box}
@@ -55,20 +55,18 @@
       width:min(var(--card-w), 94vw);
       background:var(--panel);
       border-radius:var(--radius);
-      border:1px solid rgba(104,104,104,255);
+      border:1px solid rgba(255,255,255,.05);
       box-shadow:
         0 20px 60px rgba(0,0,0,.68),
-        0 2px 0 rgb(104,104,104,255) inset;
+        0 2px 0 rgba(255,255,255,.03) inset;
       padding: clamp(18px,2.6vw,26px);
-      /* Platz nach oben: Logo + Wordmark + Abstand zum Formular */
       padding-top: calc(var(--hd) + var(--logo-gap) + var(--title-gap) + 24px);
       overflow: visible;
     }
 
-    /* ===== Fixierte Markenebene: Logo + Schriftzug ===== */
     .brand-stack{
       position:absolute; left:50%; top:0;
-      transform:translate(-50%, calc(-40% + 2px)); /* Logo sitzt etwas tiefer */
+      transform:translate(-50%, calc(-40% + 2px));
       display:grid; place-items:center;
       pointer-events:none; z-index:5;
       width:min(42vw, 640px);
@@ -90,7 +88,6 @@
 
     .title-spacer{ height: var(--title-gap); }
 
-    /* ===== Formular ===== */
     .content{ display:grid; gap:14px; }
 
     label{
@@ -168,7 +165,6 @@
     }
     .foot small{ display:block }
 
-    /* Mobile Tweaks */
     @media (max-width:560px){
       :root{
         --card-w: 92vw;
@@ -184,7 +180,6 @@
 <body>
   <div class="wrap">
     <div class="card" role="group" aria-labelledby="hd-title">
-      <!-- Brand -->
       <div class="brand-stack" aria-hidden="true">
         <img class="brand-logo" src="/HD-Logo.png" alt="HD Logo">
         <img class="brand-wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel-Dashboard" id="hd-title">
