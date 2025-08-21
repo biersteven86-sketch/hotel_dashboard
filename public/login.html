@@ -15,9 +15,9 @@
     :root{
       /* Farben / Look */
       --page:#06080c;
-      --panel:#141a22;  /* wieder helleres Dunkelgrau */
+      --panel:rgba(103,103,103,0.92);  /* mittleres Grau mit leichter Transparenz */
       --text:#eef2f8;
-      --muted:#aab4c0;
+      --muted:#d5d7da;
       --accent:#e02824;
       --accent-2:#b31618;
 
@@ -57,7 +57,7 @@
       border-radius:var(--radius);
       border:1px solid rgba(255,255,255,.05);
       box-shadow:
-        0 20px 60px rgba(0,0,0,.68),
+        0 20px 60px rgba(0,0,0,.55),
         0 2px 0 rgba(255,255,255,.03) inset;
       padding: clamp(18px,2.6vw,26px);
       padding-top: calc(var(--hd) + var(--logo-gap) + var(--title-gap) + 24px);
@@ -101,12 +101,12 @@
       display:grid; grid-template-columns:1fr auto; align-items:center;
       min-height:50px; padding:0 12px;
       border-radius:14px;
-      border:1px solid rgba(255,255,255,.09);
-      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.06));
+      border:1px solid rgba(255,255,255,.15);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.08));
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,.08),
         inset 0 0 0 1px rgba(255,255,255,.08),
-        0 8px 22px rgba(0,0,0,.45);
+        0 8px 22px rgba(0,0,0,.35);
     }
     .field input{
       background:transparent; border:0; outline:0;
