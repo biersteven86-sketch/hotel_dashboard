@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login · Hotel‑Dashboard</title>
+  <title>Login · Hotel-Dashboard</title>
   <meta name="color-scheme" content="light dark">
 
   <!-- Assets -->
@@ -13,27 +13,23 @@
 
   <style>
     :root{
-      /* Look & Farben */
       --page:#06080c;
       --text:#eef2f8;
       --muted:#cfd6de;
       --accent:#e02824;
       --accent-2:#b31618;
 
-      /* Panel-Farbe nach deinem Swatch (#676767) als Glas */
       --panel-r:103; --panel-g:103; --panel-b:103;
-      --panel-alpha: .28;                 /* Transparenz der Fläche */
+      --panel-alpha: .28;
       --panel-border: rgba(255,255,255,.10);
 
-      /* Größen */
-      --card-w: 640px;                    /* Karte bewusst kleiner */
+      --card-w: 640px;
       --radius:22px;
 
-      /* Brand-Stack */
-      --hd:108px;                         /* (geändert) Logo minimal größer */
-      --word-gap:6px;                     /* HD ↔ Schriftzug: sehr nah */
+      --hd:108px;
+      --word-gap:6px;
       --title-w: clamp(300px, 78%, 540px);
-      --title-gap:8px;                    /* Schriftzug ↔ Formular: eng */
+      --title-gap:8px;
     }
 
     *{box-sizing:border-box}
@@ -46,14 +42,8 @@
       background:var(--page) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
 
-    .wrap{
-      min-height:100%;
-      display:grid;
-      place-items:center;
-      padding:clamp(18px,4vw,60px);
-    }
+    .wrap{ min-height:100%; display:grid; place-items:center; padding:clamp(18px,4vw,60px); }
 
-    /* ===== Karte (Glas mit deiner Farbe) ===== */
     .card{
       position:relative;
       width:min(var(--card-w), 94vw);
@@ -62,9 +52,7 @@
       backdrop-filter: blur(8px) saturate(120%);
       -webkit-backdrop-filter: blur(8px) saturate(120%);
       border:1px solid var(--panel-border);
-      box-shadow:
-        0 26px 70px rgba(0,0,0,.68),
-        0 1px 0 rgba(255,255,255,.05) inset;
+      box-shadow:none; /* Leuchten entfernt */
       padding: clamp(18px,2.2vw,24px);
       padding-top: calc(var(--hd) * .66 + var(--title-gap) + 14px);
       overflow: visible;
@@ -75,10 +63,8 @@
       background:linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
     }
 
-    /* ===== Logo-Stack (sehr nah zusammen) ===== */
     .brand-stack{
       position:absolute; left:50%; top:0;
-      /* (geändert) Logo minimal tiefer setzen */
       transform:translate(-50%, calc(-46% + 4px));
       display:grid; place-items:center;
       pointer-events:none; z-index:5;
@@ -86,56 +72,30 @@
     }
     .brand-stack .hd{
       width:var(--hd); height:var(--hd); object-fit:contain; display:block;
-      filter:
-        drop-shadow(0 22px 38px rgba(0,0,0,.55))
-        drop-shadow(0 1px 0 rgba(255,255,255,.08));
+      filter: drop-shadow(0 22px 38px rgba(0,0,0,.55)) drop-shadow(0 1px 0 rgba(255,255,255,.08));
     }
     .brand-stack .wordmark{
       margin-top:var(--word-gap);
       width:var(--title-w); height:auto; display:block;
-      filter:
-        drop-shadow(0 1px 0 rgba(255,255,255,.10))
-        drop-shadow(0 16px 26px rgba(0,0,0,.50));
+      filter: drop-shadow(0 1px 0 rgba(255,255,255,.10)) drop-shadow(0 16px 26px rgba(0,0,0,.50));
     }
 
-    /* Spacer verhindert Kollision mit Schriftzug */
     .title-spacer{ height: var(--title-gap); }
 
-    /* ===== Formular ===== */
     .content{ display:grid; gap:10px; }
+    label{ display:block; font-size:13px; color:#fff; margin:0 0 4px; }
 
-    label{
-      display:block;
-      font-size:13px;
-      color:#fff;                 /* Labels weiß, wie gewünscht */
-      margin:0 0 4px;
-    }
-
-    /* Nur Umrandung, keine Fläche */
     .field{
       display:grid; grid-template-columns:1fr auto; align-items:center;
       min-height:48px; padding:0 12px;
       border-radius:14px;
       background: transparent;
       border:1.2px solid rgba(255,255,255,.25);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.06),
-        0 10px 26px rgba(0,0,0,.40);
-      transition: box-shadow .15s ease, border-color .15s ease;
-    }
-    .field:focus-within{
-      border-color: rgba(255,255,255,.42);
-      box-shadow:
-        0 0 0 3px rgba(224,40,36,.18),
-        0 14px 34px rgba(0,0,0,.55);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 10px 26px rgba(0,0,0,.40);
     }
     .field input{
       background:transparent; border:0; outline:0;
-      color:#fff;                 /* Eingabetext weiß */
-      font-size:16px;
-      padding:10px 8px;
-      width:100%;
-      caret-color:#fff;
+      color:#fff; font-size:16px; padding:10px 8px; width:100%; caret-color:#fff;
     }
     .field input::placeholder{ color:rgba(255,255,255,.90); }
 
@@ -145,7 +105,6 @@
     }
     .icon svg{ width:22px; height:22px; display:block }
 
-    /* Autofill (Gelb) neutralisieren */
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
     input:-webkit-autofill:focus{
@@ -166,28 +125,22 @@
 
     .row-links{ display:flex; gap:12px; font-size:13px; margin-top:2px }
     .row-links a{
-      color:var(--accent); text-decoration:none; font-weight:700;
+      color:#7aa6ff; /* neue Farbe */
+      text-decoration:none;
+      font-weight:700;
       border-bottom:1px dashed rgba(255,255,255,.22);
     }
-    .row-links a:hover{ color:#fff; border-bottom-color:rgba(255,255,255,.45) }
+    .row-links a:hover{
+      color:#fff;
+      border-bottom-color:rgba(255,255,255,.45);
+    }
 
     .submit{
       margin-top:8px;
       border:0; border-radius:14px; padding:12px 18px;
       font-weight:900; font-size:16px; color:#fff; cursor:pointer;
       background:linear-gradient(180deg,var(--accent),var(--accent-2));
-      box-shadow:
-        0 14px 28px rgba(224,39,36,.32),
-        0 1px 0 rgba(255,255,255,.06) inset;
-      transition:transform .08s ease, box-shadow .12s ease;
     }
-    .submit:hover{
-      box-shadow:
-        0 18px 38px rgba(224,39,36,.40),
-        0 1px 0 rgba(255,255,255,.08) inset;
-    }
-    .submit:active{ transform:translateY(1px) scale(.997) }
-    .submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none }
 
     .help{ text-align:center; margin:8px 0 10px; font-size:13px; color:var(--muted) }
 
@@ -199,24 +152,21 @@
     }
     .foot small{ display:block }
 
-    /* Mobile Tweaks */
     @media (max-width:560px){
       :root{ --hd:100px; --title-w: 86%; --word-gap:6px; --title-gap:10px }
       .card{ padding-top: calc(var(--hd) * .7 + var(--title-gap) + 12px); }
-      .brand-stack{ transform:translate(-50%, calc(-48% + 2px)); } /* auf kleineren Screens wieder die alte Relation */
+      .brand-stack{ transform:translate(-50%, calc(-48% + 2px)); }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card" role="group" aria-labelledby="hd-title">
-      <!-- Feste Markenebene -->
       <div class="brand-stack" aria-hidden="true">
         <img class="hd" src="/HD-Logo.png" alt="HD">
-        <img class="wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel‑Dashboard" id="hd-title">
+        <img class="wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel-Dashboard" id="hd-title">
       </div>
 
-      <!-- Abstand, damit das Formular nicht unter den Schriftzug rutscht -->
       <div class="title-spacer" aria-hidden="true"></div>
 
       <div class="content">
@@ -226,7 +176,7 @@
           <div>
             <label for="username">Benutzername</label>
             <div class="field">
-              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
+              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
             </div>
           </div>
 
@@ -235,13 +185,11 @@
             <div class="field">
               <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
               <button class="icon" type="button" id="togglePw" aria-label="Passwort anzeigen/ausblenden">
-                <!-- geschlossen -->
-                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.05 0-9.27-3.11-11-8 1.02-2.93 3.03-5.19 5.47-6.53m3.17-1.19A9.77 9.77 0 0112 4c5.05 0 9.27 3.11 11 8a11.73 11.73 0 01-1.41 2.94M9.88 9.88A3 3 0 1112 15a3 3 0 01-2.12-5.12z"/>
                   <line x1="3" y1="3" x2="21" y2="21"/>
                 </svg>
-                <!-- offen -->
-                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none" aria-hidden="true">
+                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
                   <circle cx="12" cy="12" r="3"/>
                 </svg>
@@ -261,7 +209,7 @@
 
       <div class="foot">
         <small>
-          © <span id="y"></span> Hotel‑Dashboard<br>
+          © <span id="y"></span> Hotel-Dashboard<br>
           Powered by MY HOME HOTEL AM ROTTWEIL GMBH
         </small>
       </div>
@@ -269,9 +217,7 @@
   </div>
 
   <script>
-    // © Jahr
     document.getElementById('y').textContent = new Date().getFullYear();
-
     const u = document.getElementById('username');
     const p = document.getElementById('password');
     const s = document.getElementById('submitBtn');
