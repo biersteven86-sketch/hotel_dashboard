@@ -30,7 +30,7 @@
       --radius:22px;
 
       /* Brand-Stack */
-      --hd:100px;                         /* Logo-Größe (Zwischending) */
+      --hd:108px;                         /* (geändert) Logo minimal größer */
       --word-gap:6px;                     /* HD ↔ Schriftzug: sehr nah */
       --title-w: clamp(300px, 78%, 540px);
       --title-gap:8px;                    /* Schriftzug ↔ Formular: eng */
@@ -78,7 +78,8 @@
     /* ===== Logo-Stack (sehr nah zusammen) ===== */
     .brand-stack{
       position:absolute; left:50%; top:0;
-      transform:translate(-50%, calc(-48% + 2px)); /* optisch etwas tiefer */
+      /* (geändert) Logo minimal tiefer setzen */
+      transform:translate(-50%, calc(-46% + 4px));
       display:grid; place-items:center;
       pointer-events:none; z-index:5;
       width:min(32vw, 520px);
@@ -200,8 +201,9 @@
 
     /* Mobile Tweaks */
     @media (max-width:560px){
-      :root{ --hd:92px; --title-w: 86%; --word-gap:6px; --title-gap:10px }
+      :root{ --hd:100px; --title-w: 86%; --word-gap:6px; --title-gap:10px }
       .card{ padding-top: calc(var(--hd) * .7 + var(--title-gap) + 12px); }
+      .brand-stack{ transform:translate(-50%, calc(-48% + 2px)); } /* auf kleineren Screens wieder die alte Relation */
     }
   </style>
 </head>
