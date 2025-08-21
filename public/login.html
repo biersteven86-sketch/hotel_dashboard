@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login · Hotel‑Dashboard</title>
+  <title>Login · Hotel-Dashboard</title>
   <meta name="color-scheme" content="light dark">
 
   <!-- Assets -->
@@ -13,30 +13,22 @@
 
   <style>
     :root{
-      /* Look & Farben */
       --page:#06080c;
       --text:#eef2f8;
       --muted:#cfd6de;
 
-      /* NEU: Markenrot nach Screenshot */
-      --brand-red:#c61a10;
-      --brand-red-dark:#9f140d;
+      /* Neues dunkleres Rot */
+      --brand-red:#a9160e;
+      --brand-red-dark:#8c120b;
 
-      /* (bestehende) Rottöne – werden für Button nicht mehr genutzt */
-      --accent:#e02824; 
-      --accent-2:#b31618;
-
-      /* Panel (#676767) als Glas */
       --panel-r:103; --panel-g:103; --panel-b:103;
       --panel-alpha: .28;
       --panel-border: rgba(255,255,255,.10);
 
-      /* Größen */
       --card-w: 640px;
       --radius:22px;
 
-      /* Brand-Stack */
-      --hd:108px;                         /* aktuelles Logo‑Maß */
+      --hd:108px;
       --word-gap:6px;
       --title-w: clamp(300px, 78%, 540px);
       --title-gap:8px;
@@ -54,7 +46,6 @@
 
     .wrap{ min-height:100%; display:grid; place-items:center; padding:clamp(18px,4vw,60px); }
 
-    /* ===== Karte (Glas) – unverändert, ohne Glow ===== */
     .card{
       position:relative;
       width:min(var(--card-w), 94vw);
@@ -63,7 +54,7 @@
       backdrop-filter: blur(8px) saturate(120%);
       -webkit-backdrop-filter: blur(8px) saturate(120%);
       border:1px solid var(--panel-border);
-      box-shadow:none; /* kein äußeres Leuchten */
+      box-shadow:none;
       padding: clamp(18px,2.2vw,24px);
       padding-top: calc(var(--hd) * .66 + var(--title-gap) + 14px);
       overflow: visible;
@@ -73,11 +64,11 @@
       background:linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
     }
 
-    /* ===== Logo-Stack ===== */
     .brand-stack{
       position:absolute; left:50%; top:0;
-      transform:translate(-50%, calc(-46% + 4px)); /* dein letzter Stand */
-      display:grid; place-items:center; pointer-events:none; z-index:5;
+      transform:translate(-50%, calc(-46% + 4px));
+      display:grid; place-items:center;
+      pointer-events:none; z-index:5;
       width:min(32vw, 520px);
     }
     .brand-stack .hd{
@@ -92,7 +83,6 @@
 
     .title-spacer{ height: var(--title-gap); }
 
-    /* ===== Formular ===== */
     .content{ display:grid; gap:10px; }
 
     .error{
@@ -103,17 +93,15 @@
       padding:10px 12px; border-radius:12px; font-size:13px; margin:0 0 8px;
     }
 
-    /* Größer & leserlicher: Labels */
     label{
       display:block;
-      font-size:14.5px;               /* +1.5px */
+      font-size:14.5px;
       font-weight:700;
       color:#fff;
       margin:0 0 4px;
       letter-spacing:.2px;
     }
 
-    /* Felder (nur Outline) */
     .field{
       display:grid; grid-template-columns:1fr auto; align-items:center;
       min-height:48px; padding:0 12px;
@@ -125,7 +113,9 @@
     }
     .field:focus-within{
       border-color: rgba(255,255,255,.42);
-      box-shadow: 0 0 0 3px rgba(198,26,16,.18), 0 14px 34px rgba(0,0,0,.55);
+      box-shadow:
+        0 0 0 3px rgba(169,22,14,.28), /* dunkleres Rot für Fokus */
+        0 14px 34px rgba(0,0,0,.55);
     }
     .field input{
       background:transparent; border:0; outline:0;
@@ -139,7 +129,6 @@
     }
     .icon svg{ width:22px; height:22px; display:block }
 
-    /* Autofill neutralisieren */
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
     input:-webkit-autofill:focus{
@@ -150,35 +139,32 @@
       filter:none !important;
     }
 
-    /* ===== Link „Passwort vergessen?“: ROT, keine Punkte/Unterkante ===== */
-    .row-links{ display:flex; gap:12px; font-size:14px; margin-top:2px } /* +1px */
+    .row-links{ display:flex; gap:12px; font-size:14px; margin-top:2px }
     .row-links a{
       color:var(--brand-red);
-      text-decoration:none;              /* keine Unterstreichung */
+      text-decoration:none;
       font-weight:800;
-      border-bottom:none;                /* „Punkte“ (früher dashed) weg */
+      border-bottom:none;
       letter-spacing:.2px;
     }
     .row-links a:hover{ color:#fff; }
 
-    /* ===== Button „Anmelden“ exakt im Markenrot ===== */
     .submit{
       margin-top:8px;
       border:0; border-radius:14px; padding:12px 18px;
       font-weight:900; font-size:16px; color:#fff; cursor:pointer;
       background:var(--brand-red);
-      box-shadow:none;                   /* kein Leuchten */
+      box-shadow:none;
       transition: transform .08s ease, filter .12s ease, background-color .12s ease;
     }
     .submit:hover{ background:var(--brand-red-dark); filter:saturate(110%); }
     .submit:active{ transform:translateY(1px) scale(.997) }
     .submit:disabled{ opacity:.6; cursor:not-allowed; }
 
-    /* Hinweis & Footer: größer/kontrastreicher */
     .help{
       text-align:center; margin:8px 0 10px;
-      font-size:14px;                    /* +1px */
-      color:#fff;                        /* mehr Kontrast */
+      font-size:14px;
+      color:#fff;
       letter-spacing:.2px;
     }
 
@@ -187,14 +173,13 @@
       padding:12px 6px 6px;
       border-top:1px solid rgba(255,255,255,.14);
       text-align:center;
-      color:#fff;                        /* heller */
-      font-size:13.5px;                  /* +1px */
+      color:#fff;
+      font-size:13.5px;
       line-height:1.5;
       letter-spacing:.2px;
     }
     .foot small{ display:block }
 
-    /* Mobile Tweaks (wie gehabt) */
     @media (max-width:560px){
       :root{ --hd:100px; --title-w: 86%; --word-gap:6px; --title-gap:10px }
       .card{ padding-top: calc(var(--hd) * .7 + var(--title-gap) + 12px); }
@@ -205,10 +190,9 @@
 <body>
   <div class="wrap">
     <div class="card" role="group" aria-labelledby="hd-title">
-      <!-- Brand -->
       <div class="brand-stack" aria-hidden="true">
         <img class="hd" src="/HD-Logo.png" alt="HD">
-        <img class="wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel‑Dashboard" id="hd-title">
+        <img class="wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel-Dashboard" id="hd-title">
       </div>
 
       <div class="title-spacer" aria-hidden="true"></div>
@@ -220,7 +204,7 @@
           <div>
             <label for="username">Benutzername</label>
             <div class="field">
-              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
+              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
             </div>
           </div>
 
@@ -229,13 +213,11 @@
             <div class="field">
               <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
               <button class="icon" type="button" id="togglePw" aria-label="Passwort anzeigen/ausblenden">
-                <!-- geschlossen -->
-                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.05 0-9.27-3.11-11-8 1.02-2.93 3.03-5.19 5.47-6.53m3.17-1.19A9.77 9.77 0 0112 4c5.05 0 9.27 3.11 11 8a11.73 11.73 0 01-1.41 2.94M9.88 9.88A3 3 0 1112 15a3 3 0 01-2.12-5.12z"/>
                   <line x1="3" y1="3" x2="21" y2="21"/>
                 </svg>
-                <!-- offen -->
-                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none" aria-hidden="true">
+                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
                   <circle cx="12" cy="12" r="3"/>
                 </svg>
@@ -255,7 +237,7 @@
 
       <div class="foot">
         <small>
-          © <span id="y"></span> Hotel‑Dashboard<br>
+          © <span id="y"></span> Hotel-Dashboard<br>
           Powered by MY HOME HOTEL AM ROTTWEIL GMBH
         </small>
       </div>
@@ -263,9 +245,7 @@
   </div>
 
   <script>
-    // © Jahr
     document.getElementById('y').textContent = new Date().getFullYear();
-
     const u = document.getElementById('username');
     const p = document.getElementById('password');
     const s = document.getElementById('submitBtn');
