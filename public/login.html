@@ -40,8 +40,9 @@
 
     body{
       margin:0;
-      font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
-      font-family:'Roboto', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      font-size:16px;
+      line-height:1.45;
       color:var(--text);
       background:var(--page) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
@@ -59,13 +60,13 @@
       box-shadow:0 26px 70px rgba(0,0,0,.68),0 1px 0 rgba(255,255,255,.05) inset;
       padding:clamp(18px,2.2vw,24px);
       padding-top:calc(var(--hd) * .66 + var(--title-gap) + 14px);
-      padding-bottom: 8px;
+      padding-bottom:8px;
       overflow:visible;
     }
 
     .brand-stack{
       position:absolute;left:50%;top:0;
-      transform:translate(-50%,-51%); /* zwei Schritte zurück von -54% */
+      transform:translate(-50%,-51%);
       display:grid;place-items:center;
       pointer-events:none;z-index:5;
       width:min(32vw,520px);
@@ -135,7 +136,7 @@
 
     .help{text-align:center;margin:8px 0 10px;font-size:14px;color:var(--muted)}
 
-    .foot{margin-top:15px;padding:12px 6px 6px;border-top:1px solid rgba(255,255,255,.10);text-align:center;color:#e0e5ec;font-size:136x;line-height:1,45}
+    .foot{margin-top:15px;padding:12px 6px 6px;border-top:1px solid rgba(255,255,255,.10);text-align:center;color:#e0e5ec;font-size:13px;line-height:1.45}
     .foot small{display:block}
 
     @media (max-width:560px){
@@ -194,7 +195,3 @@
     const u=document.getElementById('username'),p=document.getElementById('password'),s=document.getElementById('submitBtn'),tp=document.getElementById('togglePw'),eyeOn=document.getElementById('eye-on'),eyeOff=document.getElementById('eye-off'),err=document.getElementById('err');
     const update=()=>{s.disabled=!(u.value.trim()&&p.value.trim())};u.addEventListener('input',update);p.addEventListener('input',update);update();
     tp.addEventListener('click',()=>{const show=p.type==="password";p.type=show?"text":"password";eyeOn.style.display=show?"block":"none";eyeOff.style.display=show?"none":"block"});
-    if(new URLSearchParams(location.search).get('err'))err.style.display='block';
-  </script>
-</body>
-</html>
