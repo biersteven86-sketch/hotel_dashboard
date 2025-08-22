@@ -1,3 +1,7 @@
+# Backup & ersetzen
+FILE="/home/steven/hotel_dashboard/public/login.html"
+cp -a "$FILE" "${FILE%.html}.backup_$(date +%F_%H-%M-%S).html"
+cat > "$FILE" <<'HTML'
 <!doctype html>
 <html lang="de">
 <head>
@@ -27,10 +31,12 @@
       --radius:22px;
 
       /* Brand-Stack */
-      --hd:132px;        
-      --word-gap:-28px;  
-      --title-w:clamp(300px,78%,540px);
-      --title-gap:2px;   /* Spacer unten klein */
+      --hd:132px;               /* Logo-Kantenlänge */
+      --word-w:clamp(300px,78%,540px); /* Wortmarke Breite */
+      --word-h:clamp(36px,6.4vw,52px); /* Wortmarke Höhe (fixiert für exakte Abstände) */
+
+      /* >>> NEU: Exakt gleiche Abstände ober/unter Wortmarke <<< */
+      --gap-eq: 18px;           /* Feinjustage: gleicher Abstand oben & unten zum Schriftzug */
     }
 
     *{box-sizing:border-box}
@@ -54,29 +60,36 @@
       -webkit-backdrop-filter:blur(8px) saturate(120%);
       border:1px solid var(--panel-border);
       box-shadow:0 26px 70px rgba(0,0,0,.68),0 1px 0 rgba(255,255,255,.05) inset;
+
+      /* >>> NEU: Gleicher Abstand oberhalb (zum Schriftzug) */
       padding:clamp(18px,2.2vw,24px);
-      padding-top:calc(var(--hd) * .66 + var(--title-gap) + 14px);
+      padding-top:calc(var(--gap-eq) + var(--word-h));
       overflow:visible;
     }
 
-    .brand-stack{
-      position:absolute;left:50%;top:0;
-      transform:translate(-50%,-51%); /* zwei Schritte zurück von -54% */
+    /* Brand-Stack jetzt im normalen Fluss, damit wir sauber messen können */
+    .brand{
       display:grid;place-items:center;
-      pointer-events:none;z-index:5;
       width:min(32vw,520px);
-    }
-    .brand-stack .hd{
-      width:var(--hd);height:var(--hd);object-fit:contain;display:block;
+      margin:0 auto;
+      pointer-events:none;
+      user-select:none;
+      /* Schatten wie zuvor */
       filter:drop-shadow(0 22px 38px rgba(0,0,0,.55)) drop-shadow(0 1px 0 rgba(255,255,255,.08));
     }
-    .brand-stack .wordmark{
-      margin-top:var(--word-gap);
-      width:var(--title-w);height:auto;display:block;
+    .brand .hd{
+      width:var(--hd);height:var(--hd);object-fit:contain;display:block;
+      /* >>> NEU: Logo visuell nach oben ziehen, damit der Schriftzug die Abstände definiert */
+      transform:translateY(-36%);
+    }
+    .brand .wordmark{
+      width:var(--word-w);height:var(--word-h);display:block;object-fit:contain;
+      margin-top:-10px; /* leichte Überlappung zum Logo für kompakte Optik */
       filter:drop-shadow(0 1px 0 rgba(255,255,255,.10)) drop-shadow(0 16px 26px rgba(0,0,0,.50));
     }
 
-    .title-spacer{height:var(--title-gap)}
+    /* >>> NEU: Gleicher Abstand unterhalb (zum Formular) */
+    .title-spacer{height:var(--gap-eq)}
 
     .content{display:grid;gap:10px}
 
@@ -135,16 +148,22 @@
     .foot small{display:block}
 
     @media (max-width:560px){
-      :root{--hd:116px;--title-w:86%;--word-gap:-24px;--title-gap:6px}
-      .card{padding-top:calc(var(--hd) * .7 + var(--title-gap) + 12px)}
+      :root{
+        --hd:116px;
+        --word-w:86%;
+        --word-h:44px; /* fix, damit die Gleichheit auch mobil stimmt */
+        --gap-eq: 14px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card" role="group" aria-labelledby="hd-title">
-      <div class="brand-stack" aria-hidden="true">
-        <img class="hd" src="/HD-Logo.png" alt="HD">
+
+      <!-- Brand-Stack im Fluss: Logo über Schriftzug, Schriftzug definiert die Abstände -->
+      <div class="brand" aria-hidden="true">
+        <img class="hd" src="/HD-Logo.png" alt="HD-Logo">
         <img class="wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel-Dashboard" id="hd-title">
       </div>
 
@@ -187,11 +206,33 @@
   </div>
 
   <script>
+    // Jahr im Footer
     document.getElementById('y').textContent=new Date().getFullYear();
-    const u=document.getElementById('username'),p=document.getElementById('password'),s=document.getElementById('submitBtn'),tp=document.getElementById('togglePw'),eyeOn=document.getElementById('eye-on'),eyeOff=document.getElementById('eye-off'),err=document.getElementById('err');
-    const update=()=>{s.disabled=!(u.value.trim()&&p.value.trim())};u.addEventListener('input',update);p.addEventListener('input',update);update();
-    tp.addEventListener('click',()=>{const show=p.type==="password";p.type=show?"text":"password";eyeOn.style.display=show?"block":"none";eyeOff.style.display=show?"none":"block"});
-    if(new URLSearchParams(location.search).get('err'))err.style.display='block';
+
+    // Interaktionen
+    const u=document.getElementById('username'),
+          p=document.getElementById('password'),
+          s=document.getElementById('submitBtn'),
+          tp=document.getElementById('togglePw'),
+          eyeOn=document.getElementById('eye-on'),
+          eyeOff=document.getElementById('eye-off'),
+          err=document.getElementById('err');
+
+    const update=()=>{s.disabled=!(u.value.trim()&&p.value.trim())};
+    u.addEventListener('input',update); p.addEventListener('input',update); update();
+
+    tp.addEventListener('click',()=>{
+      const show=p.type==="password";
+      p.type=show?"text":"password";
+      eyeOn.style.display=show?"block":"none";
+      eyeOff.style.display=show?"none":"block";
+    });
+
+    if(new URLSearchParams(location.search).get('err')) err.style.display='block';
+
+    // Fokus-Qualität: Cursor direkt in Benutzername
+    u.focus({ preventScroll:true });
   </script>
 </body>
 </html>
+HTML
