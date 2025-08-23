@@ -17,26 +17,22 @@
       --page:#06080c;
       --text:#eef2f8;
       --muted:#cfd6de;
+      --accent:#b71c1c;     /* Button-Rot (dunkler) */
+      --accent-2:#7f0000;   /* Button-Rot unten */
+      --accent-link:#fff;   /* Passwort-vergessen Link */
 
-      /* Farben */
-      --accent:#b71c1c;       /* Button dunkelrot */
-      --accent-2:#7f0000;     /* Button Verlauf */
-      --accent-link:#fff;     /* Link "Passwort vergessen?" */
-
-      /* Panel/Glas */
       --panel-r:103; --panel-g:103; --panel-b:103;
-      --panel-alpha:.50;
+      --panel-alpha:.50;                       /* Transparenz Pane */
       --panel-border:rgba(255,255,255,.10);
 
-      /* Layout-Basis (Desktop) */
       --card-w:440px;
       --radius:22px;
 
       /* Brand-Stack */
-      --hd:132px;
-      --word-gap:-28px;
+      --hd:132px;                    /* HD-Icon */
+      --word-gap:-28px;              /* Abstand Icon → Schriftzug */
       --title-w:clamp(300px,78%,540px);
-      --title-gap:-20px;
+      --title-gap:-20px;             /* Spacer unter Schriftzug */
     }
 
     *{box-sizing:border-box}
@@ -44,9 +40,7 @@
 
     body{
       margin:0;
-      font-size:16px;
-      line-height:1.45;
-      font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
       color:var(--text);
       background:var(--page) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
@@ -69,10 +63,8 @@
     }
 
     .brand-stack{
-      position:absolute;left:50%;top:0;
-      transform:translate(-50%,-51%);
-      display:grid;place-items:center;
-      pointer-events:none;z-index:5;
+      position:absolute;left:50%;top:0;transform:translate(-50%,-51%);
+      display:grid;place-items:center;pointer-events:none;z-index:5;
       width:min(32vw,520px);
     }
     .brand-stack .hd{
@@ -86,7 +78,6 @@
     }
 
     .title-spacer{height:var(--title-gap)}
-
     .content{display:grid;gap:10px}
 
     label{display:block;font-size:15px;color:#fff;margin:0 0 4px}
@@ -104,15 +95,14 @@
       box-shadow:0 0 0 3px rgba(224,40,36,.18),0 14px 34px rgba(0,0,0,.55);
     }
     .field input{
-      background:transparent;border:0;outline:0;
-      color:#fff;font-size:16px;padding:10px 8px;width:100%;caret-color:#fff;
+      background:transparent;border:0;outline:0;color:#fff;font-size:16px;
+      padding:10px 8px;width:100%;caret-color:#fff;
     }
     .field input::placeholder{color:rgba(255,255,255,.90)}
-
     .field button.icon{all:unset;cursor:pointer;border-radius:10px;padding:8px;display:grid;place-items:center;color:#c7cfdb}
     .icon svg{width:22px;height:22px;display:block}
 
-    /* Autofill fix */
+    /* autofill gelb ausschalten */
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
     input:-webkit-autofill:focus{
@@ -124,71 +114,42 @@
 
     .error{display:none;background:rgba(224,39,36,.12);border:1px solid rgba(224,39,36,.45);color:#ffd6d6;padding:10px 12px;border-radius:12px;font-size:13px;margin:0 0 8px}
 
-    .row-links{display:flex;gap:12px;font-size:14px;margin-top:8px;}
-    .row-links a{color:var(--accent-link);text-decoration:none;font-weight:400;}
-    .row-links a:hover{color:#fff}
+    .row-links{display:flex;gap:12px;font-size:14px;margin-top:8px}
+    .row-links a{color:var(--accent-link);text-decoration:none;font-weight:400}
+    .row-links a:hover{color:#fff;border-bottom-color:rgba(255,255,255,.45)}
 
     .submit{
       margin-top:12px;border:0;border-radius:14px;padding:12px 26px;
       font-weight:900;font-size:16px;color:#fff;cursor:pointer;
       background:linear-gradient(180deg,var(--accent),var(--accent-2));
-      box-shadow:none;
-      transition:transform .08s ease,box-shadow .12s ease;
+      box-shadow:none;transition:transform .08s ease,box-shadow .12s ease;
     }
-    .submit:hover{box-shadow:0 8px 18px rgba(0,0,0,.25)}
+    .submit:hover{box-shadow:0 18px 38px rgba(224,39,36,.40),0 1px 0 rgba(255,255,255,.08) inset}
     .submit:active{transform:translateY(1px) scale(.997)}
     .submit:disabled{opacity:.6;cursor:not-allowed;box-shadow:none}
 
     .help{text-align:center;margin:8px 0 10px;font-size:14px;color:var(--muted)}
 
-    .foot{
-      margin-top:15px;
-      padding:12px 6px 6px;
-      border-top:1px solid rgba(255,255,255,.10);
-      text-align:center;
-      color:#e0e5ec;
-      font-size:13px;
-      line-height:1.45;
-    }
+    .foot{margin-top:15px;padding:12px 6px 6px;border-top:1px solid rgba(255,255,255,.10);text-align:center;color:#e0e5ec;font-size:13px;line-height:1.45}
     .foot small{display:block}
 
-    /* ========== Responsive ========== */
-
-    /* Mobile (bis 560px) */
+    /* ---------- Smartphone-Optimierung ---------- */
     @media (max-width:560px){
       :root{
-        --card-w: 94vw;      /* nutzt fast voll die Breite */
-        --hd:116px;
-        --title-w:86%;
-        --word-gap:-24px;
-        --title-gap:12px;    /* mehr Luft unter dem Schriftzug */
-      }
-      .brand-stack{
-        transform:translate(-50%,-48%); /* etwas tiefer */
+        --hd:140px;          /* größeres HD-Icon auf Handy */
+        --title-w:92%;       /* Schriftzug breiter anzeigen */
+        --word-gap:-18px;    /* etwas enger */
+        --title-gap:0px;     /* weniger Luft darunter */
       }
       .card{
-        padding-top:calc(var(--hd) * .78 + var(--title-gap) + 14px);
+        width:94vw;          /* Box etwas breiter */
+        padding-top:calc(var(--hd) * .62 + var(--title-gap) + 12px);
+        padding-bottom:10px;
       }
+      label{font-size:16px}
+      .row-links{font-size:15px}
+      .submit{font-size:17px;padding:13px 28px}
     }
-
-    /* Tablet (561px – 900px) */
-    @media (min-width:561px) and (max-width:900px){
-      :root{
-        --card-w:520px;    /* etwas breiter als Mobil */
-        --hd:128px;        /* mittleres Logo */
-        --title-w:82%;
-        --word-gap:-26px;
-        --title-gap:6px;   /* kompakter */
-      }
-      .brand-stack{
-        transform:translate(-50%,-50%);
-      }
-      .card{
-        padding-top:calc(var(--hd) * .72 + var(--title-gap) + 14px);
-      }
-    }
-
-    /* Desktop (>900px): Basiswerte oben gelten */
   </style>
 </head>
 <body>
@@ -237,28 +198,28 @@
   </div>
 
   <script>
-    document.getElementById('y').textContent=new Date().getFullYear();
-    const u=document.getElementById('username'),
-          p=document.getElementById('password'),
-          s=document.getElementById('submitBtn'),
-          tp=document.getElementById('togglePw'),
-          eyeOn=document.getElementById('eye-on'),
-          eyeOff=document.getElementById('eye-off'),
-          err=document.getElementById('err');
+    document.getElementById('y').textContent = new Date().getFullYear();
+    const u = document.getElementById('username');
+    const p = document.getElementById('password');
+    const s = document.getElementById('submitBtn');
+    const tp = document.getElementById('togglePw');
+    const eyeOn = document.getElementById('eye-on');
+    const eyeOff = document.getElementById('eye-off');
+    const err = document.getElementById('err');
 
-    const update=()=>{s.disabled=!(u.value.trim()&&p.value.trim())};
-    u.addEventListener('input',update);
-    p.addEventListener('input',update);
+    const update = () => { s.disabled = !(u.value.trim() && p.value.trim()); };
+    u.addEventListener('input', update);
+    p.addEventListener('input', update);
     update();
 
-    tp.addEventListener('click',()=>{
-      const show=p.type==="password";
-      p.type=show?"text":"password";
-      eyeOn.style.display=show?"block":"none";
-      eyeOff.style.display=show?"none":"block";
+    tp.addEventListener('click', () => {
+      const show = p.type === "password";
+      p.type = show ? "text" : "password";
+      eyeOn.style.display = show ? "block" : "none";
+      eyeOff.style.display = show ? "none" : "block";
     });
 
-    if(new URLSearchParams(location.search).get('err')) err.style.display='block';
+    if (new URLSearchParams(location.search).get('err')) err.style.display = 'block';
   </script>
 </body>
 </html>
