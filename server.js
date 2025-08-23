@@ -22,6 +22,16 @@ const loginLimiter = rateLimit({ windowMs: 5*60*1000, max: 50, standardHeaders:t
 
 const publicDir = path.join(__dirname, 'public');
 
+// 🔐 Global-Guard: nur /login, /health und /public/* sind offen
+const OPEN_PATHS = new Set(['/', '/login', '/health']);
+app.use((req, res, next) => {
+  const isOpen = OPEN_PATHS.has(req.path) || req.path.startsWith('/public/');
+  const hasUser = !!(req.session && req.session.user);
+  console.log(`[guard] ${req.method} ${req.path}  session=${hasUser?'YES':'NO'}`);
+  if (isOpen || hasUser) return next();
+  return res.redirect('/login');
+});
+
 // 1) Blocke direkte .html-Aufrufe (außer login.html)
 app.use((req,res,next)=>{
   if (req.path.endsWith('.html') && req.path !== '/login.html') {
