@@ -1,4 +1,3 @@
-// server.js
 const express  = require('express');
 const path     = require('path');
 const session  = require('express-session');
@@ -6,7 +5,7 @@ const rateLimit= require('express-rate-limit');
 require('dotenv').config({ quiet:true });
 
 const app  = express();
-const PORT = process.env.PORT || 3000; // lokal 3000, Render setzt $PORT
+const PORT = process.env.PORT || 3000; // lokal 3000, Render setzt $PORT:contentReference[oaicite:1]{index=1}
 
 app.set('trust proxy', 1);
 app.use(express.urlencoded({ extended: true }));
@@ -18,14 +17,13 @@ app.use(session({
   cookie: { httpOnly:true, sameSite:'lax', secure:false, maxAge: 60*60*1000 }
 }));
 
-// Rate Limits
+// Nur POST /login limitieren
 const loginLimiter = rateLimit({ windowMs: 5*60*1000, max: 50, standardHeaders:true, legacyHeaders:false });
-const resetLimiter = rateLimit({ windowMs: 10*60*1000, max: 30, standardHeaders:true, legacyHeaders:false });
 
 const publicDir = path.join(__dirname, 'public');
 
-// 🔐 Global-Guard: nur /login, /reset, /health und /public/* sind offen
-const OPEN_PATHS = new Set(['/', '/login', '/reset', '/health']);
+// 🔐 Global-Guard: nur /login, /health und /public/* sind offen
+const OPEN_PATHS = new Set(['/', '/login', '/health']);
 app.use((req, res, next) => {
   const isOpen = OPEN_PATHS.has(req.path) || req.path.startsWith('/public/');
   const hasUser = !!(req.session && req.session.user);
@@ -34,18 +32,18 @@ app.use((req, res, next) => {
   return res.redirect('/login');
 });
 
-// Blocke direkte .html-Aufrufe (außer login.html und reset.html)
+// 1) Blocke direkte .html-Aufrufe (außer login.html)
 app.use((req,res,next)=>{
-  if (req.path.endsWith('.html') && !['/login.html','/reset.html'].includes(req.path)) {
+  if (req.path.endsWith('.html') && req.path !== '/login.html') {
     return res.redirect('/login');
   }
   next();
 });
 
-// Statische Assets (ohne Directory-Index)
+// 2) Statische Assets (Bilder, CSS, JS) öffentlich
 app.use(express.static(publicDir, { index:false }));
 
-// Auth-Guard
+// 3) Auth-Guard für geschützte Seiten
 function requireAuth(req, res, next) {
   if (req.session && req.session.user) return next();
   return res.redirect('/login');
@@ -58,16 +56,6 @@ app.head('/', (_req,res)=>res.set('Location','/login').sendStatus(302));
 // Login (öffentlich)
 app.get ('/login',  (_req,res)=>res.sendFile('login.html',  { root: publicDir }));
 app.head('/login',  (_req,res)=>res.sendStatus(200));
-
-// Passwort-Reset (öffentlich)
-app.get ('/reset',  (req,res)=>res.sendFile('reset.html',  { root: publicDir }));
-app.head('/reset',  (_req,res)=>res.sendStatus(200));
-app.post('/reset', resetLimiter, (req,res)=>{
-  // Sicherheit: niemals verraten, ob E-Mail/Nutzer existiert
-  // Hier nur Dummy-Flow / Hook für spätere Mail-Integration
-  // const { identifier } = req.body; // E-Mail oder Benutzername
-  return res.redirect('/reset?done=1');
-});
 
 // Geschützte Seiten
 app.get ('/index',  requireAuth, (_req,res)=>res.sendFile('index.html',  { root: publicDir }));
