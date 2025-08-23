@@ -1,10 +1,11 @@
-const express   = require('express');
-const path      = require('path');
-const session   = require('express-session');
-const rateLimit = require('express-rate-limit');
+const express  = require('express');
+const path     = require('path');
+const session  = require('express-session');
+const rateLimit= require('express-rate-limit');
 require('dotenv').config({ quiet:true });
 
 const app  = express();
+// ⬇️ Standard jetzt 3000
 const PORT = process.env.PORT || 3000;
 
 app.set('trust proxy', 1);
@@ -13,60 +14,60 @@ app.use(express.json());
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'change-me-please',
-  resave: false,
-  saveUninitialized: false,
+  resave: false, saveUninitialized: false,
   cookie: { httpOnly:true, sameSite:'lax', secure:false, maxAge: 60*60*1000 }
 }));
 
 // Nur POST /login limitieren
-const loginLimiter = rateLimit({
-  windowMs: 5*60*1000,
-  max: 50,
-  standardHeaders:true,
-  legacyHeaders:false
-});
+const loginLimiter = rateLimit({ windowMs: 5*60*1000, max: 50, standardHeaders:true, legacyHeaders:false });
 
 const publicDir = path.join(__dirname, 'public');
 
-// 1) HTML-Zugriffe direkt blocken (z. B. /index.html) → immer /login
-app.use((req, res, next) => {
-  if (req.path.toLowerCase().endsWith('.html')) return res.redirect('/login');
+// ⬅️ NEU: .html direkt verbieten (außer login.html)
+app.use((req,res,next)=>{
+  if (req.method==='GET' && req.path.endsWith('.html')) {
+    if (req.path === '/login.html') return next();
+    return res.redirect(302, req.path.replace(/\.html$/,''));
+  }
   next();
 });
 
-// 2) Statische Assets (Bilder/CSS/JS). HTML wird durch (1) nie ausgeliefert.
+// Statische Assets (Bilder, CSS, JS)
 app.use(express.static(publicDir, { index:false }));
 
-// Helper: Auth required
-function requireAuth(req, res, next) {
-  if (req.session && req.session.user) return next();
-  return res.redirect('/login');
-}
-
-// Root → /login
+// Root → /login (GET & HEAD)
 app.get ('/', (_req,res)=>res.redirect('/login'));
 app.head('/', (_req,res)=>res.set('Location','/login').sendStatus(302));
 
-// Login (öffentlich)
+// Helper: Auth-Zwang für geschützte Seiten
+function requireAuth(req,res,next){
+  if (req.session && req.session.user) return next();
+  return res.redirect('/login?next=' + encodeURIComponent(req.originalUrl || '/'));
+}
+
+// Login & HEAD
 app.get ('/login',  (_req,res)=>res.sendFile('login.html',  { root: publicDir }));
 app.head('/login',  (_req,res)=>res.sendStatus(200));
+
+// ⬅️ Geschützt: /status, /ibelsa, /index
+app.get ('/status', requireAuth, (_req,res)=>res.sendFile('status.html', { root: publicDir }));
+app.head('/status', requireAuth, (_req,res)=>res.sendStatus(200));
+
+app.get ('/ibelsa', requireAuth, (_req,res)=>res.sendFile('ibelsa.html', { root: publicDir }));
+app.head('/ibelsa', requireAuth, (_req,res)=>res.sendStatus(200));
+
+app.get ('/index',  requireAuth, (_req,res)=>res.sendFile('index.html',  { root: publicDir }));
+app.head('/index',  requireAuth, (_req,res)=>res.sendStatus(200));
 
 // Login prüfen
 app.post('/login', loginLimiter, (req,res)=>{
   const { username, password } = req.body || {};
-  const {
-    DASH_USER='',DASH_PASS='',
-    ADMIN_USER='',ADMIN_PASS='',
-    IBELSA_USER='',IBELSA_PASS=''
-  } = process.env;
-
+  const { DASH_USER='',DASH_PASS='', ADMIN_USER='',ADMIN_PASS='', IBELSA_USER='',IBELSA_PASS='' } = process.env;
   const ok =
     (username===DASH_USER   && password===DASH_PASS)   ||
     (username===ADMIN_USER  && password===ADMIN_PASS)  ||
     (username===IBELSA_USER && password===IBELSA_PASS);
-
   if (!ok) return res.redirect('/login?err=1');
-
   req.session.user = username;
   return res.redirect('/after-login');
 });
@@ -77,34 +78,6 @@ app.get('/after-login', (req,res)=>{
   const adminUser = (process.env.ADMIN_USER || 'admin').toLowerCase();
   if (u && u.toLowerCase()===adminUser) return res.redirect('/index');
   return res.redirect('/ibelsa');
-});
-
-// Geschützte Seiten
-app.get ('/index',  requireAuth, (_req,res)=>{
-  res.set('Cache-Control','no-store');
-  res.sendFile('index.html', { root: publicDir });
-});
-app.head('/index',  requireAuth, (_req,res)=>res.sendStatus(200));
-
-app.get ('/ibelsa', requireAuth, (_req,res)=>{
-  res.set('Cache-Control','no-store');
-  res.sendFile('ibelsa.html', { root: publicDir });
-});
-app.head('/ibelsa', requireAuth, (_req,res)=>res.sendStatus(200));
-
-app.get ('/status', requireAuth, (_req,res)=>{
-  res.set('Cache-Control','no-store');
-  res.sendFile('status.html', { root: publicDir });
-});
-app.head('/status', requireAuth, (_req,res)=>res.sendStatus(200));
-
-// Optional: /index.html → /index (falls (1) mal geändert wird)
-app.get ('/index.html', (_req,res)=>res.redirect('/index'));
-app.head('/index.html', (_req,res)=>res.set('Location','/index').sendStatus(302));
-
-// Logout
-app.post('/logout', (req,res)=>{
-  req.session.destroy(()=>res.redirect('/login'));
 });
 
 // Health (GET/HEAD)
