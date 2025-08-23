@@ -5,7 +5,7 @@ const rateLimit= require('express-rate-limit');
 require('dotenv').config({ quiet:true });
 
 const app  = express();
-const PORT = process.env.PORT || 3000; // lokal 3000, Render setzt $PORT:contentReference[oaicite:1]{index=1}
+const PORT = 3000; // lokal 3000, Render setzt $PORT
 
 app.set('trust proxy', 1);
 app.use(express.urlencoded({ extended: true }));
@@ -22,8 +22,8 @@ const loginLimiter = rateLimit({ windowMs: 5*60*1000, max: 50, standardHeaders:t
 
 const publicDir = path.join(__dirname, 'public');
 
-// 🔐 Global-Guard: nur /login, /health und /public/* sind offen
-const OPEN_PATHS = new Set(['/', '/login', '/health']);
+// 🔐 Global-Guard: nur /login, /reset, /health und /public/* sind offen
+const OPEN_PATHS = new Set(['/', '/login', '/reset', '/health']);
 app.use((req, res, next) => {
   const isOpen = OPEN_PATHS.has(req.path) || req.path.startsWith('/public/');
   const hasUser = !!(req.session && req.session.user);
@@ -32,9 +32,18 @@ app.use((req, res, next) => {
   return res.redirect('/login');
 });
 
-// 1) Blocke direkte .html-Aufrufe (außer login.html)
+// 🚫 Nie Backup-/Temp-Dateien ausliefern (z. B. /public/login_backup_..., *.bak, *~, *.old, *.save)
+const BACKUP_BLOCK_RE = /(backup|\.bak(?:\.|_|$)|~$|\.old(?:\.|$)|\.save(?:\.|$))/i;
+app.use((req, res, next) => {
+  if (req.path.startsWith('/public/') && BACKUP_BLOCK_RE.test(req.path)) {
+    return res.status(404).type('text').send('Not Found');
+  }
+  next();
+});
+
+// 1) Blocke direkte .html-Aufrufe (außer login.html und reset.html)
 app.use((req,res,next)=>{
-  if (req.path.endsWith('.html') && req.path !== '/login.html') {
+  if (req.path.endsWith('.html') && req.path !== '/login.html' && req.path !== '/reset.html') {
     return res.redirect('/login');
   }
   next();
@@ -56,6 +65,10 @@ app.head('/', (_req,res)=>res.set('Location','/login').sendStatus(302));
 // Login (öffentlich)
 app.get ('/login',  (_req,res)=>res.sendFile('login.html',  { root: publicDir }));
 app.head('/login',  (_req,res)=>res.sendStatus(200));
+
+// 🔓 Reset (öffentlich) – für "Passwort vergessen"
+app.get ('/reset',  (_req,res)=>res.sendFile('reset.html',  { root: publicDir }));
+app.head('/reset',  (_req,res)=>res.sendStatus(200));
 
 // Geschützte Seiten
 app.get ('/index',  requireAuth, (_req,res)=>res.sendFile('index.html',  { root: publicDir }));
