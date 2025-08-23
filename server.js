@@ -5,7 +5,7 @@ const rateLimit= require('express-rate-limit');
 require('dotenv').config({ quiet:true });
 
 const app  = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000; // lokal 3000, Render setzt $PORT:contentReference[oaicite:1]{index=1}
 
 app.set('trust proxy', 1);
 app.use(express.urlencoded({ extended: true }));
@@ -21,35 +21,36 @@ app.use(session({
 const loginLimiter = rateLimit({ windowMs: 5*60*1000, max: 50, standardHeaders:true, legacyHeaders:false });
 
 const publicDir = path.join(__dirname, 'public');
+
+// 1) Blocke direkte .html-Aufrufe (außer login.html)
+app.use((req,res,next)=>{
+  if (req.path.endsWith('.html') && req.path !== '/login.html') {
+    return res.redirect('/login');
+  }
+  next();
+});
+
+// 2) Statische Assets (Bilder, CSS, JS) öffentlich
 app.use(express.static(publicDir, { index:false }));
 
-// 🔐 Middleware: Login erforderlich
+// 3) Auth-Guard für geschützte Seiten
 function requireAuth(req, res, next) {
   if (req.session && req.session.user) return next();
   return res.redirect('/login');
 }
 
-// Root → /login (GET & HEAD)
+// Root → /login
 app.get ('/', (_req,res)=>res.redirect('/login'));
 app.head('/', (_req,res)=>res.set('Location','/login').sendStatus(302));
 
-// Lesbare Routen (GET) + explizite HEAD-Antworten
+// Login (öffentlich)
 app.get ('/login',  (_req,res)=>res.sendFile('login.html',  { root: publicDir }));
 app.head('/login',  (_req,res)=>res.sendStatus(200));
 
-// 🔐 geschützte Seiten
-app.get ('/status', requireAuth, (_req,res)=>res.sendFile('status.html', { root: publicDir }));
-app.head('/status', requireAuth, (_req,res)=>res.sendStatus(200));
-
-app.get ('/ibelsa', requireAuth, (_req,res)=>res.sendFile('ibelsa.html', { root: publicDir }));
-app.head('/ibelsa', requireAuth, (_req,res)=>res.sendStatus(200));
-
+// Geschützte Seiten
 app.get ('/index',  requireAuth, (_req,res)=>res.sendFile('index.html',  { root: publicDir }));
-app.head('/index',  requireAuth, (_req,res)=>res.sendStatus(200));
-
-// Optional: /index.html -> /index
-app.get ('/index.html', (_req,res)=>res.redirect('/index'));
-app.head('/index.html', (_req,res)=>res.set('Location','/index').sendStatus(302));
+app.get ('/ibelsa', requireAuth, (_req,res)=>res.sendFile('ibelsa.html', { root: publicDir }));
+app.get ('/status', requireAuth, (_req,res)=>res.sendFile('status.html', { root: publicDir }));
 
 // Login prüfen
 app.post('/login', loginLimiter, (req,res)=>{
@@ -72,7 +73,7 @@ app.get('/after-login', (req,res)=>{
   return res.redirect('/ibelsa');
 });
 
-// Health (GET/HEAD) für Tests/Monitoring
+// Health (öffentlich)
 app.get ('/health', (_req,res)=>res.type('text').send('OK'));
 app.head('/health', (_req,res)=>res.sendStatus(200));
 
@@ -87,6 +88,5 @@ app.use((err,_req,res,_next)=>{
 
 app.listen(PORT, ()=>{
   console.log('Hotel-Dashboard läuft auf Port', PORT);
-  const ip = (process.env.LAN_IP) || '';
   console.log('  • publicDir:', publicDir);
 });
