@@ -1,12 +1,12 @@
-// server.js
-const express  = require('express');
-const path     = require('path');
-const session  = require('express-session');
-const rateLimit= require('express-rate-limit');
+const express   = require('express');
+const path      = require('path');
+const session   = require('express-session');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config({ quiet:true });
 
 const app  = express();
-const PORT = process.env.PORT || 3000; // lokal 3000, Render setzt $PORT
+// Logohaus 3000 default: Port 3000 (Render würde $PORT setzen)
+const PORT = process.env.PORT || 3000;
 
 app.set('trust proxy', 1);
 app.use(express.urlencoded({ extended: true }));
@@ -14,13 +14,14 @@ app.use(express.json());
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'change-me-please',
-  resave: false, saveUninitialized: false,
+  resave: false,
+  saveUninitialized: false,
   cookie: { httpOnly:true, sameSite:'lax', secure:false, maxAge: 60*60*1000 }
 }));
 
-// Rate Limits
-const loginLimiter = rateLimit({ windowMs: 5*60*1000, max: 50, standardHeaders:true, legacyHeaders:false });
-const resetLimiter = rateLimit({ windowMs: 10*60*1000, max: 30, standardHeaders:true, legacyHeaders:false });
+// Nur Login/Reset drosseln
+const loginLimiter  = rateLimit({ windowMs: 5*60*1000, max: 50, standardHeaders:true, legacyHeaders:false });
+const resetLimiter  = rateLimit({ windowMs: 5*60*1000, max: 20, standardHeaders:true, legacyHeaders:false });
 
 const publicDir = path.join(__dirname, 'public');
 
@@ -34,7 +35,7 @@ app.use((req, res, next) => {
   return res.redirect('/login');
 });
 
-// Blocke direkte .html-Aufrufe (außer login.html und reset.html)
+// 1) Blocke direkte .html-Aufrufe (außer login.html & reset.html)
 app.use((req,res,next)=>{
   if (req.path.endsWith('.html') && !['/login.html','/reset.html'].includes(req.path)) {
     return res.redirect('/login');
@@ -42,10 +43,10 @@ app.use((req,res,next)=>{
   next();
 });
 
-// Statische Assets (ohne Directory-Index)
+// 2) Statische Assets öffentlich
 app.use(express.static(publicDir, { index:false }));
 
-// Auth-Guard
+// 3) Auth-Guard für geschützte Seiten
 function requireAuth(req, res, next) {
   if (req.session && req.session.user) return next();
   return res.redirect('/login');
@@ -59,16 +60,6 @@ app.head('/', (_req,res)=>res.set('Location','/login').sendStatus(302));
 app.get ('/login',  (_req,res)=>res.sendFile('login.html',  { root: publicDir }));
 app.head('/login',  (_req,res)=>res.sendStatus(200));
 
-// Passwort-Reset (öffentlich)
-app.get ('/reset',  (req,res)=>res.sendFile('reset.html',  { root: publicDir }));
-app.head('/reset',  (_req,res)=>res.sendStatus(200));
-app.post('/reset', resetLimiter, (req,res)=>{
-  // Sicherheit: niemals verraten, ob E-Mail/Nutzer existiert
-  // Hier nur Dummy-Flow / Hook für spätere Mail-Integration
-  // const { identifier } = req.body; // E-Mail oder Benutzername
-  return res.redirect('/reset?done=1');
-});
-
 // Geschützte Seiten
 app.get ('/index',  requireAuth, (_req,res)=>res.sendFile('index.html',  { root: publicDir }));
 app.get ('/ibelsa', requireAuth, (_req,res)=>res.sendFile('ibelsa.html', { root: publicDir }));
@@ -77,11 +68,17 @@ app.get ('/status', requireAuth, (_req,res)=>res.sendFile('status.html', { root:
 // Login prüfen
 app.post('/login', loginLimiter, (req,res)=>{
   const { username, password } = req.body || {};
-  const { DASH_USER='',DASH_PASS='', ADMIN_USER='',ADMIN_PASS='', IBELSA_USER='',IBELSA_PASS='' } = process.env;
+  const {
+    DASH_USER='',DASH_PASS='',
+    ADMIN_USER='',ADMIN_PASS='',
+    IBELSA_USER='',IBELSA_PASS=''
+  } = process.env;
+
   const ok =
     (username===DASH_USER   && password===DASH_PASS)   ||
     (username===ADMIN_USER  && password===ADMIN_PASS)  ||
     (username===IBELSA_USER && password===IBELSA_PASS);
+
   if (!ok) return res.redirect('/login?err=1');
   req.session.user = username;
   return res.redirect('/after-login');
@@ -93,6 +90,20 @@ app.get('/after-login', (req,res)=>{
   const adminUser = (process.env.ADMIN_USER || 'admin').toLowerCase();
   if (u && u.toLowerCase()===adminUser) return res.redirect('/index');
   return res.redirect('/ibelsa');
+});
+
+// ========= Passwort vergessen =========
+// GET /reset → öffentliche Seite
+app.get('/reset', (_req,res)=>res.sendFile('reset.html', { root: publicDir }));
+app.head('/reset', (_req,res)=>_req.res?.sendStatus?.(200) ?? res.sendStatus(200));
+
+// POST /reset → immer Erfolg signalisieren (kein Leak)
+app.post('/reset', resetLimiter, (req,res)=>{
+  const { identifier } = req.body || {};
+  // Optional: minimal Logging ohne PII
+  console.log('[reset] Anfrage erhalten');
+  // TODO: Hier könnte später E-Mail/Token-Flow eingehängt werden.
+  return res.redirect('/reset?sent=1');
 });
 
 // Health (öffentlich)
