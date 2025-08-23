@@ -22,31 +22,30 @@ const loginLimiter = rateLimit({ windowMs: 5*60*1000, max: 50, standardHeaders:t
 
 const publicDir = path.join(__dirname, 'public');
 
-/* ---------- Auth-Guard ---------- */
-function requireAuth(req, res, next){
-  if (req.session && req.session.user) return next();
-  return res.redirect('/login');
-}
-
-/* Blocke direkte HTML-Zugriffe ohne Login (z. B. /index.html) */
-app.all(/^\/(?!login(?:\/|$)|health(?:\/|$)).*\.html$/i, (req,res,next)=>{
-  if (req.session && req.session.user) return next(); // eingeloggte dürfen weiter
-  return res.redirect('/login');
+// ❗ Blocke direkte Zugriffe auf .html-Dateien (z. B. /index.html)
+app.use((req, res, next) => {
+  if (req.path.toLowerCase().endsWith('.html')) return res.redirect('/login');
+  next();
 });
 
-/* Statische Assets (Bilder/CSS/JS) – öffentlich.
-   Liegt NACH dem HTML-Blocker, damit .html ohne Login nicht ausgeliefert wird. */
+// Statische Assets (Bilder, CSS, JS) – aber kein Auto-Index
 app.use(express.static(publicDir, { index:false }));
 
 // Root → /login (GET & HEAD)
 app.get ('/', (_req,res)=>res.redirect('/login'));
 app.head('/', (_req,res)=>res.set('Location','/login').sendStatus(302));
 
-// Login (öffentlich)
+// --- Auth-Middleware ---
+function requireAuth(req, res, next) {
+  if (req.session && req.session.user) return next();
+  return res.redirect('/login');
+}
+
+// Login-Seite (öffentlich)
 app.get ('/login',  (_req,res)=>res.sendFile('login.html',  { root: publicDir }));
 app.head('/login',  (_req,res)=>res.sendStatus(200));
 
-// Geschützte Seiten (GET/HEAD)
+// Geschützte Seiten
 app.get ('/status', requireAuth, (_req,res)=>res.sendFile('status.html', { root: publicDir }));
 app.head('/status', requireAuth, (_req,res)=>res.sendStatus(200));
 
@@ -56,9 +55,9 @@ app.head('/ibelsa', requireAuth, (_req,res)=>res.sendStatus(200));
 app.get ('/index',  requireAuth, (_req,res)=>res.sendFile('index.html',  { root: publicDir }));
 app.head('/index',  requireAuth, (_req,res)=>res.sendStatus(200));
 
-// Optional: /index.html -> /index (Greift nur nach Login; ohne Login fängt der HTML-Blocker oben ab)
-app.get ('/index.html', requireAuth, (_req,res)=>res.redirect('/index'));
-app.head('/index.html', requireAuth, (_req,res)=>res.set('Location','/index').sendStatus(302));
+// Optional: /index.html -> /index (falls Static-MW oben nicht greift)
+app.get ('/index.html', (_req,res)=>res.redirect('/index'));
+app.head('/index.html', (_req,res)=>res.set('Location','/index').sendStatus(302));
 
 // Login prüfen
 app.post('/login', loginLimiter, (req,res)=>{
@@ -81,7 +80,7 @@ app.get('/after-login', (req,res)=>{
   return res.redirect('/ibelsa');
 });
 
-// Health (GET/HEAD) für Tests/Monitoring (öffentlich)
+// Health (GET/HEAD) für Tests/Monitoring
 app.get ('/health', (_req,res)=>res.type('text').send('OK'));
 app.head('/health', (_req,res)=>res.sendStatus(200));
 
