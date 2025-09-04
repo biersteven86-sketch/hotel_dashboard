@@ -1,0 +1,80 @@
+PROJECT_REFERENCE_NEW.txt
+======================
+
+Zweck
+-----
+Dies ist die aktuelle saubere Referenz für das Hotel-Dashboard (Stand: September 2025).
+Enthält nur das, was wirklich benötigt wird.
+
+Ordnerstruktur (Server)
+-----------------------
+/home/steven/hotel_dashboard
+├─ server.js                 # Hauptserver (Express)
+├─ .env                      # lokale Secrets (niemals committen)
+├─ package.json              # Node-Abhängigkeiten
+├─ package-lock.json         # Lockfile
+├─ lib/
+│  └─ ibelsa.js              # Fetch-Helper für Ibelsa-API
+├─ scripts/
+│  └─ restart_hotel.sh       # Neustart/PM2-Helfer (optional)
+├─ public/
+│  ├─ login.html
+│  ├─ index.html
+│  ├─ status.html
+│  ├─ ibelsa.html
+│  ├─ reset.html             # Passwort-Reset-Seite
+│  └─ images/…               # Assets (Logo, Bilder, CSS/JS)
+├─ README_ibelsa.md          # Starter-Pack & Best Practices
+├─ ibelsa.postman.json       # Minimal-Collection (Ping, Info, Reservation)
+├─ Ibelsa dokumentation.txt  # vollständige API-Doku
+├─ curl-cheatsheet.md        # cURL-Beispiele
+└─ PROJECT_REFERENCE_NEW.txt # diese Datei
+
+Ausgelagerte Bereiche
+---------------------
+- Backups: /home/steven/backups/hotel_dashboard/
+- node_modules: immer via "npm install" neu erzeugen
+- Alte Logs/Temp/Backup-Dateien: entfernt
+
+Backup & Cron
+-------------
+- Tägliches Projekt-Backup: 03:30 Uhr → /home/steven/backups/hotel_dashboard/
+- NAS-Sync: 04:40 Uhr → /mnt/pc-backup/raspi_backup/ (Credentials: /root/.smbcredentials)
+- Rotation: alte Backups >30 Tage automatisch löschen
+
+PM2 Verwaltung
+--------------
+Status ansehen:
+  pm2 status
+
+Logs live ansehen:
+  pm2 logs hotel-dashboard --lines 200 --timestamp
+
+Start/Stop/Restart:
+  pm2 stop hotel-dashboard
+  pm2 start /home/steven/hotel_dashboard/server.js --name hotel-dashboard
+  pm2 restart hotel-dashboard
+
+Autostart sichern:
+  pm2 save
+
+Ibelsa-API Nutzung
+------------------
+Basis-URL: https://rooms.ibelsa.com
+Auth: Header x-ibelsa-key (Pflicht), x-ibelsa-system-key (optional)
+Format: JSON (HTTPS)
+
+Beispiele (siehe curl-cheatsheet.md):
+  curl -H "x-ibelsa-key: $IBELSA_KEY" https://rooms.ibelsa.com/api/test/ping
+
+Node-Helper:
+  import { ibelsa } from './lib/ibelsa.js';
+  const data = await ibelsa('/api/hotel/information');
+
+Workflow
+--------
+- Änderungen an server.js oder public/*.html hier posten → Update per heredoc-Befehl ins Projektverzeichnis.
+- Stabile Referenz-Dateien (README_ibelsa.md, ibelsa.postman.json, Ibelsa dokumentation.txt, curl-cheatsheet.md) bleiben bestehen.
+- Backups werden extern gepflegt und automatisch geprüft.
+
+Stand: 2025-09-04
