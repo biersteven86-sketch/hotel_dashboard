@@ -10,3 +10,13 @@ login_master_backup.html
 .env.*
 node_modules/
 __backups_tmp_do_not_commit/
+# --- local junk / backups ---
+*.bak
+*.old
+*.orig
+*.tmp
+*~
+*.backup.*
+login.backup.*.html
+_backups_tmp_do_not_commit/
+backups/
