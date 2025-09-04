@@ -1,0 +1,175 @@
+<!-- MARKER: LIVE-TEST-2025-08-13-✓ -->
+<!doctype html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hotel – Dashboard Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --b1:#0f2a66; --b2:#2e64cf; --b3:#5a47b8; --b4:#7c54c9; --b5:#3a0f5c;
+      --white:#fff; --muted:#c9d6ec;
+      --stroke:rgba(255,255,255,.18);
+      --cardA: rgba(130,160,220,.55);
+      --cardB: rgba(110,140,200,.50);
+      --input-bg: rgba(225,238,255,.45);
+      --green1:#2ecc71; --green2:#27ae60;
+      --focus:#fffb; /* helle Focus-Aura */
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Poppins,system-ui,Arial,sans-serif; color:var(--white);
+      display:flex; align-items:center; justify-content:center; padding:32px; overflow:hidden;
+      background: radial-gradient(circle at 20% 30%, var(--b1) 0%, var(--b2) 25%, var(--b3) 45%, var(--b4) 70%, var(--b5) 100%);
+      background-size: 400% 400%;
+      animation: bgDrift 120s ease-in-out infinite;
+    }
+    @keyframes bgDrift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    @media (prefers-reduced-motion: reduce){
+      body{animation:none}
+    }
+
+    .card{
+      width: clamp(340px, 58vw, 860px);
+      background: linear-gradient(180deg, var(--cardA), var(--cardB));
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.25);
+      box-shadow: 0 14px 36px rgba(0,0,0,.35);
+      padding: 28px 28px 26px;
+      position:relative; z-index:1;
+      backdrop-filter: blur(6px);
+    }
+
+    .title-row{display:flex; align-items:center; justify-content:center; margin-bottom:6px}
+    .title{
+      font-size: clamp(28px, 3.2vw, 44px); font-weight:800; letter-spacing:.3px;
+      background: linear-gradient(90deg, #ffffff, #e8ddff, #ffffff);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      text-shadow: 0 2px 6px rgba(0,0,0,.28);
+    }
+    .subtitle{color:var(--muted); text-align:center; margin:2px 0 18px; font-size:14px}
+
+    .group{margin:10px 0}
+    label{display:block; font-size:12px; opacity:.95; margin:0 0 6px 2px}
+    .input-wrap{position:relative}
+    .input{
+      width:100%; height:46px; padding:10px 14px; padding-right:48px;
+      border-radius:12px; border:1px solid var(--stroke);
+      background: var(--input-bg); color:#0b1733;
+      outline:none; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+    }
+    .input::placeholder{color:rgba(11,23,51,.65)}
+    .input:focus-visible{outline:2px solid transparent; box-shadow:0 0 0 4px var(--focus), inset 0 0 0 1px rgba(255,255,255,.06)}
+
+    .toggle{
+      position:absolute; right:6px; top:50%; transform:translateY(-50%);
+      width:38px; height:38px; display:grid; place-items:center;
+      background: transparent; border:none; color:#1b2a55;
+      cursor:pointer; user-select:none; font-size:18px; line-height:1;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,.25));
+      border-radius:10px;
+    }
+    .toggle:focus-visible{outline:2px solid transparent; box-shadow:0 0 0 4px var(--focus)}
+
+    .btn{
+      width:100%; height:50px; margin-top:14px; border:0; border-radius:14px; cursor:pointer;
+      font-weight:800; letter-spacing:.2px; color:#fff;
+      background: linear-gradient(180deg, var(--green1), var(--green2));
+      box-shadow: 0 10px 20px rgba(39,174,96,.28);
+      transition: transform .06s ease;
+    }
+    .btn:active{transform: translateY(1px)}
+    .btn[aria-busy="true"]{opacity:.75; cursor:progress}
+
+    .footer{margin-top:12px; text-align:center; color:var(--muted); font-size:12px}
+
+    .links{display:flex; justify-content:center; gap:16px; margin-top:10px}
+    .links a{color:#eef; font-size:12px; text-underline-offset:2px}
+    .links a:focus-visible{outline:2px solid transparent; box-shadow:0 0 0 4px var(--focus)}
+  </style>
+</head>
+<body>
+  <div class="card" role="region" aria-labelledby="title">
+    <div class="title-row">
+      <h1 class="title" id="title">Hotel – Dashboard</h1>
+    </div>
+    <p class="subtitle">Anmelden – bitte Zugangsdaten eingeben.</p>
+
+    <form class="form" method="POST" action="/login" autocomplete="on" novalidate>
+      <div class="group">
+        <label for="u">Benutzername</label>
+        <div class="input-wrap">
+          <input
+            id="u"
+            name="username"
+            class="input"
+            type="text"
+            placeholder="Benutzername"
+            required
+            autocomplete="username"
+            autocapitalize="none"
+            spellcheck="false"
+            inputmode="text"
+          />
+        </div>
+      </div>
+
+      <div class="group">
+        <label for="p">Passwort</label>
+        <div class="input-wrap">
+          <input
+            id="p"
+            name="password"
+            class="input"
+            type="password"
+            placeholder="Passwort"
+            required
+            autocomplete="current-password"
+            spellcheck="false"
+          />
+          <button
+            type="button"
+            class="toggle"
+            id="pw-toggle"
+            aria-label="Passwort anzeigen"
+            aria-controls="p"
+            aria-pressed="false"
+          >🙈</button>
+        </div>
+      </div>
+
+      <button class="btn" id="submitBtn" type="submit" aria-busy="false">Login</button>
+      <div class="links" aria-label="Hilfslinks">
+        <a href="/forgot-password">Passwort vergessen?</a>
+        <a href="/help/login">Hilfe</a>
+      </div>
+    </form>
+
+    <div class="footer">© 2025 Hotel – Dashboard</div>
+  </div>
+
+  <script>
+    (function(){
+      const pw = document.getElementById('p');
+      const btn = document.getElementById('pw-toggle');
+      const submitBtn = document.getElementById('submitBtn');
+
+      // Passwort anzeigen/ausblenden via Klick + ARIA
+      btn.addEventListener('click', () => {
+        const isHidden = pw.type === 'password';
+        pw.type = isHidden ? 'text' : 'password';
+        btn.setAttribute('aria-pressed', String(isHidden));
+        btn.setAttribute('aria-label', isHidden ? 'Passwort ausblenden' : 'Passwort anzeigen');
+        btn.textContent = isHidden ? '🙉' : '🙈';
+      });
+
+      // Optional: kleiner "busy" Zustand beim Absenden
+      document.querySelector('form').addEventListener('submit', () => {
+        submitBtn.setAttribute('aria-busy','true');
+      });
+    })();
+  </script>
+</body>
+</html>
