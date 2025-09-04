@@ -5,7 +5,7 @@ const rateLimit= require('express-rate-limit');
 require('dotenv').config({ quiet:true });
 
 const app  = express();
-const PORT = process.env.PORT || 3000; // lokal 3000, Render setzt $PORT
+const PORT = process.env.PORT || 3000; // lokal 3000, Render setzt $PORT:contentReference[oaicite:1]{index=1}
 
 app.set('trust proxy', 1);
 app.use(express.urlencoded({ extended: true }));
@@ -22,34 +22,22 @@ const loginLimiter = rateLimit({ windowMs: 5*60*1000, max: 50, standardHeaders:t
 
 const publicDir = path.join(__dirname, 'public');
 
-// 1) Statische Assets (Bilder, CSS, JS) öffentlich – MUSS vor Guards stehen
-app.use(express.static(publicDir, { index:false }));
+  // 2) Statische Assets (Bilder, CSS, JS) öffentlich – MUSS vor Guards stehen
+  app.use(express.static(publicDir, { index:false }));
 
-// ------------- Guards -------------
+
+
+// 🔐 Global-Guard: nur /login, /health und /public/* sind offen
 const OPEN_PATHS = new Set(['/', '/login', '/health']);
-
-// Assets IMMER durchlassen
-const assetRE = /\.(?:png|jpe?g|gif|svg|ico|webp|css|js|map)$/i;
-
 app.use((req, res, next) => {
-  // Kurz-Log
-  if (assetRE.test(req.path)) {
-    console.log(`[asset] ${req.method} ${req.path}`);
-  } else {
-    console.log(`[guard] ${req.method} ${req.path}  session=${req.session && req.session.user ? 'YES':'NO'}`);
-  }
-
-  // Assets und offene Pfade immer erlauben
-  if (assetRE.test(req.path)) return next();
-  if (OPEN_PATHS.has(req.path)) return next();
-  if (req.path.startsWith('/public/')) return next();
-
-  // Wenn eingeloggt → ok, sonst zum Login
-  if (req.session && req.session.user) return next();
+  const isOpen = OPEN_PATHS.has(req.path) || req.path.startsWith('/public/');
+  const hasUser = !!(req.session && req.session.user);
+  console.log(`[guard] ${req.method} ${req.path}  session=${hasUser?'YES':'NO'}`);
+  if (isOpen || hasUser) return next();
   return res.redirect('/login');
 });
 
-// Blocke direkte .html-Aufrufe (außer login.html)
+// 1) Blocke direkte .html-Aufrufe (außer login.html)
 app.use((req,res,next)=>{
   if (req.path.endsWith('.html') && req.path !== '/login.html') {
     return res.redirect('/login');
@@ -57,7 +45,13 @@ app.use((req,res,next)=>{
   next();
 });
 
-// ------------- Routen -------------
+// 2) Statische Assets (Bilder, CSS, JS) öffentlich
+
+// 3) Auth-Guard für geschützte Seiten
+function requireAuth(req, res, next) {
+  if (req.session && req.session.user) return next();
+  return res.redirect('/login');
+}
 
 // Root → /login
 app.get ('/', (_req,res)=>res.redirect('/login'));
@@ -68,10 +62,6 @@ app.get ('/login',  (_req,res)=>res.sendFile('login.html',  { root: publicDir })
 app.head('/login',  (_req,res)=>res.sendStatus(200));
 
 // Geschützte Seiten
-function requireAuth(req, res, next) {
-  if (req.session && req.session.user) return next();
-  return res.redirect('/login');
-}
 app.get ('/index',  requireAuth, (_req,res)=>res.sendFile('index.html',  { root: publicDir }));
 app.get ('/ibelsa', requireAuth, (_req,res)=>res.sendFile('ibelsa.html', { root: publicDir }));
 app.get ('/status', requireAuth, (_req,res)=>res.sendFile('status.html', { root: publicDir }));
@@ -101,7 +91,7 @@ app.get('/after-login', (req,res)=>{
 app.get ('/health', (_req,res)=>res.type('text').send('OK'));
 app.head('/health', (_req,res)=>res.sendStatus(200));
 
-// 404 → Login (HTML), Assets werden oben von static() gehandhabt
+// 404 → Login
 app.use((_req,res)=>res.status(404).sendFile('login.html', { root: publicDir }));
 
 // Fehlerhandler
