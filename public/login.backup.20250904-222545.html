@@ -17,26 +17,22 @@
       --page:#06080c;
       --text:#eef2f8;
       --muted:#cfd6de;
+      --accent:#b71c1c;
+      --accent-2:#7f0000;
+      --accent-link:#fff;
 
-      /* Farben */
-      --accent:#b71c1c;       /* Button dunkelrot */
-      --accent-2:#7f0000;     /* Button Verlauf */
-      --accent-link:#fff;     /* Link "Passwort vergessen?" */
-
-      /* Panel/Glas */
       --panel-r:103; --panel-g:103; --panel-b:103;
       --panel-alpha:.50;
       --panel-border:rgba(255,255,255,.10);
 
-      /* Layout-Basis (Desktop) */
       --card-w:440px;
       --radius:22px;
 
       /* Brand-Stack */
-      --hd:132px;
-      --word-gap:-28px;
+      --hd:132px;        
+      --word-gap:-28px;  
       --title-w:clamp(300px,78%,540px);
-      --title-gap:-20px;
+      --title-gap:-20px;   /* Spacer unten klein */
     }
 
     *{box-sizing:border-box}
@@ -44,9 +40,8 @@
 
     body{
       margin:0;
-      font-size:16px;
-      line-height:1.45;
-      font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
+      font-family:'Roboto', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
       color:var(--text);
       background:var(--page) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
@@ -64,7 +59,7 @@
       box-shadow:0 26px 70px rgba(0,0,0,.68),0 1px 0 rgba(255,255,255,.05) inset;
       padding:clamp(18px,2.2vw,24px);
       padding-top:calc(var(--hd) * .66 + var(--title-gap) + 14px);
-      padding-bottom:8px;
+      padding-bottom: 8px;
       overflow:visible;
     }
 
@@ -112,7 +107,6 @@
     .field button.icon{all:unset;cursor:pointer;border-radius:10px;padding:8px;display:grid;place-items:center;color:#c7cfdb}
     .icon svg{width:22px;height:22px;display:block}
 
-    /* Autofill fix */
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
     input:-webkit-autofill:focus{
@@ -126,7 +120,7 @@
 
     .row-links{display:flex;gap:12px;font-size:14px;margin-top:8px;}
     .row-links a{color:var(--accent-link);text-decoration:none;font-weight:400;}
-    .row-links a:hover{color:#fff}
+    .row-links a:hover{color:#fff;border-bottom-color:rgba(255,255,255,.45)}
 
     .submit{
       margin-top:12px;border:0;border-radius:14px;padding:12px 26px;
@@ -135,60 +129,28 @@
       box-shadow:none;
       transition:transform .08s ease,box-shadow .12s ease;
     }
-    .submit:hover{box-shadow:0 8px 18px rgba(0,0,0,.25)}
+    .submit:hover{box-shadow:0 18px 38px rgba(224,39,36,.40),0 1px 0 rgba(255,255,255,.08) inset}
     .submit:active{transform:translateY(1px) scale(.997)}
     .submit:disabled{opacity:.6;cursor:not-allowed;box-shadow:none}
 
     .help{text-align:center;margin:8px 0 10px;font-size:14px;color:var(--muted)}
 
-    .foot{
-      margin-top:15px;
-      padding:12px 6px 6px;
-      border-top:1px solid rgba(255,255,255,.10);
-      text-align:center;
-      color:#e0e5ec;
-      font-size:13px;
-      line-height:1.45;
-    }
+    .foot{margin-top:15px;padding:12px 6px 6px;border-top:1px solid rgba(255,255,255,.10);text-align:center;color:#e0e5ec;font-size:136x;line-height:1,45}
     .foot small{display:block}
 
-    /* ========== Responsive ========== */
-
-    /* Mobile (bis 560px) */
+    /* ===== Mobile-Fix: Wortmarke größer & Stack breiter ===== */
     @media (max-width:560px){
       :root{
-        --card-w: 94vw;      /* nutzt fast voll die Breite */
         --hd:116px;
-        --title-w:86%;
         --word-gap:-24px;
-        --title-gap:12px;    /* mehr Luft unter dem Schriftzug */
+        --title-gap:6px;
+        /* WICHTIG: wortmarke auf Handy größer machen */
+        --title-w:clamp(260px,80vw,520px);
       }
-      .brand-stack{
-        transform:translate(-50%,-48%); /* etwas tiefer */
-      }
-      .card{
-        padding-top:calc(var(--hd) * .78 + var(--title-gap) + 14px);
-      }
+      /* Container der Brand-Stack auf Handy breiter machen */
+      .brand-stack{ width:min(90vw,520px); }
+      .card{ padding-top:calc(var(--hd) * .7 + var(--title-gap) + 12px); }
     }
-
-    /* Tablet (561px – 900px) */
-    @media (min-width:561px) and (max-width:900px){
-      :root{
-        --card-w:520px;    /* etwas breiter als Mobil */
-        --hd:128px;        /* mittleres Logo */
-        --title-w:82%;
-        --word-gap:-26px;
-        --title-gap:6px;   /* kompakter */
-      }
-      .brand-stack{
-        transform:translate(-50%,-50%);
-      }
-      .card{
-        padding-top:calc(var(--hd) * .72 + var(--title-gap) + 14px);
-      }
-    }
-
-    /* Desktop (>900px): Basiswerte oben gelten */
   </style>
 </head>
 <body>
@@ -230,7 +192,7 @@
       <div class="foot">
         <small>
           © <span id="y"></span> Hotel-Dashboard<br>
-          Powered by MY HOME HOTEL AM ROTTWEIL GMBH
+          Powered by MY HOME HOTEL LAMM ROTTWEIL GMBH
         </small>
       </div>
     </div>
