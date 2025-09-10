@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Passwort · Hotel-Dashboard</title>
   <meta name="color-scheme" content="light dark">
-  <!-- build: reset.html · 2025-09-10 · delay=15s -->
 
   <!-- Assets (gleich wie login.html) -->
   <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
@@ -18,16 +17,14 @@
       --page:#06080c; --text:#eef2f8; --muted:#cfd6de;
       --accent:#b71c1c; --accent-2:#7f0000; --accent-link:#fff;
       --panel-r:103; --panel-g:103; --panel-b:103; --panel-alpha:.50; --panel-border:rgba(255,255,255,.10);
-      --card-w:440px; --radius:22px;
-      --hd:132px; --word-gap:-28px; --title-w:clamp(300px,78%,540px); --title-gap:-20px;
-      --ok:#1ecb6b; --warn:#e02724;
+      --card-w:520px; --radius:22px;
+      --hd:116px; --word-gap:-24px; --title-w:86%; --title-gap:-6px;
     }
     *{box-sizing:border-box} html,body{height:100%}
     body{
       margin:0;font-size:16px;line-height:1.45;
       font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
-      color:var(--text);
-      background:var(--page) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
+      color:var(--text);background:var(--page) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
     }
     .wrap{min-height:100%;display:grid;place-items:center;padding:clamp(18px,4vw,60px)}
     .card{
@@ -36,39 +33,22 @@
       backdrop-filter:blur(8px) saturate(120%);-webkit-backdrop-filter:blur(8px) saturate(120%);
       border:1px solid var(--panel-border);
       box-shadow:0 26px 70px rgba(0,0,0,.68),0 1px 0 rgba(255,255,255,.05) inset;
-      padding:clamp(18px,2.2vw,24px);padding-top:calc(var(--hd)*.66 + var(--title-gap) + 14px);padding-bottom:8px;overflow:visible;
+      padding:clamp(18px,2.2vw,24px);padding-top:calc(var(--hd)*.78 + var(--title-gap) + 14px);padding-bottom:8px;overflow:visible;
     }
-    .brand-stack{position:absolute;left:50%;top:0;transform:translate(-50%,-51%);display:grid;place-items:center;pointer-events:none;z-index:5;width:min(32vw,520px)}
-    .brand-stack .hd{width:var(--hd);height:var(--hd);object-fit:contain;display:block;
-      filter:drop-shadow(0 22px 38px rgba(0,0,0,.55)) drop-shadow(0 1px 0 rgba(255,255,255,.08));}
-    .brand-stack .wordmark{margin-top:var(--word-gap);width:var(--title-w);height:auto;display:block;
-      filter:drop-shadow(0 1px 0 rgba(255,255,255,.10)) drop-shadow(0 16px 26px rgba(0,0,0,.50));}
-    .title-spacer{height:var(--title-gap)}
-    .content{display:grid;gap:10px}
-    label{display:block;font-size:15px;color:#fff;margin:0 0 4px}
-    .field{display:grid;grid-template-columns:1fr auto;align-items:center;min-height:48px;padding:0 12px;border-radius:14px;background:transparent;border:1.2px solid rgba(255,255,255,.25);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 26px rgba(0,0,0,.40);transition:box-shadow .15s ease,border-color .15s ease}
+    .brand-stack{position:absolute;left:50%;top:0;transform:translate(-50%,-48%);display:grid;place-items:center;pointer-events:none;z-index:5;width:min(32vw,520px)}
+    .brand-stack .hd{width:var(--hd);height:var(--hd);object-fit:contain;display:block;filter:drop-shadow(0 22px 38px rgba(0,0,0,.55)) drop-shadow(0 1px 0 rgba(255,255,255,.08))}
+    .brand-stack .wordmark{margin-top:var(--word-gap);width:var(--title-w);height:auto;display:block;filter:drop-shadow(0 1px 0 rgba(255,255,255,.10)) drop-shadow(0 16px 26px rgba(0,0,0,.50))}
+    .title-spacer{height:var(--title-gap)} h2{margin:0 0 8px}
+    p{margin:0 0 10px;color:var(--muted)}
+    .field{display:grid;grid-template-columns:1fr auto;align-items:center;min-height:48px;padding:0 12px;border-radius:14px;background:transparent;border:1.2px solid rgba(255,255,255,.25);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 26px rgba(0,0,0,.40)}
     .field:focus-within{border-color:rgba(255,255,255,.42);box-shadow:0 0 0 3px rgba(224,40,36,.18),0 14px 34px rgba(0,0,0,.55)}
     .field input{background:transparent;border:0;outline:0;color:#fff;font-size:16px;padding:10px 8px;width:100%;caret-color:#fff}
-    .field input::placeholder{color:rgba(255,255,255,.90)}
-    .submit{margin-top:12px;border:0;border-radius:14px;padding:12px 26px;font-weight:900;font-size:16px;color:#fff;cursor:pointer;background:linear-gradient(180deg,var(--accent),var(--accent-2));box-shadow:none;transition:transform .08s ease,box-shadow .12s ease}
-    .submit:hover{box-shadow:0 8px 18px rgba(0,0,0,.25)} .submit:active{transform:translateY(1px) scale(.997)} .submit:disabled{opacity:.6;cursor:not-allowed;box-shadow:none}
-    .row-links{display:flex;gap:12px;font-size:14px;margin-top:8px}
-    .row-links a{color:var(--accent-link);text-decoration:none;font-weight:400}
-    .row-links a:hover{color:#fff}
-    .help{text-align:center;margin:8px 0 10px;font-size:14px;color:var(--muted)}
-    .foot{margin-top:15px;padding:12px 6px 6px;border-top:1px solid rgba(255,255,255,.10);text-align:center;color:#e0e5ec;font-size:13px;line-height:1.45}
-    .foot small{display:block}
-    .note{font-size:13px;color:#cfe4d6;background:rgba(30,203,107,.12);border:1px solid rgba(30,203,107,.4);padding:10px 12px;border-radius:12px;display:none}
-    .error{font-size:13px;color:#ffd6d6;background:rgba(224,39,36,.12);border:1px solid rgba(224,39,36,.45);padding:10px 12px;border-radius:12px;display:none}
-    .rules{font-size:13px;color:var(--muted);margin-top:6px}
-    @media (max-width:560px){
-      :root{--card-w:94vw;--hd:116px;--title-w:86%;--word-gap:-24px;--title-gap:12px}
-      .brand-stack{transform:translate(-50%,-48%)} .card{padding-top:calc(var(--hd)*.78 + var(--title-gap) + 14px)}
-    }
-    @media (min-width:561px) and (max-width:900px){
-      :root{--card-w:520px;--hd:128px;--title-w:82%;--word-gap:-26px;--title-gap:6px}
-      .brand-stack{transform:translate(-50%,-50%)} .card{padding-top:calc(var(--hd)*.72 + var(--title-gap) + 14px)}
-    }
+    .row{display:grid;gap:10px} label{display:block;font-size:15px;color:#fff;margin:0 0 4px}
+    .submit{margin-top:6px;border:0;border-radius:14px;padding:12px 26px;font-weight:900;font-size:16px;color:#fff;cursor:pointer;background:linear-gradient(180deg,var(--accent),var(--accent-2))}
+    .submit:disabled{opacity:.6;cursor:not-allowed} .link{color:var(--accent-link);text-decoration:none}
+    .error{display:none;background:rgba(224,39,36,.12);border:1px solid rgba(224,39,36,.45);color:#ffd6d6;padding:10px 12px;border-radius:12px;font-size:13px}
+    .ok{display:none;background:rgba(11,156,49,.14);border:1px solid rgba(11,156,49,.45);color:#d7ffd7;padding:10px 12px;border-radius:12px;font-size:13px}
+    .foot{margin-top:15px;padding:12px 6px 6px;border-top:1px solid rgba(255,255,255,.10);text-align:center;color:#e0e5ec;font-size:13px}
   </style>
 </head>
 <body>
@@ -78,203 +58,160 @@
         <img class="hd" src="/HD-Logo.png" alt="HD">
         <img class="wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel-Dashboard" id="hd-title">
       </div>
+
       <div class="title-spacer" aria-hidden="true"></div>
 
-      <div class="content">
-        <!-- Modus A: Passwort vergessen (E-Mail anfordern) -->
-        <div id="view-forgot" hidden>
-          <h2 style="margin:0 0 6px;font-size:20px">Passwort vergessen</h2>
-          <p class="help" style="margin-top:0">Gib deine E-Mail ein. Wenn ein Konto existiert, senden wir dir einen Link.</p>
+      <div id="view-email">
+        <h2>Passwort zurücksetzen</h2>
+        <p>Gib deine E-Mail ein. Wir schicken dir einen Link und einen Code.</p>
+        <div class="error" id="err-email"></div>
+        <div class="ok" id="ok-email"></div>
+        <form id="form-email" class="row" novalidate>
+          <label for="email">E-Mail</label>
+          <div class="field"><input id="email" name="email" type="email" autocomplete="email" placeholder="name@example.com" required></div>
+          <button class="submit" id="btn-send" type="submit">Link zusenden</button>
+          <small>Schon einen Code? <a class="link" href="#" id="goto-token">Zur Code-Eingabe wechseln</a></small>
+        </form>
+      </div>
 
-          <div id="msg-forgot" class="note"></div>
-          <div id="err-forgot" class="error"></div>
+      <div id="view-token" style="display:none">
+        <h2>Code prüfen & neues Passwort</h2>
+        <p>Wir haben dir einen Link und Code geschickt. Trage beides hier ein.</p>
+        <div class="error" id="err-token"></div>
+        <div class="ok" id="ok-token"></div>
+        <form id="form-token" class="row" novalidate>
+          <label for="email2">E-Mail</label>
+          <div class="field"><input id="email2" name="email" type="email" required></div>
 
-          <form id="form-forgot" novalidate>
-            <label for="email">E-Mail</label>
-            <div class="field">
-              <input id="email" name="email" type="email" placeholder="z. B. name@hotel-dashboard.de" required autocomplete="email" />
-            </div>
+          <label for="token">Code</label>
+          <div class="field"><input id="token" name="token" type="text" minlength="6" maxlength="16" required></div>
 
-            <button class="submit" id="btn-forgot" type="submit" disabled>Link zusenden</button>
-          </form>
+          <label for="firstname">Vorname</label>
+          <div class="field"><input id="firstname" name="firstname" type="text" required></div>
 
-          <div class="row-links" style="margin-top:12px">
-            <a href="/login" aria-label="Zur Anmeldung">Zur Anmeldung</a>
-          </div>
-        </div>
+          <label for="lastname">Nachname</label>
+          <div class="field"><input id="lastname" name="lastname" type="text" required></div>
 
-        <!-- Modus B: Neues Passwort setzen (mit Token) -->
-        <div id="view-reset" hidden>
-          <h2 style="margin:0 0 6px;font-size:20px">Neues Passwort setzen</h2>
-          <p class="help" style="margin-top:0">Gib dein neues Passwort ein und bestätige deinen Namen.</p>
+          <label for="password">Neues Passwort</label>
+          <div class="field"><input id="password" name="password" type="password" placeholder="mind. 10 Zeichen" required></div>
+          <label for="password2">Passwort (Wiederholen)</label>
+          <div class="field"><input id="password2" type="password" required></div>
 
-          <div id="msg-reset" class="note"></div>
-          <div id="err-reset" class="error"></div>
-
-          <form id="form-reset" novalidate>
-            <label for="firstname">Vorname (Mitarbeiter)</label>
-            <div class="field">
-              <input id="firstname" name="firstname" type="text" placeholder="z. B. Max" required autocomplete="given-name" />
-            </div>
-
-            <label for="lastname" style="margin-top:8px">Nachname (Mitarbeiter)</label>
-            <div class="field">
-              <input id="lastname" name="lastname" type="text" placeholder="z. B. Mustermann" required autocomplete="family-name" />
-            </div>
-
-            <label for="pw1" style="margin-top:8px">Neues Passwort</label>
-            <div class="field">
-              <input id="pw1" name="pw1" type="password" placeholder="••••••••••" required autocomplete="new-password" />
-            </div>
-
-            <label for="pw2" style="margin-top:8px">Passwort wiederholen</label>
-            <div class="field">
-              <input id="pw2" name="pw2" type="password" placeholder="••••••••••" required autocomplete="new-password" />
-            </div>
-
-            <div class="rules">Mindestens 10 Zeichen, Groß-/Kleinbuchstaben und Zahl oder Sonderzeichen.</div>
-
-            <button class="submit" id="btn-reset" type="submit" disabled>Passwort speichern</button>
-          </form>
-
-          <div class="row-links" style="margin-top:12px">
-            <a href="/login">Zur Anmeldung</a>
-          </div>
-        </div>
+          <button class="submit" id="btn-confirm" type="submit">Passwort setzen</button>
+          <small>Fertig? <a class="link" href="/login">Jetzt anmelden</a></small>
+        </form>
       </div>
 
       <div class="foot">
-        <small>
-          © <span id="y"></span> Hotel-Dashboard<br>
-          Powered by MY HOME HOTEL LAMM ROTTWEIL GMBH
-        </small>
+        <small>© <span id="y"></span> Hotel-Dashboard · Powered by MY HOME HOTEL LAMM ROTTWEIL GMBH</small>
       </div>
     </div>
   </div>
 
   <script>
-    const REDIRECT_DELAY = 15; // Sekunden
-    console.log('reset.html loaded · delay='+REDIRECT_DELAY+'s');
+  document.getElementById('y').textContent=new Date().getFullYear();
 
-    // Jahr
-    document.getElementById('y').textContent = new Date().getFullYear();
+  const qs = new URLSearchParams(location.search);
+  const hasDeepLink = qs.has('token') && qs.has('email');
 
-    // Modus bestimmen (Token?)
-    const params = new URLSearchParams(location.search);
-    const token = params.get('token');
-    const emailParam = params.get('email');
-    const viewForgot = document.getElementById('view-forgot');
-    const viewReset  = document.getElementById('view-reset');
-    if (token) { viewReset.hidden = false; } else { viewForgot.hidden = false; }
+  const vEmail  = document.getElementById('view-email');
+  const vToken  = document.getElementById('view-token');
+  const errE    = document.getElementById('err-email');
+  const okE     = document.getElementById('ok-email');
+  const errT    = document.getElementById('err-token');
+  const okT     = document.getElementById('ok-token');
 
-    // ====== FORGOT (E-Mail anfordern) ======
-    const email = document.getElementById('email');
-    const btnForgot = document.getElementById('btn-forgot');
-    const errForgot = document.getElementById('err-forgot');
-    const msgForgot = document.getElementById('msg-forgot');
+  const email   = document.getElementById('email');
+  const email2  = document.getElementById('email2');
+  const token   = document.getElementById('token');
+  const fn      = document.getElementById('firstname');
+  const ln      = document.getElementById('lastname');
+  const pw      = document.getElementById('password');
+  const pw2     = document.getElementById('password2');
 
-    const updateForgot = ()=>{ btnForgot.disabled = !(email && email.value.trim()); };
-    if (email) {
-      email.addEventListener('input', updateForgot); updateForgot();
+  function show(el, on){ el.style.display = on ? '' : 'none'; }
+  function msg(el, text){ el.textContent = text; el.style.display = text ? 'block':'none'; }
 
-      document.getElementById('form-forgot')?.addEventListener('submit', async (e)=>{
-        e.preventDefault();
-        errForgot.style.display='none'; msgForgot.style.display='none';
-        btnForgot.disabled = true;
+  // Startansicht: Wenn Link/Token in URL -> direkt Token-View
+  if (hasDeepLink) {
+    email2.value = qs.get('email') || '';
+    token.value  = qs.get('token') || '';
+    show(vEmail,false); show(vToken,true);
+  } else {
+    show(vEmail,true); show(vToken,false);
+  }
 
-        try{
-          const body = new URLSearchParams({ email: email.value.trim() });
-          await fetch('/reset', {
-            method:'POST',
-            headers:{'Content-Type':'application/x-www-form-urlencoded'},
-            body
-          });
+  // Wechsel manuell
+  document.getElementById('goto-token').addEventListener('click', (e)=>{
+    e.preventDefault();
+    email2.value = email.value || '';
+    show(vEmail,false); show(vToken,true);
+  });
 
-          let sec = REDIRECT_DELAY;
-          msgForgot.innerHTML =
-            'Reset-Mail verschickt. Bitte Postfach (und Spam) prüfen. ' +
-            'Automatische Rückkehr zur Anmeldung in <b><span id="sec">'+sec+'</span>s</b>.';
-          msgForgot.style.display='block';
-
-          const secEl = document.getElementById('sec');
-          const t = setInterval(()=>{
-            sec--; if (secEl) secEl.textContent = String(sec);
-            if (sec <= 0){ clearInterval(t); location.href = "/login"; }
-          },1000);
-        }catch(err){
-          errForgot.textContent = 'Fehler beim Senden. Bitte später erneut versuchen.';
-          errForgot.style.display='block';
-        }finally{
-          btnForgot.disabled = false;
-        }
+  // E-Mail absenden -> /reset (Server sendet Mail & speichert Token)
+  document.getElementById('form-email').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    msg(errE,''); msg(okE,'');
+    const val = (email.value||'').trim();
+    if(!val){ msg(errE,'Bitte E-Mail eintragen'); return; }
+    try{
+      const res = await fetch('/reset', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ email: val })
       });
-    }
-
-    // ====== RESET (Neues Passwort setzen) ======
-    const pw1 = document.getElementById('pw1');
-    const pw2 = document.getElementById('pw2');
-    const firstname = document.getElementById('firstname');
-    const lastname  = document.getElementById('lastname');
-    const btnReset = document.getElementById('btn-reset');
-    const errReset = document.getElementById('err-reset');
-    const msgReset = document.getElementById('msg-reset');
-
-    function strong(pw){
-      if(!pw || pw.length < 10) return false;
-      const upper = /[A-Z]/.test(pw);
-      const lower = /[a-z]/.test(pw);
-      const digit = /\d/.test(pw);
-      const special = /[^A-Za-z0-9]/.test(pw);
-      return (upper && lower && (digit || special));
-    }
-    function updateReset(){
-      const ok =
-        pw1 && pw2 && pw1.value.trim() && pw2.value.trim() &&
-        pw1.value === pw2.value && strong(pw1.value) &&
-        firstname && firstname.value.trim().length >= 2 &&
-        lastname  && lastname.value.trim().length >= 2 &&
-        token && emailParam;
-      if (btnReset) btnReset.disabled = !ok;
-    }
-    [pw1,pw2,firstname,lastname].forEach(el=> el && el.addEventListener('input', updateReset));
-    updateReset();
-
-    document.getElementById('form-reset')?.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      errReset.style.display='none'; msgReset.style.display='none';
-      btnReset.disabled = true;
-
-      try{
-        // optional: Token vorab validieren (liefert nur 200/400)
-        const v = await fetch('/reset/validate?token='+encodeURIComponent(token)+'&email='+encodeURIComponent(emailParam));
-        if (!v.ok) throw new Error('Token ungültig oder abgelaufen');
-
-        const body = new URLSearchParams({
-          token, email: emailParam,
-          password: pw1.value,
-          firstname: firstname.value.trim(),
-          lastname: lastname.value.trim()
-        });
-        const res = await fetch('/reset/confirm', {
-          method:'POST',
-          headers:{'Content-Type':'application/x-www-form-urlencoded'},
-          body
-        });
-        if(!res.ok){
-          const txt = await res.text();
-          throw new Error(txt || 'Fehler beim Speichern');
-        }
-
-        msgReset.textContent = 'Dein Passwort wurde aktualisiert. Du kannst dich jetzt anmelden.';
-        msgReset.style.display='block';
-        setTimeout(()=>{ location.href = '/login?reset=1'; }, 1400);
-      }catch(err){
-        errReset.textContent = err && err.message ? err.message : 'Fehler beim Speichern. Bitte später erneut versuchen.';
-        errReset.style.display='block';
-      }finally{
-        btnReset.disabled = false;
+      if(!res.ok){
+        const t = await res.text();
+        msg(errE, t || 'Senden fehlgeschlagen');
+        return;
       }
-    });
+      msg(okE,'Reset-Mail wurde gesendet. Bitte Postfach prüfen.');
+      // Neu: sofort in Token-Ansicht wechseln, E-Mail übernehmen – kein Countdown
+      email2.value = val;
+      show(vEmail,false); show(vToken,true);
+    }catch(err){
+      msg(errE,'Netzwerkfehler – bitte später erneut versuchen.');
+    }
+  });
+
+  // Policy-Check clientseitig
+  function strong(p){
+    return p.length>=10 && /[A-Z]/.test(p) && /[a-z]/.test(p) && (/\d/.test(p) || /[^A-Za-z0-9]/.test(p));
+  }
+
+  // Passwort setzen -> /reset/confirm
+  document.getElementById('form-token').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    msg(errT,''); msg(okT,'');
+    const em = (email2.value||'').trim().toLowerCase();
+    const tk = (token.value||'').trim();
+    const a  = (fn.value||'').trim();
+    const b  = (ln.value||'').trim();
+    const p1 = pw.value||'', p2 = pw2.value||'';
+
+    if(!(em && tk && a && b && p1 && p2)){ msg(errT,'Bitte alle Felder ausfüllen.'); return; }
+    if(p1!==p2){ msg(errT,'Die beiden Passwörter stimmen nicht überein.'); return; }
+    if(!strong(p1)){ msg(errT,'Passwort zu schwach (mind. 10 Zeichen, Groß/Klein + Zahl/Sonderzeichen).'); return; }
+
+    try{
+      const res = await fetch('/reset/confirm', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          email: em, token: tk, firstname: a, lastname: b, password: p1
+        })
+      });
+      const txt = await res.text();
+      if(!res.ok){
+        msg(errT, txt || 'Fehler beim Setzen des Passworts');
+        return;
+      }
+      // Erfolg: Meldung anzeigen, KEIN Auto-Redirect – Button „Jetzt anmelden“ ist sichtbar
+      msg(okT, 'Passwort gesetzt. Du kannst dich jetzt anmelden.');
+    }catch(err){
+      msg(errT,'Netzwerkfehler – bitte später erneut versuchen.');
+    }
+  });
   </script>
 </body>
 </html>
