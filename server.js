@@ -8,7 +8,6 @@ const path = require('path');
 const fs = require('fs');
 const fsp = fs.promises;
 const crypto = require('crypto');
-const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const rateLimit = require('express-rate-limit');
 
