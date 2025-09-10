@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Startseite · Hotel-Dashboard</title>
+  <meta name="color-scheme" content="light dark">
+
+  <!-- Nur hier (Index) das neue Bild vorladen -->
+  <link rel="preload" as="image" href="/Hotel-Dashboard-hintergrund.jpg">
+  <link rel="preload" as="image" href="/HD-Logo.png">
+  <link rel="preload" as="image" href="/Hotel-Dashboard-Schriftzug.png">
+
+  <style>
+    :root{
+      --glass: rgba(24,24,24,.78);
+      --border: rgba(255,255,255,.12);
+      --muted: #cfd6de;
+    }
+    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    body{
+      /* Nur Index: neues Hintergrundbild mit korrektem, maskiertem Dateinamen */
+      background:#000 url('/Hotel-Dashboard-hintergrund.jpg') center/cover fixed no-repeat;
+      color:#fff;
+    }
+    .wrap{min-height:100%;display:grid;place-items:center;padding:24px}
+    .card{
+      width:min(1000px,96vw);
+      background:var(--glass);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:0 20px 50px rgba(0,0,0,.45);
+      padding:20px;
+      position:relative;
+      overflow:hidden;
+    }
+    .brand{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+    .brand img.logo{width:44px;height:44px;object-fit:contain}
+    .brand img.word{height:22px;object-fit:contain}
+    .hr{height:1px;background:var(--border);margin:10px 0 16px}
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:16px;
+    }
+    @media (max-width: 780px){
+      .grid{grid-template-columns: 1fr;}
+    }
+    .panel{
+      background:rgba(0,0,0,.18);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px;
+      min-height:120px;
+    }
+    .panel h2{margin:0 0 6px 0;font-size:16px;font-weight:700}
+    .muted{color:var(--muted);font-size:14px;margin:0}
+    a.link{color:#fff;text-decoration:none}
+    a.link:hover{text-decoration:underline}
+    .top-actions{
+      position:absolute;right:14px;top:14px;display:flex;gap:10px;align-items:center
+    }
+    .btn{
+      appearance:none;border:1px solid var(--border);
+      background:rgba(0,0,0,.25);color:#fff;border-radius:10px;
+      padding:8px 12px;cursor:pointer;font-weight:600
+    }
+    .btn:hover{background:rgba(255,255,255,.06)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <main class="card" role="main">
+      <header class="brand" aria-label="Hotel-Dashboard">
+        <img class="logo" src="/HD-Logo.png" alt="HD">
+        <img class="word" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel-Dashboard">
+      </header>
+
+      <div class="top-actions">
+        <a class="link" href="/dashboard" aria-label="Zum Dashboard">
+          <button class="btn" type="button">Zum Dashboard</button>
+        </a>
+        <a class="link" href="/logout" aria-label="Abmelden">
+          <button class="btn" type="button">Logout</button>
+        </a>
+      </div>
+
+      <div class="hr"></div>
+
+      <section class="grid">
+        <div class="panel">
+          <h2>Startseite</h2>
+          <p class="muted">Willkommen im Hotel-Dashboard. Diese Seite ist geschützt (Login erforderlich).</p>
+          <p class="muted">Oben rechts läuft der 5-Minuten Session-Timer.</p>
+        </div>
+        <div class="panel">
+          <h2>Nächste Schritte</h2>
+          <p class="muted">Hier können später Kacheln/Links zu Modulen erscheinen (z.&nbsp;B. Reservierungen, Gäste, Reports).</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Session-Countdown oben rechts -->
+  <script src="/session-timer.js" defer></script>
+</body>
+</html>

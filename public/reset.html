@@ -1,364 +1,254 @@
-// server.js
-const express    = require('express');
-const path       = require('path');
-const fs         = require('fs');
-const session    = require('express-session');
-const rateLimit  = require('express-rate-limit');
-const nodemailer = require('nodemailer');
-const crypto     = require('crypto');
-require('dotenv').config({ quiet: true });
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Passwort zurücksetzen · Hotel-Dashboard</title>
+  <meta name="color-scheme" content="light dark">
+  <link rel="preload" as="image" href="/Hotel-Dashboard-hintergrund.jpg">
+  <link rel="preload" as="image" href="/HD-Logo.png">
+  <link rel="preload" as="image" href="/Hotel-Dashboard-Schriftzug.png">
+  <style>
+    :root { --panel-bg: rgba(255,255,255,0.9); --panel-fg:#111; --muted:#666; --accent:#0a7cff; }
+    @media (prefers-color-scheme: dark) {
+      :root { --panel-bg: rgba(24,24,24,0.9); --panel-fg:#f3f3f3; --muted:#aaa; }
+    }
+    html,body { height:100%; margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    body {
+      background: #000 url('/Hotel-Dashboard-hintergrund.jpg') center/cover no-repeat fixed;
+      display:flex; align-items:center; justify-content:center; padding:24px;
+    }
+    .card {
+      width:min(720px, 96vw); background:var(--panel-bg); color:var(--panel-fg);
+      border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.35); overflow:hidden;
+      backdrop-filter: blur(6px);
+    }
+    .head { text-align:center; padding:28px 24px 8px; }
+    .brand { display:flex; flex-direction:column; align-items:center; gap:10px; }
+    .brand img.logo { width:72px; height:72px; object-fit:contain; }
+    .brand img.wordmark { height:26px; object-fit:contain; }
 
-const app  = express();
-const PORT = process.env.PORT || 3000;
+    .tabs { display:flex; gap:8px; padding:0 22px; }
+    .tab {
+      flex: 1; text-align:center; padding:10px 12px; border-bottom:2px solid transparent;
+      font-weight:600; cursor:pointer; color:var(--muted);
+    }
+    .tab.active { color:var(--panel-fg); border-color:var(--accent); }
 
-// ===== Root & Verzeichnisse =====
-const ROOT      = process.env.HD_ROOT
-  ? path.resolve(process.env.HD_ROOT)
-  : path.resolve(__dirname);
+    .body { padding:22px; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+    @media (max-width: 760px) { .grid { grid-template-columns:1fr; } }
 
-const publicDir   = path.join(ROOT, 'public');
-const dataDir     = path.join(ROOT, 'data');
-const authDir     = path.join(dataDir, 'auth');
-const usersPath   = path.join(dataDir, 'users.json');
-const tokensPath  = path.join(authDir, 'reset.db.json');
-const auditLogPath= path.join(authDir, 'reset_audit.log');
+    label { font-size:14px; color:var(--muted); display:block; margin:4px 0; }
+    input {
+      width:100%; padding:12px 14px; border-radius:12px; border:1px solid #ccc;
+      background:#fff; color:#111; outline:none;
+    }
+    @media (prefers-color-scheme: dark) {
+      input { background:#181818; color:#eee; border-color:#3a3a3a; }
+    }
+    .btn {
+      cursor:pointer; width:100%; padding:12px 14px; border:none; border-radius:12px;
+      background:var(--accent); color:#fff; font-weight:600; font-size:16px;
+    }
+    .msg { font-size:14px; padding:10px 12px; border-radius:10px; display:none; margin-bottom:12px; }
+    .msg.ok { background:rgba(16,185,129,0.15); color:#10b981; display:block; }
+    .msg.err{ background:rgba(239,68,68,0.15);  color:#ef4444; display:block; }
+    .muted { color:var(--muted); font-size:14px; }
+    .row { display:flex; gap:12px; align-items:center; justify-content:space-between; }
+    .hide{ display:none !important; }
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-labelledby="title">
+    <header class="head">
+      <div class="brand">
+        <img class="logo" src="/HD-Logo.png" alt="Hotel-Dashboard Logo" />
+        <img class="wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel-Dashboard" />
+      </div>
+    </header>
 
-// Verzeichnisse sicherstellen
-fs.mkdirSync(publicDir, { recursive: true });
-fs.mkdirSync(authDir,   { recursive: true });
-fs.mkdirSync(dataDir,   { recursive: true });
+    <nav class="tabs" aria-label="Ansichten">
+      <div id="tabRequest" class="tab">Link zusenden</div>
+      <div id="tabConfirm" class="tab">Passwort setzen</div>
+    </nav>
 
-// ===== Helper: Token-DB =====
-function loadTokens() {
-  try {
-    const raw = fs.readFileSync(tokensPath, 'utf8');
-    const parsed = JSON.parse(raw);
-    let tokens = parsed && parsed.tokens;
-    if (!Array.isArray(tokens)) tokens = [];
-    return { tokens };
-  } catch {
-    return { tokens: [] };
-  }
-}
-function saveTokens(obj) {
-  const out = { tokens: Array.isArray(obj.tokens) ? obj.tokens : [] };
-  fs.writeFileSync(tokensPath, JSON.stringify(out, null, 2), 'utf8');
-}
-function purgeExpiredTokens(db) {
-  const now = Date.now();
-  db.tokens = db.tokens.filter(t => !t.used && t.expiresAt > now);
-}
+    <section class="body">
+      <div id="msg" class="msg" role="status" aria-live="polite"></div>
 
-// ===== Helper: Users-DB =====
-function loadUsers() {
-  try {
-    const raw = fs.readFileSync(usersPath, 'utf8');
-    const parsed = JSON.parse(raw);
-    let users = parsed && parsed.users;
-    if (!Array.isArray(users)) users = [];
-    return { users };
-  } catch {
-    return { users: [] };
-  }
-}
-function saveUsers(obj) {
-  const out = { users: Array.isArray(obj.users) ? obj.users : [] };
-  fs.writeFileSync(usersPath, JSON.stringify(out, null, 2), 'utf8');
-}
-function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
-  const iterations = 310000;
-  const keylen = 32;
-  const digest = 'sha256';
-  const hash = crypto.pbkdf2Sync(password, salt, iterations, keylen, digest).toString('hex');
-  return { algo: `pbkdf2:${digest}:${iterations}`, salt, hash };
-}
-function verifyPassword(password, user) {
-  if (!user?.passHash || !user?.passSalt) return false;
-  const parts = String(user.passAlgo || '').split(':'); // pbkdf2:sha256:310000
-  const iterations = Number(parts[2] || 310000);
-  const digest = parts[1] || 'sha256';
-  const keylen = 32;
-  const test = crypto.pbkdf2Sync(password, user.passSalt, iterations, keylen, digest).toString('hex');
-  return crypto.timingSafeEqual(Buffer.from(test, 'hex'), Buffer.from(user.passHash, 'hex'));
-}
+      <!-- Ansicht A: E-Mail zum Zusenden -->
+      <form id="formRequest" method="post" action="/reset" novalidate>
+        <label for="req_email">E-Mail</label>
+        <input id="req_email" name="email" type="email" required placeholder="dein.name@hotel.de" autocomplete="email" />
+        <button class="btn" type="submit" style="margin-top:12px;">Link zusenden</button>
+        <p class="muted" style="margin-top:10px;">Du erhältst eine E-Mail mit einem Token zum Zurücksetzen.</p>
+      </form>
 
-// ===== Express Basics =====
-app.set('trust proxy', 1);
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+      <!-- Ansicht B: Passwort setzen -->
+      <form id="formConfirm" class="hide" method="post" action="/reset/confirm" novalidate>
+        <div class="grid">
+          <div>
+            <label for="conf_email">E-Mail</label>
+            <input id="conf_email" name="email" type="email" required placeholder="dein.name@hotel.de" autocomplete="email" />
+          </div>
+          <div>
+            <label for="conf_token">Token</label>
+            <input id="conf_token" name="token" type="text" required placeholder="abcdef123456" autocomplete="one-time-code" />
+          </div>
+          <div>
+            <label for="conf_first">Vorname</label>
+            <input id="conf_first" name="firstName" type="text" required placeholder="Vorname" />
+          </div>
+          <div>
+            <label for="conf_last">Nachname</label>
+            <input id="conf_last" name="lastName" type="text" required placeholder="Nachname" />
+          </div>
+          <div>
+            <label for="conf_pass">Neues Passwort</label>
+            <input id="conf_pass" name="password" type="password" required placeholder="••••••••" autocomplete="new-password" />
+          </div>
+          <div>
+            <label for="conf_pass2">Passwort wiederholen</label>
+            <input id="conf_pass2" name="password2" type="password" required placeholder="••••••••" autocomplete="new-password" />
+          </div>
+        </div>
+        <button class="btn" type="submit" style="margin-top:12px;">Passwort setzen</button>
+        <div class="row" style="margin-top:10px;">
+          <span class="muted">Fertig?</span><a class="muted" style="text-decoration:none;" href="/login">Zur Anmeldung</a>
+        </div>
+      </form>
+    </section>
+  </main>
 
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'change-me-please',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { httpOnly: true, sameSite: 'lax', secure: false, maxAge: 60 * 60 * 1000 }
-}));
+  <script>
+    const $ = (s, r=document)=>r.querySelector(s);
+    const msg = $("#msg");
+    const formRequest = $("#formRequest");
+    const formConfirm = $("#formConfirm");
+    const tabRequest = $("#tabRequest");
+    const tabConfirm = $("#tabConfirm");
+    const q = new URLSearchParams(location.search);
 
-// RateLimit nur auf POST /login
-const loginLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000,
-  max: 50,
-  standardHeaders: true,
-  legacyHeaders: false
-});
+    function show(type, text){
+      msg.className = "msg " + type;
+      msg.textContent = text;
+      msg.style.display = "block";
+    }
+    function hideMsg(){ msg.style.display = "none"; }
 
-// Statische Assets zuerst
-app.use(express.static(publicDir, { index: false }));
-
-// ===== Guards =====
-const OPEN_PATHS = new Set([
-  '/', '/login', '/health',
-  '/reset', '/reset.html',
-  '/reset/validate', '/reset/confirm'
-]);
-const assetRE = /\.(?:png|jpe?g|gif|svg|ico|webp|css|js|map)$/i;
-
-app.use((req, res, next) => {
-  if (assetRE.test(req.path)) return next();
-  if (OPEN_PATHS.has(req.path)) return next();
-  if (req.path.startsWith('/public/')) return next();
-  if (req.session && req.session.user) return next();
-  return res.redirect('/login');
-});
-
-// Direkte .html Aufrufe blocken (außer login/reset)
-app.use((req, res, next) => {
-  if (req.path.endsWith('.html') && req.path !== '/login.html' && req.path !== '/reset.html') {
-    return res.redirect('/login');
-  }
-  next();
-});
-
-// ===== Routen: öffentlich =====
-app.get ('/', (_req, res) => res.redirect('/login'));
-app.head('/', (_req, res) => res.set('Location', '/login').sendStatus(302));
-
-app.get ('/login', (_req, res) => res.sendFile('login.html', { root: publicDir }));
-app.head('/login', (_req, res) => res.sendStatus(200));
-
-app.get ('/reset', (_req, res) => res.sendFile('reset.html', { root: publicDir }));
-app.head('/reset', (_req, res) => res.sendStatus(200));
-
-// Reset anstoßen: Token erzeugen + Mail
-app.post('/reset', async (req, res) => {
-  try {
-    const email = String(req.body.email || '').trim().toLowerCase();
-    if (!email) return res.status(400).type('text').send('E-Mail fehlt');
-
-    const token = Math.random().toString(36).slice(2, 10);
-    const now   = Date.now();
-    const exp   = now + 30 * 60 * 1000; // 30 Min
-
-    const db = loadTokens();
-    purgeExpiredTokens(db);
-    db.tokens = db.tokens.filter(t => t.email !== email);
-    db.tokens.push({ email, token, createdAt: now, expiresAt: exp, used: false });
-    saveTokens(db);
-
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || '587', 10),
-      secure: String(process.env.SMTP_SECURE || 'false') === 'true',
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-      tls: { rejectUnauthorized: false }
-    });
-
-    const appBase = process.env.APP_BASE_URL || `http://localhost:${PORT}`;
-    const verifyUrl = `${appBase}/reset?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
-
-    const info = await transporter.sendMail({
-      from: `"Passwort-Service" <${process.env.SMTP_USER}>`,
-      to: email,
-      subject: 'Passwort zurücksetzen',
-      text:
-`Hallo,
-
-wir haben eine Anfrage zum Zurücksetzen deines Passworts erhalten.
-Dein Code lautet: ${token}
-
-Oder klicke:
-${verifyUrl}
-
-Der Code ist 30 Minuten gültig.
-Falls du das nicht warst, kannst du diese Nachricht ignorieren.`,
-      html:
-`<p>Hallo,</p>
-<p>wir haben eine Anfrage zum Zurücksetzen deines Passworts erhalten.</p>
-<p>Dein Code lautet: <b>${token}</b></p>
-<p>Oder klicke: <a href="${verifyUrl}">${verifyUrl}</a></p>
-<p>Der Code ist 30&nbsp;Minuten gültig.<br>Falls du das nicht warst, kannst du diese Nachricht ignorieren.</p>`
-    });
-
-    console.log('✅ Reset-Mail verschickt:', info.messageId, '→', email);
-    return res.type('text').send('Reset-Mail verschickt. Bitte Postfach prüfen.');
-  } catch (err) {
-    console.error('❌ Fehler /reset:', err && (err.stack || err));
-    return res.status(500).type('text').send('Mailversand fehlgeschlagen');
-  }
-});
-
-// Token prüfen
-app.get('/reset/validate', (req, res) => {
-  const token = String(req.query.token || '').trim();
-  const email = String(req.query.email || '').trim().toLowerCase();
-  if (!token || !email) return res.status(400).json({ ok:false, msg:'token/email fehlt' });
-
-  const db = loadTokens();
-  const now = Date.now();
-  const rec = db.tokens.find(t => t.email === email && t.token === token && !t.used && t.expiresAt > now);
-  if (!rec) return res.status(404).json({ ok:false, msg:'ungültig oder abgelaufen' });
-
-  return res.json({ ok:true, msg:'valid' });
-});
-app.head('/reset/validate', (_req, res) => res.sendStatus(200));
-
-// Passwort endgültig setzen
-app.post('/reset/confirm', (req, res) => {
-  try {
-    const token     = String(req.body.token || '').trim();
-    const emailRaw  = String(req.body.email || '').trim();
-    const email     = emailRaw.toLowerCase();
-    const password  = String(req.body.password || '');
-    const firstname = String(req.body.firstname || '').trim();
-    const lastname  = String(req.body.lastname || '').trim();
-
-    if (!token || !email || !password || !firstname || !lastname) {
-      return res.status(400).type('text').send('Pflichtfelder fehlen');
+    function activate(view){
+      if (view === "confirm") {
+        formRequest.classList.add("hide");
+        formConfirm.classList.remove("hide");
+        tabRequest.classList.remove("active");
+        tabConfirm.classList.add("active");
+      } else {
+        formConfirm.classList.add("hide");
+        formRequest.classList.remove("hide");
+        tabConfirm.classList.remove("active");
+        tabRequest.classList.add("active");
+      }
+      hideMsg();
     }
 
-    // Stärkeprüfung
-    const strong = (
-      password.length >= 10 &&
-      /[A-Z]/.test(password) &&
-      /[a-z]/.test(password) &&
-      (/\d/.test(password) || /[^A-Za-z0-9]/.test(password))
-    );
-    if (!strong) return res.status(422).type('text').send('Passwort zu schwach');
+    // Tabs
+    tabRequest.addEventListener("click", ()=>activate("request"));
+    tabConfirm.addEventListener("click", ()=>activate("confirm"));
 
-    const db = loadTokens();
-    const now = Date.now();
-    const idx = db.tokens.findIndex(t => t.email === email && t.token === token && !t.used && t.expiresAt > now);
-    if (idx === -1) return res.status(403).type('text').send('Token ungültig/abgelaufen');
+    // URL-Parameter auslesen (E-Mail + Token vorbefüllen)
+    const sent = q.get("sent");
+    const emailQ = q.get("email");
+    const tokenQ = q.get("token");
+    if (sent === "1") show("ok", "Wenn die E-Mail existiert, wurde ein Link zum Zurücksetzen gesendet.");
 
-    // Token als benutzt markieren
-    db.tokens[idx].used = true;
-    purgeExpiredTokens(db);
-    saveTokens(db);
-
-    // Audit-Log
-    const audit = {
-      ts: new Date().toISOString(),
-      email,
-      firstname,
-      lastname,
-      ip: (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').toString()
-    };
-    fs.appendFileSync(auditLogPath, JSON.stringify(audit) + '\n');
-
-    // User anlegen/aktualisieren
-    const ud = loadUsers();
-    const uIdx = ud.users.findIndex(u => (u.email || '').toLowerCase() === email);
-    const { algo, salt, hash } = hashPassword(password);
-    const username = emailRaw.split('@')[0];
-
-    if (uIdx === -1) {
-      ud.users.push({
-        email,
-        username,
-        firstname,
-        lastname,
-        role: "user", // Standardrolle
-        passAlgo: algo,
-        passSalt: salt,
-        passHash: hash,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      });
+    if (emailQ) {
+      $("#req_email").value = emailQ;
+      $("#conf_email").value = emailQ;
+    }
+    if (tokenQ) {
+      $("#conf_token").value = tokenQ;
+      activate("confirm");
     } else {
-      ud.users[uIdx] = {
-        ...ud.users[uIdx],
-        firstname,
-        lastname,
-        passAlgo: algo,
-        passSalt: salt,
-        passHash: hash,
-        updatedAt: new Date().toISOString()
-      };
+      activate("request");
     }
-    saveUsers(ud);
 
-    return res.type('text').send('Passwort gesetzt');
-  } catch (err) {
-    console.error('❌ Fehler /reset/confirm:', err && (err.stack || err));
-    return res.status(500).type('text').send('Fehler beim Setzen des Passworts');
-  }
-});
+    // Formular A: Link zusenden (POST /reset → JSON erwartet)
+    formRequest.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hideMsg();
+      const fd = new FormData(formRequest);
+      const body = new URLSearchParams(fd);
+      try {
+        const res = await fetch("/reset", {
+          method:"POST",
+          headers:{ "Content-Type":"application/x-www-form-urlencoded" },
+          body
+        });
+        const ct = res.headers.get("content-type")||"";
+        if (ct.includes("application/json")) {
+          const j = await res.json();
+          if (res.ok && j.ok) {
+            show("ok", j.message || "E-Mail zum Zurücksetzen wurde gesendet.");
+            // Optional: auf die Confirm-Ansicht wechseln, wenn Token via Mail kommt.
+            // activate("confirm");
+          } else {
+            show("err", j.message || "Senden fehlgeschlagen.");
+          }
+        } else if (res.ok) {
+          show("ok", "E-Mail zum Zurücksetzen wurde gesendet.");
+        } else {
+          show("err", "Senden fehlgeschlagen.");
+        }
+      } catch (err) {
+        show("err", "Netzwerkfehler. Bitte erneut versuchen.");
+      }
+    });
 
-// ===== Routen: geschützt =====
-function requireAuth(req, res, next) {
-  if (req.session && req.session.user) return next();
-  return res.redirect('/login');
-}
-function requireAdmin(req, res, next) {
-  if (req.session && req.session.user && req.session.role === 'admin') return next();
-  return res.redirect('/login?err=unauthorized');
-}
+    // Formular B: Passwort setzen (POST /reset/confirm → JSON erwartet)
+    formConfirm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hideMsg();
 
-app.get('/index',  requireAuth, (_req, res) => res.sendFile('index.html',  { root: publicDir }));
-app.get('/ibelsa', requireAuth, (_req, res) => res.sendFile('ibelsa.html', { root: publicDir }));
+      const email = $("#conf_email").value.trim();
+      const token = $("#conf_token").value.trim();
+      const first = $("#conf_first").value.trim();
+      const last  = $("#conf_last").value.trim();
+      const p1 = $("#conf_pass").value;
+      const p2 = $("#conf_pass2").value;
+      if (!email || !token || !first || !last) {
+        show("err", "Bitte alle Pflichtfelder ausfüllen.");
+        return;
+      }
+      if (p1.length < 8) { show("err","Passwort muss mindestens 8 Zeichen haben."); return; }
+      if (p1 !== p2)     { show("err","Passwörter stimmen nicht überein."); return; }
 
-// Admin-Bereich
-app.get('/admin', requireAdmin, (_req, res) => {
-  res.type('text').send('Admin-Dashboard – hier später Logs/Kundenverwaltung einbauen');
-});
+      const body = new URLSearchParams({
+        email, token, firstName:first, lastName:last, password:p1
+      });
 
-// Login prüfen (nur users.json)
-app.post('/login', loginLimiter, (req, res) => {
-  const { username, password } = req.body || {};
-  const name = String(username || '').trim();
-  const pass = String(password || '');
-
-  const ud = loadUsers();
-  const nameLower = name.toLowerCase();
-  const user = ud.users.find(u =>
-    (u.email && u.email.toLowerCase() === nameLower) ||
-    (u.username && u.username.toLowerCase() === nameLower)
-  );
-  if (user && verifyPassword(pass, user)) {
-    req.session.user = name;
-    req.session.role = user.role || "user";
-    return res.redirect('/after-login');
-  }
-
-  return res.redirect('/login?err=1');
-});
-
-// Nach Login verteilen
-app.get('/after-login', (req, res) => {
-  const role = req.session?.role || "user";
-  if (role === "admin") return res.redirect('/admin');
-  return res.redirect('/index');
-});
-
-// Health
-app.get ('/health', (_req, res) => res.type('text').send('OK'));
-app.head('/health', (_req, res) => res.sendStatus(200));
-
-// 404 → Login
-app.use((_req, res) => res.status(404).sendFile('login.html', { root: publicDir }));
-
-// Fehlerhandler
-app.use((err, _req, res, _next) => {
-  console.error('[server] Fehler:', err && err.stack || err);
-  res.status(500).type('text').send('Internal Server Error');
-});
-
-// Start
-app.listen(PORT, () => {
-  console.log('Hotel-Dashboard läuft auf Port', PORT);
-  console.log('ROOT      :', ROOT);
-  console.log('publicDir :', publicDir);
-  console.log('users.json:', usersPath);
-  console.log('tokens    :', tokensPath);
-  console.log('audit log :', auditLogPath);
-});
+      try {
+        const res = await fetch("/reset/confirm", {
+          method:"POST",
+          headers:{ "Content-Type":"application/x-www-form-urlencoded" },
+          body
+        });
+        const ct = res.headers.get("content-type")||"";
+        if (ct.includes("application/json")) {
+          const j = await res.json();
+          if (res.ok && j.ok) {
+            show("ok", j.message || "Passwort gesetzt. Du kannst dich jetzt anmelden.");
+          } else {
+            show("err", j.message || "Zurücksetzen fehlgeschlagen.");
+          }
+        } else if (res.ok) {
+          show("ok", "Passwort gesetzt. Du kannst dich jetzt anmelden.");
+        } else {
+          show("err", "Zurücksetzen fehlgeschlagen.");
+        }
+      } catch (err) {
+        show("err", "Netzwerkfehler. Bitte erneut versuchen.");
+      }
+    });
+  </script>
+</body>
+</html>
