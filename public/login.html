@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login · Hotel-Dashboard</title>
+  <meta name="color-scheme" content="light dark">
+
+  <!-- Assets -->
+  <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
+  <link rel="preload" as="image" href="/HD-Logo.png">
+  <link rel="preload" as="image" href="/Hotel-Dashboard-Schriftzug.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --page:#06080c;
+      --text:#eef2f8;
+      --muted:#cfd6de;
+
+      /* Farben */
+      --accent:#b71c1c;       /* Button dunkelrot */
+      --accent-2:#7f0000;     /* Button Verlauf */
+      --accent-link:#fff;     /* Link "Passwort vergessen?" */
+
+      /* Panel/Glas */
+      --panel-r:103; --panel-g:103; --panel-b:103;
+      --panel-alpha:.50;
+      --panel-border:rgba(255,255,255,.10);
+
+      /* Layout-Basis (Desktop) */
+      --card-w:440px;
+      --radius:22px;
+
+      /* Brand-Stack */
+      --hd:132px;
+      --word-gap:-28px;
+      --title-w:clamp(300px,78%,540px);
+      --title-gap:-20px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+
+    body{
+      margin:0;
+      font-size:16px;
+      line-height:1.45;
+      font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      color:var(--text);
+      background:var(--page) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
+    }
+
+    .wrap{min-height:100%;display:grid;place-items:center;padding:clamp(18px,4vw,60px)}
+
+    .card{
+      position:relative;
+      width:min(var(--card-w),94vw);
+      border-radius:var(--radius);
+      background:rgba(var(--panel-r),var(--panel-g),var(--panel-b),var(--panel-alpha));
+      backdrop-filter:blur(8px) saturate(120%);
+      -webkit-backdrop-filter:blur(8px) saturate(120%);
+      border:1px solid var(--panel-border);
+      box-shadow:0 26px 70px rgba(0,0,0,.68),0 1px 0 rgba(255,255,255,.05) inset;
+      padding:clamp(18px,2.2vw,24px);
+      padding-top:calc(var(--hd) * .66 + var(--title-gap) + 14px);
+      padding-bottom:8px;
+      overflow:visible;
+    }
+
+    .brand-stack{
+      position:absolute;left:50%;top:0;
+      transform:translate(-50%,-51%);
+      display:grid;place-items:center;
+      pointer-events:none;z-index:5;
+      width:min(32vw,520px);
+    }
+    .brand-stack .hd{
+      width:var(--hd);height:var(--hd);object-fit:contain;display:block;
+      filter:drop-shadow(0 22px 38px rgba(0,0,0,.55)) drop-shadow(0 1px 0 rgba(255,255,255,.08));
+    }
+    .brand-stack .wordmark{
+      margin-top:var(--word-gap);
+      width:var(--title-w);height:auto;display:block;
+      filter:drop-shadow(0 1px 0 rgba(255,255,255,.10)) drop-shadow(0 16px 26px rgba(0,0,0,.50));
+    }
+
+    .title-spacer{height:var(--title-gap)}
+
+    .content{display:grid;gap:10px}
+
+    label{display:block;font-size:15px;color:#fff;margin:0 0 4px}
+
+    .field{
+      display:grid;grid-template-columns:1fr auto;align-items:center;
+      min-height:48px;padding:0 12px;border-radius:14px;
+      background:transparent;
+      border:1.2px solid rgba(255,255,255,.25);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 26px rgba(0,0,0,.40);
+      transition:box-shadow .15s ease,border-color .15s ease;
+    }
+    .field:focus-within{
+      border-color:rgba(255,255,255,.42);
+      box-shadow:0 0 0 3px rgba(224,40,36,.18),0 14px 34px rgba(0,0,0,.55);
+    }
+    .field input{
+      background:transparent;border:0;outline:0;
+      color:#fff;font-size:16px;padding:10px 8px;width:100%;caret-color:#fff;
+    }
+    .field input::placeholder{color:rgba(255,255,255,.90)}
+
+    .field button.icon{all:unset;cursor:pointer;border-radius:10px;padding:8px;display:grid;place-items:center;color:#c7cfdb}
+    .icon svg{width:22px;height:22px;display:block}
+
+    /* Autofill fix */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus{
+      -webkit-text-fill-color:#fff !important;
+      transition:background-color 9999s ease-in-out 0s;
+      box-shadow:0 0 0 1000px transparent inset !important;
+      caret-color:#fff !important;
+    }
+
+    .error{display:none;background:rgba(224,39,36,.12);border:1px solid rgba(224,39,36,.45);color:#ffd6d6;padding:10px 12px;border-radius:12px;font-size:13px;margin:0 0 8px}
+
+    .row-links{display:flex;gap:12px;font-size:14px;margin-top:8px;}
+    .row-links a{color:var(--accent-link);text-decoration:none;font-weight:400;}
+    .row-links a:hover{color:#fff}
+
+    .submit{
+      margin-top:12px;border:0;border-radius:14px;padding:12px 26px;
+      font-weight:900;font-size:16px;color:#fff;cursor:pointer;
+      background:linear-gradient(180deg,var(--accent),var(--accent-2));
+      box-shadow:none;
+      transition:transform .08s ease,box-shadow .12s ease;
+    }
+    .submit:hover{box-shadow:0 8px 18px rgba(0,0,0,.25)}
+    .submit:active{transform:translateY(1px) scale(.997)}
+    .submit:disabled{opacity:.6;cursor:not-allowed;box-shadow:none}
+
+    .help{text-align:center;margin:8px 0 10px;font-size:14px;color:var(--muted)}
+
+    .foot{
+      margin-top:15px;
+      padding:12px 6px 6px;
+      border-top:1px solid rgba(255,255,255,.10);
+      text-align:center;
+      color:#e0e5ec;
+      font-size:13px;
+      line-height:1.45;
+    }
+    .foot small{display:block}
+
+    /* ========== Responsive ========== */
+
+    /* Mobile (bis 560px) */
+    @media (max-width:560px){
+      :root{
+        --card-w: 94vw;      /* nutzt fast voll die Breite */
+        --hd:116px;
+        --title-w:86%;
+        --word-gap:-24px;
+        --title-gap:12px;    /* mehr Luft unter dem Schriftzug */
+      }
+      .brand-stack{
+        transform:translate(-50%,-48%); /* etwas tiefer */
+      }
+      .card{
+        padding-top:calc(var(--hd) * .78 + var(--title-gap) + 14px);
+      }
+    }
+
+    /* Tablet (561px – 900px) */
+    @media (min-width:561px) and (max-width:900px){
+      :root{
+        --card-w:520px;    /* etwas breiter als Mobil */
+        --hd:128px;        /* mittleres Logo */
+        --title-w:82%;
+        --word-gap:-26px;
+        --title-gap:6px;   /* kompakter */
+      }
+      .brand-stack{
+        transform:translate(-50%,-50%);
+      }
+      .card{
+        padding-top:calc(var(--hd) * .72 + var(--title-gap) + 14px);
+      }
+    }
+
+    /* Desktop (>900px): Basiswerte oben gelten */
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="group" aria-labelledby="hd-title">
+      <div class="brand-stack" aria-hidden="true">
+        <img class="hd" src="/HD-Logo.png" alt="HD">
+        <img class="wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel-Dashboard" id="hd-title">
+      </div>
+
+      <div class="title-spacer" aria-hidden="true"></div>
+
+      <div class="content">
+        <div class="error" id="err">Anmeldung fehlgeschlagen. Bitte prüfen.</div>
+        <form action="/login" method="POST" id="loginForm" novalidate>
+          <div>
+            <label for="username">Benutzername</label>
+            <div class="field">
+              <input id="username" name="username" type="text" placeholder="z. B. admin" autocomplete="username" required />
+            </div>
+          </div>
+
+          <div>
+            <label for="password">Passwort</label>
+            <div class="field">
+              <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
+              <button class="icon" type="button" id="togglePw" aria-label="Passwort anzeigen/ausblenden">
+                <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.05 0-9.27-3.11-11-8 1.02-2.93 3.03-5.19 5.47-6.53m3.17-1.19A9.77 9.77 0 0112 4c5.05 0 9.27 3.11 11 8a11.73 11.73 0 01-1.41 2.94M9.88 9.88A3 3 0 1112 15a3 3 0 01-2.12-5.12z"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+                <svg id="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="row-links"><a href="/reset">Passwort vergessen?</a></div>
+          <button class="submit" id="submitBtn" type="submit" disabled>Anmelden</button>
+        </form>
+      </div>
+
+      <div class="foot">
+        <small>
+          © <span id="y"></span> Hotel-Dashboard<br>
+          Powered by MY HOME HOTEL LAMM ROTTWEIL GMBH
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('y').textContent=new Date().getFullYear();
+    const u=document.getElementById('username'),
+          p=document.getElementById('password'),
+          s=document.getElementById('submitBtn'),
+          tp=document.getElementById('togglePw'),
+          eyeOn=document.getElementById('eye-on'),
+          eyeOff=document.getElementById('eye-off'),
+          err=document.getElementById('err');
+
+    const update=()=>{s.disabled=!(u.value.trim()&&p.value.trim())};
+    u.addEventListener('input',update);
+    p.addEventListener('input',update);
+    update();
+
+    tp.addEventListener('click',()=>{
+      const show=p.type==="password";
+      p.type=show?"text":"password";
+      eyeOn.style.display=show?"block":"none";
+      eyeOff.style.display=show?"none":"block";
+    });
+
+    if(new URLSearchParams(location.search).get('err')) err.style.display='block';
+  </script>
+</body>
+</html>
