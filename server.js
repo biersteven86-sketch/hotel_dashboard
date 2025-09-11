@@ -23,7 +23,6 @@ const usersPath    = path.join(dataDir, 'users.json');
 const tokensPath   = path.join(authDir, 'reset.db.json');
 const auditLogPath = path.join(authDir, 'reset_audit.log');
 
-// Verzeichnisse sicherstellen
 fs.mkdirSync(publicDir, { recursive: true });
 fs.mkdirSync(authDir,   { recursive: true });
 fs.mkdirSync(dataDir,   { recursive: true });
@@ -138,7 +137,12 @@ const OPEN_PATHS = new Set([
   '/reset/validate', '/reset/confirm',
   '/logout',
   '/session/remaining',
-  '/HD-Logo.png', '/Hotel-Dashboard-Schriftzug.png', '/hotel-dashboard-bg.jpg'
+  // Bilderrahmen / Assets (alle Varianten whitelisten)
+  '/HD-Logo.png',
+  '/Hotel-Dashboard-Schriftzug.png',
+  '/hotel-dashboard-bg.jpg',
+  '/Hotel-Dashboard-hintergrund.jpg',
+  '/Hotel-Dashboard-hintergrund 3.jpg'
 ]);
 
 app.use((req, res, next) => {
@@ -371,6 +375,7 @@ app.post('/login', loginLimiter, (req, res) => {
   const name = String(username || '').trim();
   const pass = String(password || '');
 
+  // 1) users.json
   const ud = loadUsers();
   const nameLower = name.toLowerCase();
   const user = ud.users.find(u =>
@@ -383,6 +388,7 @@ app.post('/login', loginLimiter, (req, res) => {
     return res.redirect('/after-login');
   }
 
+  // 2) optionale .env-Fallbacks (falls noch genutzt)
   const {
     DASH_USER = '', DASH_PASS = '',
     ADMIN_USER = '', ADMIN_PASS = '',

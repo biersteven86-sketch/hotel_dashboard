@@ -6,7 +6,7 @@
   <title>Dashboard · Hotel-Dashboard</title>
   <meta name="color-scheme" content="light dark">
 
-  <!-- Assets (wie bei login/reset) -->
+  <!-- Gleich wie lokal -->
   <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
   <link rel="preload" as="image" href="/HD-Logo.png">
   <link rel="preload" as="image" href="/Hotel-Dashboard-Schriftzug.png">
@@ -17,11 +17,13 @@
       --border: rgba(255,255,255,.12);
       --muted: #cfd6de;
     }
-    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#fff}
+
+    /* IDENTISCH zu lokal: zentriert, cover, fixed, kein Extra-Offset */
     body{
       background:#000 url('/hotel-dashboard-bg.jpg') center/cover fixed no-repeat;
-      color:#fff;
     }
+
     .wrap{min-height:100%;display:grid;place-items:center;padding:24px}
     .card{
       width:min(1000px,96vw);
@@ -33,36 +35,18 @@
       position:relative;
       overflow:hidden;
     }
-    .brand{
-      display:flex;align-items:center;gap:14px;margin-bottom:10px
-    }
+    .brand{display:flex;align-items:center;gap:14px;margin-bottom:10px}
     .brand img.logo{width:44px;height:44px;object-fit:contain}
     .brand img.word{height:22px;object-fit:contain}
     .hr{height:1px;background:var(--border);margin:10px 0 16px}
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:16px;
-    }
-    @media (max-width: 780px){
-      .grid{grid-template-columns: 1fr;}
-    }
-    .panel{
-      background:rgba(0,0,0,.18);
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:14px;
-      min-height:120px;
-    }
-    .panel h2{
-      margin:0 0 6px 0;font-size:16px;font-weight:700
-    }
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media (max-width:780px){.grid{grid-template-columns:1fr}}
+    .panel{background:rgba(0,0,0,.18);border:1px solid var(--border);border-radius:14px;padding:14px;min-height:120px}
+    .panel h2{margin:0 0 6px 0;font-size:16px;font-weight:700}
     .muted{color:var(--muted);font-size:14px;margin:0}
     a.link{color:#fff;text-decoration:none}
     a.link:hover{text-decoration:underline}
-    .top-actions{
-      position:absolute;right:14px;top:14px;display:flex;gap:10px;align-items:center
-    }
+    .top-actions{position:absolute;right:14px;top:14px;display:flex;gap:10px;align-items:center}
     .btn{
       appearance:none;border:1px solid var(--border);
       background:rgba(0,0,0,.25);color:#fff;border-radius:10px;
@@ -80,6 +64,9 @@
       </header>
 
       <div class="top-actions">
+        <a class="link" href="/index" aria-label="Zur Startseite">
+          <button class="btn" type="button">Startseite</button>
+        </a>
         <a class="link" href="/logout" aria-label="Abmelden">
           <button class="btn" type="button">Logout</button>
         </a>
