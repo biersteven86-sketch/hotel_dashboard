@@ -1,0 +1,23 @@
+[
+  {
+    "email": "info@myhome-rottweil.de",
+    "token": "M0WnqUhX5WpafK_O86niGU8IkMh7j9b6",
+    "createdAt": 1757488896540,
+    "expiresAt": 1757490696540,
+    "used": true
+  },
+  {
+    "email": "info@myhome-rottweil.de",
+    "token": "tXdPg7Z3rJufwTcTn4Lj33IMMIfjUjb-",
+    "createdAt": 1757489145294,
+    "expiresAt": 1757490945294,
+    "used": true
+  },
+  {
+    "email": "info@myhome-rottweil.de",
+    "token": "yb53WMHYg6KGxpREqSL9Xih-liL7vQId",
+    "createdAt": 1757489178305,
+    "expiresAt": 1757490978305,
+    "used": false
+  }
+]

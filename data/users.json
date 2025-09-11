@@ -1,0 +1,38 @@
+{
+  "users": [
+    {
+      "email": "deine.mail@example.com",
+      "username": "deine.mail",
+      "firstname": "Max",
+      "lastname": "Mustermann",
+      "passAlgo": "pbkdf2:sha256:310000",
+      "passSalt": "66b4d6d011491fb248c5844db2a420d6",
+      "passHash": "f9c95fe1db63ba368cf693bc0a16fad226216e57845cba5d3dd057f8a7dfbafb",
+      "createdAt": "2025-09-10T02:47:59.210Z",
+      "updatedAt": "2025-09-10T02:47:59.210Z"
+    },
+    {
+      "email": "info@myhome-rottweil.de",
+      "username": "info",
+      "firstname": "Steven",
+      "lastname": "Bier",
+      "passAlgo": "pbkdf2:sha256:310000",
+      "passSalt": "311f1687711842c423b7aa937b8a0fb0",
+      "passHash": "70834d2c535145e7034f50ee69ffd33672d3ba726db45c6036188dbaaaeb7e88",
+      "createdAt": "2025-09-10T04:17:19.786Z",
+      "updatedAt": "2025-09-10T05:55:05.139Z"
+    },
+    {
+      "email": "admin@hotel-dashboard.de",
+      "username": "admin",
+      "firstname": "System",
+      "lastname": "Admin",
+      "role": "admin",
+      "passAlgo": "pbkdf2:sha256:310000",
+      "passSalt": "bdfed3393aefb28b5e54f6aa1856983a",
+      "passHash": "4c41bc36494d1d05246b9c13d8159bfd6e256a9f29bcd5755023157adad6c2bd",
+      "createdAt": "2025-09-10T06:20:52.346Z",
+      "updatedAt": "2025-09-10T06:20:52.346Z"
+    }
+  ]
+}

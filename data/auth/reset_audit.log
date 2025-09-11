@@ -1,0 +1,5 @@
+{"ts":"2025-09-10T02:47:58.732Z","email":"deine.mail@example.com","firstname":"Max","lastname":"Mustermann","ip":"::ffff:127.0.0.1"}
+{"ts":"2025-09-10T04:17:19.315Z","email":"info@myhome-rottweil.de","firstname":"Steven","lastname":"Bier","ip":"::ffff:100.66.150.40"}
+{"ts":"2025-09-10T05:40:29.530Z","email":"info@myhome-rottweil.de","firstname":"Steven","lastname":"Bier","ip":"::1"}
+{"ts":"2025-09-10T05:49:05.950Z","email":"info@myhome-rottweil.de","firstname":"Steven","lastname":"Bier","ip":"::1"}
+{"ts":"2025-09-10T05:55:04.678Z","email":"info@myhome-rottweil.de","firstname":"Steven","lastname":"Bier","ip":"::ffff:100.66.150.40"}
