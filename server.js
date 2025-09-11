@@ -1,280 +1,464 @@
-// server.js — Hotel-Dashboard (Admin-Dashboard + Health + Status + Actions + PBKDF2)
-// Hinweis: keine externen neuen Abhängigkeiten nötig.
+// server.js
+const express    = require('express');
+const path       = require('path');
+const fs         = require('fs');
+const session    = require('express-session');
+const rateLimit  = require('express-rate-limit');
+const nodemailer = require('nodemailer');
+const crypto     = require('crypto');
+require('dotenv').config({ quiet: true });
 
-require('dotenv').config();
+const app  = express();
+const PORT = process.env.PORT || 3000;
 
-const express = require('express');
-const path = require('path');
-const fs = require('fs');
-const fsp = fs.promises;
-const crypto = require('crypto');
-const { execFile } = require('child_process');
-const bodyParser = require('body-parser');
-const rateLimit = require('express-rate-limit');
+// ===== Root & Verzeichnisse =====
+const ROOT = process.env.HD_ROOT
+  ? path.resolve(process.env.HD_ROOT)
+  : path.resolve(__dirname);
 
-const app = express();
+const publicDir    = path.join(ROOT, 'public');
+const dataDir      = path.join(ROOT, 'data');
+const authDir      = path.join(dataDir, 'auth');
+const usersPath    = path.join(dataDir, 'users.json');
+const tokensPath   = path.join(authDir, 'reset.db.json');
+const auditLogPath = path.join(authDir, 'reset_audit.log');
 
-// --- Konfiguration ---
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
-const APP_BASE_URL = process.env.APP_BASE_URL || `http://127.0.0.1:${PORT}`;
-const REPO_DIR = '/home/steven/hotel_dashboard';
+fs.mkdirSync(publicDir, { recursive: true });
+fs.mkdirSync(authDir,   { recursive: true });
+fs.mkdirSync(dataDir,   { recursive: true });
 
-// SMTP optional (noop wenn nicht gesetzt)
-const SMTP_HOST = process.env.SMTP_HOST || '';
-const SMTP_PORT = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 587;
-const SMTP_USER = process.env.SMTP_USER || '';
-const SMTP_PASS = process.env.SMTP_PASS || '';
-const MAIL_FROM  = process.env.MAIL_FROM  || 'no-reply@hotel-dashboard.de';
-
-// Dateien
-const DATA_DIR   = path.resolve(__dirname);
-const USERS_FILE = path.join(DATA_DIR, 'users.json');
-const TOKENS_FILE= path.join(DATA_DIR, 'reset_tokens.json');
-const AUDIT_FILE = path.join(DATA_DIR, 'audit.log');
-
-// Helpers
-async function ensureFileJSON(filePath, initialValue) {
-  try { await fsp.access(filePath, fs.constants.F_OK); }
-  catch { await fsp.writeFile(filePath, JSON.stringify(initialValue, null, 2)); }
+// ===== Helper: Token-DB =====
+function loadTokens() {
+  try {
+    const raw = fs.readFileSync(tokensPath, 'utf8');
+    const parsed = JSON.parse(raw);
+    let tokens = parsed && parsed.tokens;
+    if (!Array.isArray(tokens)) tokens = [];
+    return { tokens };
+  } catch {
+    return { tokens: [] };
+  }
 }
-async function readJSON(filePath, fallback) {
-  try { const raw = await fsp.readFile(filePath, 'utf8'); return JSON.parse(raw || 'null') ?? fallback; }
-  catch { return fallback; }
+function saveTokens(obj) {
+  const out = { tokens: Array.isArray(obj.tokens) ? obj.tokens : [] };
+  fs.writeFileSync(tokensPath, JSON.stringify(out, null, 2), 'utf8');
 }
-async function writeJSON(filePath, obj) {
-  await fsp.writeFile(filePath, JSON.stringify(obj, null, 2));
-}
-function getClientIP(req) {
-  const xf = req.headers['x-forwarded-for'];
-  if (typeof xf === 'string' && xf.length > 0) return xf.split(',')[0].trim();
-  return req.socket?.remoteAddress || '';
-}
-async function auditLog(event, details) {
-  const line = JSON.stringify({ ts: new Date().toISOString(), event, ...details }) + '\n';
-  await fsp.appendFile(AUDIT_FILE, line);
-}
-async function sendMail(to, subject, text) {
-  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) { await auditLog('mail.noop', { to, subject }); return; }
-  const nodemailer = require('nodemailer');
-  const transporter = nodemailer.createTransport({
-    host: SMTP_HOST, port: SMTP_PORT, secure: SMTP_PORT === 465,
-    auth: { user: SMTP_USER, pass: SMTP_PASS }
-  });
-  await transporter.sendMail({ from: MAIL_FROM, to, subject, text });
+function purgeExpiredTokens(db) {
+  const now = Date.now();
+  db.tokens = db.tokens.filter(t => !t.used && t.expiresAt > now);
 }
 
-// ===== PBKDF2 (sha256, 310000) – kompatibel zu users.json =====
-const PBKDF2_DIGEST = 'sha256';
-const PBKDF2_ITERS  = 310000;
-const PBKDF2_LEN    = 32;
-function hashPasswordPBKDF2(password, saltHex) {
-  const salt = Buffer.from(saltHex, 'hex');
-  const dk = crypto.pbkdf2Sync(password, salt, PBKDF2_ITERS, PBKDF2_LEN, PBKDF2_DIGEST);
-  return dk.toString('hex');
+// ===== Helper: Users-DB =====
+function loadUsers() {
+  try {
+    const raw = fs.readFileSync(usersPath, 'utf8');
+    const parsed = JSON.parse(raw);
+    let users = parsed && parsed.users;
+    if (!Array.isArray(users)) users = [];
+    return { users };
+  } catch {
+    return { users: [] };
+  }
 }
-function createPasswordRecord(password) {
-  const saltHex = crypto.randomBytes(16).toString('hex');
-  const hashHex = hashPasswordPBKDF2(password, saltHex);
-  return { passAlgo: `pbkdf2:${PBKDF2_DIGEST}:${PBKDF2_ITERS}`, passSalt: saltHex, passHash: hashHex };
+function saveUsers(obj) {
+  const out = { users: Array.isArray(obj.users) ? obj.users : [] };
+  fs.writeFileSync(usersPath, JSON.stringify(out, null, 2), 'utf8');
+}
+function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
+  const iterations = 310000;
+  const keylen = 32;
+  const digest = 'sha256';
+  const hash = crypto.pbkdf2Sync(password, salt, iterations, keylen, digest).toString('hex');
+  return { algo: `pbkdf2:${digest}:${iterations}`, salt, hash };
+}
+function verifyPassword(password, user) {
+  if (!user?.passHash || !user?.passSalt) return false;
+  const parts = String(user.passAlgo || '').split(':'); // pbkdf2:sha256:310000
+  const iterations = Number(parts[2] || 310000);
+  const digest = parts[1] || 'sha256';
+  const keylen = 32;
+  const test = crypto.pbkdf2Sync(password, user.passSalt, iterations, keylen, digest).toString('hex');
+  return crypto.timingSafeEqual(Buffer.from(test, 'hex'), Buffer.from(user.passHash, 'hex'));
 }
 
-// Policy
-function validatePasswordPolicy(pw) {
-  if (typeof pw !== 'string' || pw.length < 10) return false;
-  const hasLower=/[a-z]/.test(pw), hasUpper=/[A-Z]/.test(pw), hasDigit=/\d/.test(pw), hasSpecial=/[^A-Za-z0-9]/.test(pw);
-  if (!hasLower || !hasUpper) return false; if (!(hasDigit || hasSpecial)) return false; return true;
-}
+// ===== Express Basics =====
+app.set('trust proxy', 1);
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-// Rate Limit
-const resetLimiter = rateLimit({ windowMs:60*1000, max:30, standardHeaders:true, legacyHeaders:false });
+// ===== Sessions (inkl. Inaktivitäts-Timeout) =====
+const IDLE_MS = Number(process.env.SESSION_IDLE_MS || 5 * 60 * 1000); // 5 Minuten
 
-// Middleware
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'change-me-please',
+  resave: false,
+  saveUninitialized: false,
+  rolling: true,                                // Cookie bei Aktivität erneuern
+  cookie: {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: false,                               // hinter TLS-Proxy ggf. true setzen
+    maxAge: IDLE_MS                              // Client-Ablauf (zusätzlich zur Serverprüfung)
+  }
+}));
 
-// Init
-(async () => {
-  await ensureFileJSON(USERS_FILE, []);
-  await ensureFileJSON(TOKENS_FILE, []);
-  try { await fsp.access(AUDIT_FILE, fs.constants.F_OK); } catch { await fsp.writeFile(AUDIT_FILE, ''); }
-})().catch(err => console.error('Init error:', err));
-
-// ---------- HEALTH ----------
-app.get('/health', (req, res) => {
-  res.status(200).json({ ok:true, ts:new Date().toISOString(), port:PORT });
+// RateLimit nur auf POST /login
+const loginLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 50,
+  standardHeaders: true,
+  legacyHeaders: false
 });
 
-// ---------- LOGIN (Placeholder – wie gehabt) ----------
-app.post('/login', async (req, res) => {
-  res.redirect('/ibelsa.html');
+// (Fehlerhafter Root-Redirect wurde entfernt)
+
+// Statische Assets zuerst (Index explizit aus!)
+app.use(express.static(publicDir, { index: false }));
+
+// ===== No-Store für geschützte Antworten =====
+function setNoStore(res) {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('Surrogate-Control', 'no-store');
+}
+
+// ===== Inaktivitätsprüfung (Server-seitig) =====
+const assetRE = /\.(?:png|jpe?g|gif|svg|ico|webp|css|js|map|woff2?)$/i;
+const OPEN_PATHS = new Set([
+  '/', '/login', '/health',
+  '/reset', '/reset.html',
+  '/reset/validate', '/reset/confirm',
+  '/logout',
+  '/session/remaining',
+  // Bilderrahmen / Assets (alle Varianten whitelisten)
+  '/HD-Logo.png',
+  '/Hotel-Dashboard-Schriftzug.png',
+  '/hotel-dashboard-bg.jpg',
+  '/Hotel-Dashboard-hintergrund.jpg',
+  '/Hotel-Dashboard-hintergrund 3.jpg'
+]);
+
+app.use((req, res, next) => {
+  // 1) Assets & offene Pfade sind „passiv“
+  const isAsset   = assetRE.test(req.path);
+  const isOpen    = OPEN_PATHS.has(req.path);
+  const isPassive = isAsset || isOpen || req.path === '/session/remaining';
+
+  const now = Date.now();
+
+  // 2) Wenn eingeloggt: Timeout prüfen
+  if (req.session && req.session.user) {
+    const last = Number(req.session.lastActivity || 0);
+    const expired = last && (now - last) > IDLE_MS;
+
+    if (expired) {
+      return req.session.destroy(() => {
+        res.clearCookie('connect.sid', { httpOnly:true, sameSite:'lax', secure:false });
+        return res.redirect('/login?timeout=1');
+      });
+    }
+
+    // 3) Nur „aktive“ Requests erneuern die Aktivität
+    if (!isPassive) {
+      req.session.lastActivity = now;
+    }
+  }
+  return next();
 });
 
-// ---------- RESET: Token anfordern ----------
-app.post('/reset', resetLimiter, async (req, res) => {
+// ===== Guards (Schutz aller nicht-öffentlichen Routen) =====
+app.use((req, res, next) => {
+  if (assetRE.test(req.path)) return next();
+  if (OPEN_PATHS.has(req.path)) return next();
+  if (req.path.startsWith('/public/')) return next();
+
+  if (req.session && req.session.user) {
+    setNoStore(res);
+    return next();
+  }
+  return res.redirect('/login');
+});
+
+// Direkte .html Aufrufe blocken (außer login/reset)
+app.use((req, res, next) => {
+  if (req.path.endsWith('.html') && req.path !== '/login.html' && req.path !== '/reset.html') {
+    return res.redirect('/login');
+  }
+  next();
+});
+
+// ===== Routen: Countdown-API =====
+app.get('/session/remaining', (req, res) => {
+  const now = Date.now();
+  let remaining = 0;
+  if (req.session && req.session.user) {
+    const last = Number(req.session.lastActivity || 0);
+    remaining = Math.max(0, (last ? (IDLE_MS - (now - last)) : IDLE_MS));
+    setNoStore(res);
+  } else {
+    res.setHeader('Cache-Control', 'no-store');
+  }
+  res.json({ ok:true, remaining, idleMs: IDLE_MS });
+});
+
+// ===== Routen: öffentlich =====
+app.get ('/login', (_req, res) => res.sendFile('login.html', { root: publicDir }));
+app.head('/login', (_req, res) => res.sendStatus(200));
+
+app.get ('/reset', (_req, res) => res.sendFile('reset.html', { root: publicDir }));
+app.head('/reset', (_req, res) => res.sendStatus(200));
+
+// Reset anstoßen: Token erzeugen + Mail
+app.post('/reset', async (req, res) => {
   try {
     const email = String(req.body.email || '').trim().toLowerCase();
-    const ip = getClientIP(req);
-    if (!email) return res.status(400).send('Email required');
+    if (!email) return res.status(400).type('text').send('E-Mail fehlt');
 
-    const tokens = await readJSON(TOKENS_FILE, []);
-    for (const t of tokens) if (t.email===email && !t.used) t.used = true;
-    const token = crypto.randomBytes(24).toString('base64url');
-    const expiresAt = Date.now() + 30*60*1000;
-    tokens.push({ email, token, createdAt: Date.now(), expiresAt, used:false });
-    await writeJSON(TOKENS_FILE, tokens);
+    const token = Math.random().toString(36).slice(2, 10);
+    const now   = Date.now();
+    const exp   = now + 30 * 60 * 1000; // 30 Min
 
-    const resetLink = `${APP_BASE_URL}/reset.html?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`;
-    await sendMail(email, 'Hotel-Dashboard: Passwort zurücksetzen', `Hallo,\n\nbitte nutze diesen Link:\n${resetLink}\n\nGültig: 30 Minuten.\n`);
-    await auditLog('reset.mail.sent', { email, ip });
+    const db = loadTokens();
+    purgeExpiredTokens(db);
+    db.tokens = db.tokens.filter(t => t.email !== email);
+    db.tokens.push({ email, token, createdAt: now, expiresAt: exp, used: false });
+    saveTokens(db);
 
-    res.status(200).json({ ok:true, redirect:'/reset.html?sent=1' });
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || '587', 10),
+      secure: String(process.env.SMTP_SECURE || 'false') === 'true',
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+      tls: { rejectUnauthorized: false }
+    });
+
+    const appBase = process.env.APP_BASE_URL || `http://localhost:${PORT}`;
+    const verifyUrl = `${appBase}/reset?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
+
+    const info = await transporter.sendMail({
+      from: `"Passwort-Service" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: 'Passwort zurücksetzen',
+      text:
+`Hallo,
+
+wir haben eine Anfrage zum Zurücksetzen deines Passworts erhalten.
+Dein Code lautet: ${token}
+
+Oder klicke:
+${verifyUrl}
+
+Der Code ist 30 Minuten gültig.
+Falls du das nicht warst, kannst du diese Nachricht ignorieren.`,
+      html:
+`<p>Hallo,</p>
+<p>wir haben eine Anfrage zum Zurücksetzen deines Passworts erhalten.</p>
+<p>Dein Code lautet: <b>${token}</b></p>
+<p>Oder klicke: <a href="${verifyUrl}">${verifyUrl}</a></p>
+<p>Der Code ist 30&nbsp;Minuten gültig.<br>Falls du das nicht warst, kannst du diese Nachricht ignorieren.</p>`
+    });
+
+    console.log('✅ Reset-Mail verschickt:', info.messageId, '→', email);
+    return res.type('text').send('Reset-Mail verschickt. Bitte Postfach prüfen.');
   } catch (err) {
-    console.error(err); res.status(500).send('Internal error');
+    console.error('❌ Fehler /reset:', err && (err.stack || err));
+    return res.status(500).type('text').send('Mailversand fehlgeschlagen');
   }
 });
 
-// ---------- RESET: Token validieren ----------
-app.get('/reset/validate', resetLimiter, async (req, res) => {
-  try {
-    const email = String(req.query.email || '').trim().toLowerCase();
-    const token = String(req.query.token || '').trim();
-    if (!email || !token) return res.status(400).json({ ok:false, error:'missing_parameters' });
+// Token prüfen (für UI-Vorprüfung)
+app.get('/reset/validate', (req, res) => {
+  const token = String(req.query.token || '').trim();
+  const email = String(req.query.email || '').trim().toLowerCase();
+  if (!token || !email) return res.status(400).json({ ok:false, msg:'token/email fehlt' });
 
-    const tokens = await readJSON(TOKENS_FILE, []);
-    const hit = tokens.find(t => t.email===email && t.token===token);
-    if (!hit)                    return res.status(400).json({ ok:false, error:'invalid_token' });
-    if (hit.used)                return res.status(400).json({ ok:false, error:'token_used' });
-    if (Date.now() > hit.expiresAt) return res.status(400).json({ ok:false, error:'token_expired' });
+  const db = loadTokens();
+  const now = Date.now();
+  const rec = db.tokens.find(t => t.email === email && t.token === token && !t.used && t.expiresAt > now);
+  if (!rec) return res.status(404).json({ ok:false, msg:'ungültig oder abgelaufen' });
 
-    res.status(200).json({ ok:true });
-  } catch (err) {
-    console.error(err); res.status(500).json({ ok:false, error:'server_error' });
-  }
+  return res.json({ ok:true, msg:'valid' });
 });
+app.head('/reset/validate', (_req, res) => res.sendStatus(200));
 
-// ---------- RESET: Passwort setzen (PBKDF2) ----------
-app.post('/reset/confirm', resetLimiter, async (req, res) => {
+// Passwort endgültig setzen
+app.post('/reset/confirm', (req, res) => {
   try {
-    const ip   = getClientIP(req);
-    const email= String(req.body.email || '').trim().toLowerCase();
-    const token= String(req.body.token || '').trim();
-    const firstname = String(req.body.firstname || req.body.firstName || '').trim();
-    const lastname  = String(req.body.lastname  || req.body.lastName  || '').trim();
+    const token     = String(req.body.token || '').trim();
+    const emailRaw  = String(req.body.email || '').trim();
+    const email     = emailRaw.toLowerCase();
     const password  = String(req.body.password || '');
-    if (!email || !token || !firstname || !lastname || !password) return res.status(400).json({ ok:false, error:'missing_parameters' });
 
-    const tokens = await readJSON(TOKENS_FILE, []);
-    const idx = tokens.findIndex(t => t.email===email && t.token===token);
-    if (idx === -1)                 return res.status(400).json({ ok:false, error:'invalid_token' });
-    const t = tokens[idx];
-    if (t.used)                     return res.status(400).json({ ok:false, error:'token_used' });
-    if (Date.now() > t.expiresAt)   return res.status(400).json({ ok:false, error:'token_expired' });
+    // tolerante Namen (firstname/lastname UND firstName/lastName)
+    const firstname = String(
+      req.body.firstname || req.body.firstName || ''
+    ).trim();
+    const lastname  = String(
+      req.body.lastname  || req.body.lastName  || ''
+    ).trim();
 
-    if (!validatePasswordPolicy(password)) {
-      return res.status(422).json({ ok:false, error:'weak_password', policy:'min 10 chars, upper+lower, and digit or special' });
+    if (!token || !email || !password || !firstname || !lastname) {
+      return res.status(400).type('text').send('Pflichtfelder fehlen');
     }
 
-    const pwRec = createPasswordRecord(password);
-    const users = await readJSON(USERS_FILE, []);
-    const uIdx = users.findIndex(u => (u.email || '').toLowerCase() === email);
-    const nowISO = new Date().toISOString();
-    if (uIdx === -1) {
-      users.push({ email, username:(email.split('@')[0]||'').toLowerCase(), ...pwRec, createdAt:nowISO, updatedAt:nowISO });
-    } else {
-      users[uIdx] = { ...users[uIdx], ...pwRec, updatedAt:nowISO };
-    }
-    await writeJSON(USERS_FILE, users);
+    // Stärkeprüfung
+    const strong = (
+      password.length >= 10 &&
+      /[A-Z]/.test(password) &&
+      /[a-z]/.test(password) &&
+      (/\d/.test(password) || /[^A-Za-z0-9]/.test(password))
+    );
+    if (!strong) return res.status(422).type('text').send('Passwort zu schwach');
 
-    tokens[idx].used = true; await writeJSON(TOKENS_FILE, tokens);
-    await auditLog('reset.confirm', { email, firstname, lastname, ip });
+    const db = loadTokens();
+    const now = Date.now();
+    const idx = db.tokens.findIndex(t => t.email === email && t.token === token && !t.used && t.expiresAt > now);
+    if (idx === -1) return res.status(403).type('text').send('Token ungültig/abgelaufen');
 
-    res.status(200).json({ ok:true, redirect:'/login.html?reset=1' });
-  } catch (err) {
-    console.error(err); res.status(500).json({ ok:false, error:'server_error' });
-  }
-});
+    // Token als benutzt markieren & Altlasten aufräumen
+    db.tokens[idx].used = true;
+    purgeExpiredTokens(db);
+    saveTokens(db);
 
-// ---------- ROOT & NOT FOUND ----------
-app.get('/', (req, res) => { res.status(200).send('Hotel-Dashboard OK'); });
-app.use((req, res) => { res.status(404).send('Not Found'); });
-
-// ---------- ADMIN: STATUS ----------
-app.get('/admin/status', async (req, res) => {
-  try {
-    const uptime = process.uptime();
-    const fmtUptime = secs => {
-      const h = Math.floor(secs/3600), m = Math.floor((secs%3600)/60), s = Math.floor(secs%60);
-      return `${h}h ${m}m ${s}s`;
+    // Audit-Log
+    const audit = {
+      ts: new Date().toISOString(),
+      email,
+      firstname,
+      lastname,
+      ip: (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').toString()
     };
+    fs.appendFileSync(auditLogPath, JSON.stringify(audit) + '\n');
 
-    // Git-Infos
-    const git = await new Promise(resolve => {
-      execFile('bash', ['-lc',
-        `cd "${REPO_DIR}" && \
-         BR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '-') && \
-         LAST="$(git log -1 --pretty='%h %ci %s' 2>/dev/null || echo '-')"; \
-         echo "$BR|$LAST"`
-      ], { timeout: 4000 }, (err, stdout) => {
-        if (err) return resolve({ ok:false });
-        const [branch,last] = (stdout.trim().split('|').concat(['',''])).slice(0,2);
-        resolve({ ok:true, branch, last });
+    // User anlegen/aktualisieren
+    const ud = loadUsers();
+    const uIdx = ud.users.findIndex(u => (u.email || '').toLowerCase() === email);
+    const { algo, salt, hash } = hashPassword(password);
+    const username = emailRaw.split('@')[0];
+
+    if (uIdx === -1) {
+      ud.users.push({
+        email,
+        username,
+        firstname,
+        lastname,
+        passAlgo: algo,
+        passSalt: salt,
+        passHash: hash,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       });
-    });
+    } else {
+      ud.users[uIdx] = {
+        ...ud.users[uIdx],
+        firstname,
+        lastname,
+        passAlgo: algo,
+        passSalt: salt,
+        passHash: hash,
+        updatedAt: new Date().toISOString()
+      };
+    }
+    saveUsers(ud);
 
-    // Dienste (Beispiel: git-auto-push)
-    const svc = await new Promise(resolve => {
-      execFile('bash', ['-lc',
-        'systemctl --user is-active git-auto-push.service >/dev/null 2>&1 && echo "running" || echo "inactive"'
-      ], { timeout:3000 }, (_e, stdout) => {
-        const state = stdout.trim();
-        resolve([{ name:'git-auto-push', ok:(state==='running'), detail:state }]);
-      });
-    });
-
-    res.json({
-      node: { port: PORT, pid: process.pid, uptime: fmtUptime(uptime), ok:true },
-      proxy:{ kind: 'Apache/Nginx (Proxy)', ok: true },
-      git,
-      services: svc
-    });
-  } catch (e) {
-    res.status(500).json({ ok:false, error:'agent_failed' });
+    return res.type('text').send('Passwort gesetzt');
+  } catch (err) {
+    console.error('❌ Fehler /reset/confirm:', err && (err.stack || err));
+    return res.status(500).type('text').send('Fehler beim Setzen des Passworts');
   }
 });
 
-// ---------- ADMIN: ACTIONS (POST) ----------
-// Nur lokale Aufrufe zulassen (optional, hier soft check)
-function isLocal(req){
-  const ip = (req.headers['x-forwarded-for']||req.socket.remoteAddress||'').toString();
-  return ip.includes('127.0.0.1') || ip.includes('::1') || ip.startsWith('192.168.') || ip.startsWith('10.');
+// ===== Login/Logout =====
+app.post('/login', loginLimiter, (req, res) => {
+  const { username, password } = req.body || {};
+  const name = String(username || '').trim();
+  const pass = String(password || '');
+
+  // 1) users.json
+  const ud = loadUsers();
+  const nameLower = name.toLowerCase();
+  const user = ud.users.find(u =>
+    (u.email && u.email.toLowerCase() === nameLower) ||
+    (u.username && u.username.toLowerCase() === nameLower)
+  );
+  if (user && verifyPassword(pass, user)) {
+    req.session.user = name;
+    req.session.lastActivity = Date.now();
+    return res.redirect('/after-login');
+  }
+
+  // 2) optionale .env-Fallbacks
+  const {
+    DASH_USER = '', DASH_PASS = '',
+    ADMIN_USER = '', ADMIN_PASS = '',
+    IBELSA_USER = '', IBELSA_PASS = ''
+  } = process.env;
+
+  const ok =
+    (name === DASH_USER   && pass === DASH_PASS)   ||
+    (name === ADMIN_USER  && pass === ADMIN_PASS)  ||
+    (name === IBELSA_USER && pass === IBELSA_PASS);
+
+  if (!ok) return res.redirect('/login?err=1');
+
+  req.session.user = name;
+  req.session.lastActivity = Date.now();
+  return res.redirect('/after-login');
+});
+
+app.get('/logout', (req, res) => {
+  if (!req.session) return res.redirect('/login');
+  req.session.destroy(() => {
+    res.clearCookie('connect.sid', { httpOnly:true, sameSite:'lax', secure:false });
+    return res.redirect('/login');
+  });
+});
+
+// Nach Login verteilen
+app.get('/after-login', (req, res) => {
+  const u = (req.session && req.session.user) ? String(req.session.user) : '';
+  const adminUser = (process.env.ADMIN_USER || 'admin').toLowerCase();
+  if (u && u.toLowerCase() === adminUser) {
+    setNoStore(res);
+    return res.redirect('/index');
+  }
+  setNoStore(res);
+  return res.redirect('/dashboard');
+});
+
+// ===== Routen: geschützt =====
+function requireAuth(req, res, next) {
+  if (req.session && req.session.user) {
+    setNoStore(res);
+    return next();
+  }
+  return res.redirect('/login');
 }
 
-app.post('/admin/git/pull', (req, res) => {
-  if (!isLocal(req)) return res.status(403).end();
-  execFile('bash', ['-lc', `cd "${REPO_DIR}" && git pull --rebase --autostash origin main`], { timeout: 20000 }, (err, stdout, stderr) => {
-    if (err) return res.status(500).send(stderr||'pull failed');
-    res.status(200).send(stdout||'OK');
-  });
-});
-app.post('/admin/git/push', (req, res) => {
-  if (!isLocal(req)) return res.status(403).end();
-  execFile('bash', ['-lc', `cd "${REPO_DIR}" && git add -A && (git diff --cached --quiet || git commit -m "dashboard push") && git push origin HEAD:main`], { timeout: 20000 }, (err, stdout, stderr) => {
-    if (err) return res.status(500).send(stderr||'push failed');
-    res.status(200).send(stdout||'OK');
-  });
-});
-app.post('/admin/services/restart', (req, res) => {
-  if (!isLocal(req)) return res.status(403).end();
-  const name = String(req.query.name||'').trim();
-  if (!name) return res.status(400).send('name required');
-  execFile('bash', ['-lc', `systemctl --user restart ${name}.service`], { timeout: 15000 }, (err, stdout, stderr) => {
-    if (err) return res.status(500).send(stderr||'restart failed');
-    res.status(200).send(stdout||'OK');
-  });
+app.get('/index',     requireAuth, (_req, res) => res.sendFile('index.html',     { root: publicDir }));
+app.get('/dashboard', requireAuth, (_req, res) => res.sendFile('dashboard.html', { root: publicDir }));
+
+// ===== Health =====
+app.get ('/health', (_req, res) => res.type('text').send('OK'));
+app.head('/health', (_req, res) => res.sendStatus(200));
+
+// ===== 404 → Login (Assets fängt static oben ab) =====
+app.use((_req, res) => res.status(404).sendFile('login.html', { root: publicDir }));
+
+// ===== Fehlerhandler =====
+app.use((err, _req, res, _next) => {
+  console.error('[server] Fehler:', err && err.stack || err);
+  res.status(500).type('text').send('Internal Server Error');
 });
 
-// ---------- START ----------
+// ===== Start =====
 app.listen(PORT, () => {
-  console.log(`Hotel-Dashboard listening on ${PORT}`);
+  console.log('Hotel-Dashboard läuft auf Port', PORT);
+  console.log('ROOT      :', ROOT);
+  console.log('publicDir :', publicDir);
+  console.log('users.json:', usersPath);
+  console.log('tokens    :', tokensPath);
+  console.log('audit log :', auditLogPath);
+  console.log('session idle(ms):', IDLE_MS);
 });
