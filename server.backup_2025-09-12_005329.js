@@ -1,5 +1,5 @@
-// server.js — Hotel-Dashboard (Reset-Flow, PBKDF2 statt bcryptjs)
-// Läuft hinter NGINX (80/443) → Node/Express auf PORT (Default 3000)
+// server.js — Hotel-Dashboard (Reset-Flow, PBKDF2-Version)
+// Läuft hinter Proxy (80/443) → Node/Express auf PORT (Default 3000)
 
 require('dotenv').config();
 
@@ -8,7 +8,7 @@ const path = require('path');
 const fs = require('fs');
 const fsp = fs.promises;
 const crypto = require('crypto');
-// bcryptjs ENTFERNT – wir benutzen PBKDF2 (sha256, 310000) wie in users.json
+// ⚠️ bcryptjs entfernt – wir verwenden PBKDF2 (sha256, 310000) wie in users.json vorgesehen.
 const bodyParser = require('body-parser');
 const rateLimit = require('express-rate-limit');
 
@@ -25,7 +25,7 @@ const SMTP_USER = process.env.SMTP_USER || '';
 const SMTP_PASS = process.env.SMTP_PASS || '';
 const MAIL_FROM  = process.env.MAIL_FROM  || 'no-reply@hotel-dashboard.de';
 
-// --- Dateien / Speicher ---
+// --- Dateien / Speicher (wie in deiner letzten Version) ---
 const DATA_DIR   = path.resolve(__dirname);
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const TOKENS_FILE= path.join(DATA_DIR, 'reset_tokens.json');
@@ -98,6 +98,18 @@ function createPasswordRecord(password) {
     passHash: hashHex
   };
 }
+function verifyPasswordRecord(password, user) {
+  if (!user || typeof user.passAlgo !== 'string') return false;
+  // erwartet Format: pbkdf2:sha256:310000
+  const parts = user.passAlgo.split(':');
+  if (parts.length < 3 || parts[0] !== 'pbkdf2') return false;
+  const digest = parts[1];
+  const iters  = parseInt(parts[2], 10);
+  if (digest !== PBKDF2_DIGEST || iters !== PBKDF2_ITERS) return false;
+  if (!user.passSalt || !user.passHash) return false;
+  const calc = hashPasswordPBKDF2(password, user.passSalt);
+  return crypto.timingSafeEqual(Buffer.from(calc, 'hex'), Buffer.from(user.passHash, 'hex'));
+}
 
 // Passwort-Policy: ≥10 Zeichen, Groß- & Kleinbuchstabe, Ziffer ODER Sonderzeichen
 function validatePasswordPolicy(pw) {
@@ -133,12 +145,13 @@ app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] })
   catch { await fsp.writeFile(AUDIT_FILE, ''); }
 })().catch(err => { console.error('Init error:', err); });
 
-// ---------- LOGIN-FLOW (unverändert, Placeholder) ----------
+// ---------- LOGIN (Placeholder – unverändert zum letzten Stand) ----------
 app.post('/login', async (req, res) => {
+  // Dein bestehender Login-Flow bleibt unberührt.
   res.redirect('/ibelsa.html');
 });
 
-// ---------- PASSWORT-RESET: Token anfordern (unverändert) ----------
+// ---------- PASSWORT-RESET: Token anfordern ----------
 app.post('/reset', resetLimiter, async (req, res) => {
   try {
     const email = String(req.body.email || '').trim().toLowerCase();
@@ -171,7 +184,7 @@ app.post('/reset', resetLimiter, async (req, res) => {
   }
 });
 
-// ---------- NEU: Token validieren (unverändert zur Struktur) ----------
+// ---------- Token validieren ----------
 app.get('/reset/validate', resetLimiter, async (req, res) => {
   try {
     const email = String(req.query.email || '').trim().toLowerCase();
@@ -193,14 +206,15 @@ app.get('/reset/validate', resetLimiter, async (req, res) => {
   }
 });
 
-// ---------- PASSWORT SETZEN & AUDIT (nur PBKDF2-Änderung) ----------
+// ---------- Passwort setzen & Audit (PBKDF2, tolerant bei Feldnamen) ----------
 app.post('/reset/confirm', resetLimiter, async (req, res) => {
   try {
     const ip   = getClientIP(req);
     const email= String(req.body.email || '').trim().toLowerCase();
     const token= String(req.body.token || '').trim();
-    const firstname = String(req.body.firstname || '').trim();   // Beibehaltener Feldname (keine Strukturänderung)
-    const lastname  = String(req.body.lastname  || '').trim();
+    // tolerant: firstname/lastname UND firstName/lastName akzeptieren
+    const firstname = String(req.body.firstname || req.body.firstName || '').trim();
+    const lastname  = String(req.body.lastname  || req.body.lastName  || '').trim();
     const password  = String(req.body.password || '');
 
     // Pflichtfelder prüfen
@@ -225,19 +239,18 @@ app.post('/reset/confirm', resetLimiter, async (req, res) => {
       });
     }
 
-    // === einzig notwendige Änderung: PBKDF2-Password-Record erzeugen ===
-    const pwRec = createPasswordRecord(password);
-
-    // users.json aktualisieren (create or update) – Felder wie in users.json vorhanden
+    // Nutzer laden / anlegen / aktualisieren – PBKDF2 Felder
     const users = await readJSON(USERS_FILE, []);
     const uIdx = users.findIndex(u => (u.email || '').toLowerCase() === email);
+    const pwRec = createPasswordRecord(password);
     const nowISO = new Date().toISOString();
 
     if (uIdx === -1) {
       users.push({
         email,
         username: (email.split('@')[0] || '').toLowerCase(),
-        // Vor-/Nachname NICHT dauerhaft neu persistieren (nur Audit)
+        firstname,
+        lastname,
         ...pwRec,
         createdAt: nowISO,
         updatedAt: nowISO
@@ -245,6 +258,9 @@ app.post('/reset/confirm', resetLimiter, async (req, res) => {
     } else {
       users[uIdx] = {
         ...users[uIdx],
+        // Vor-/Nachname NICHT persistent erzwingen, nur aktualisieren wenn leer
+        firstname: users[uIdx].firstname || firstname,
+        lastname:  users[uIdx].lastname  || lastname,
         ...pwRec,
         updatedAt: nowISO
       };
@@ -255,7 +271,7 @@ app.post('/reset/confirm', resetLimiter, async (req, res) => {
     tokens[idx].used = true;
     await writeJSON(TOKENS_FILE, tokens);
 
-    // Audit schreiben (Vor-/Nachname nur hier, nicht dauerhaft speichern)
+    // Audit schreiben (Vor-/Nachname nur hier, nicht dauerhaft neu speichern)
     await auditLog('reset.confirm', { email, firstname, lastname, ip });
 
     return res.status(200).json({ ok: true, redirect: '/login.html?reset=1' });

@@ -1,1 +1,7 @@
 Hotel-Dashboard läuft auf Port 3000
+ROOT      : /home/steven/hotel_dashboard
+publicDir : /home/steven/hotel_dashboard/public
+users.json: /home/steven/hotel_dashboard/data/users.json
+tokens    : /home/steven/hotel_dashboard/data/auth/reset.db.json
+audit log : /home/steven/hotel_dashboard/data/auth/reset_audit.log
+session idle(ms): 300000

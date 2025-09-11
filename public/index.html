@@ -3,105 +3,299 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Startseite · Hotel-Dashboard</title>
+  <title>Admin-Dashboard · Hotel-Dashboard</title>
   <meta name="color-scheme" content="light dark">
-
-  <!-- Nur hier (Index) das neue Bild vorladen -->
-  <link rel="preload" as="image" href="/Hotel-Dashboard-hintergrund.jpg">
+  <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
   <link rel="preload" as="image" href="/HD-Logo.png">
   <link rel="preload" as="image" href="/Hotel-Dashboard-Schriftzug.png">
-
   <style>
     :root{
-      --glass: rgba(24,24,24,.78);
-      --border: rgba(255,255,255,.12);
-      --muted: #cfd6de;
+      --page:#06080c; --text:#eef2f8; --muted:#cfd6de;
+      --ok:#10b981; --warn:#f59e0b; --err:#ef4444; --info:#38bdf8;
+      --panel:rgba(255,255,255,.10); --panel2:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.14); --radius:18px;
+      --card-w:360px;
     }
-    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    @media (prefers-color-scheme: light){
+      :root{ --page:#f6f7fb; --text:#0f172a; --muted:#5b6574; --panel:rgba(0,0,0,.06); --panel2:rgba(0,0,0,.03); --border:rgba(0,0,0,.08); }
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      /* Nur Index: neues Hintergrundbild mit korrektem, maskiertem Dateinamen */
-      background:#000 url('/Hotel-Dashboard-hintergrund.jpg') center/cover fixed no-repeat;
-      color:#fff;
+      margin:0;background:var(--page) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
+      color:var(--text); font: 16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
-    .wrap{min-height:100%;display:grid;place-items:center;padding:24px}
-    .card{
-      width:min(1000px,96vw);
-      background:var(--glass);
-      border:1px solid var(--border);
-      border-radius:18px;
-      box-shadow:0 20px 50px rgba(0,0,0,.45);
-      padding:20px;
-      position:relative;
-      overflow:hidden;
+    .wrap{min-height:100%;display:grid;grid-template-rows:auto 1fr auto;gap:18px;padding:clamp(16px,3vw,26px)}
+    header{
+      display:flex;align-items:center;gap:14px;padding:10px 12px;border:1px solid var(--border);
+      border-radius:16px;background:var(--panel);backdrop-filter:blur(6px) saturate(120%);
     }
-    .brand{display:flex;align-items:center;gap:14px;margin-bottom:10px}
-    .brand img.logo{width:44px;height:44px;object-fit:contain}
-    .brand img.word{height:22px;object-fit:contain}
-    .hr{height:1px;background:var(--border);margin:10px 0 16px}
+    header .brand{display:flex;align-items:center;gap:12px}
+    header .brand img.logo{width:48px;height:48px;object-fit:contain}
+    header .brand img.word{height:20px;object-fit:contain}
+    header .meta{margin-left:auto;font-size:14px;color:var(--muted)}
     .grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:16px;
+      display:grid;gap:14px;
+      grid-template-columns: repeat(auto-fill, minmax(var(--card-w),1fr));
     }
-    @media (max-width: 780px){
-      .grid{grid-template-columns: 1fr;}
+    .card{
+      border:1px solid var(--border); border-radius:var(--radius);
+      background:var(--panel2); backdrop-filter: blur(6px);
+      padding:14px; display:grid; gap:10px;
     }
-    .panel{
-      background:rgba(0,0,0,.18);
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:14px;
-      min-height:120px;
+    .card h3{margin:0;font-size:16px;display:flex;align-items:center;gap:10px}
+    .stat{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:10px 12px;border-radius:12px;border:1px dashed var(--border);
+      background:rgba(255,255,255,.04);
+      font-size:14px;
     }
-    .panel h2{margin:0 0 6px 0;font-size:16px;font-weight:700}
-    .muted{color:var(--muted);font-size:14px;margin:0}
-    a.link{color:#fff;text-decoration:none}
-    a.link:hover{text-decoration:underline}
-    .top-actions{
-      position:absolute;right:14px;top:14px;display:flex;gap:10px;align-items:center
-    }
-    .btn{
-      appearance:none;border:1px solid var(--border);
-      background:rgba(0,0,0,.25);color:#fff;border-radius:10px;
-      padding:8px 12px;cursor:pointer;font-weight:600
-    }
-    .btn:hover{background:rgba(255,255,255,.06)}
+    .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-weight:700}
+    .b-ok{background:rgba(16,185,129,.15);color:var(--ok);border:1px solid rgba(16,185,129,.35)}
+    .b-warn{background:rgba(245,158,11,.15);color:var(--warn);border:1px solid rgba(245,158,11,.35)}
+    .b-err{background:rgba(239,68,68,.16);color:var(--err);border:1px solid rgba(239,68,68,.36)}
+    .b-info{background:rgba(56,189,248,.16);color:var(--info);border:1px solid rgba(56,189,248,.36)}
+    .rows{display:grid;gap:8px}
+    .kv{display:flex;align-items:center;justify-content:space-between;font-size:13.5px;color:var(--muted)}
+    .kv code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:rgba(0,0,0,.18);padding:2px 6px;border-radius:8px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{all:unset;cursor:pointer;border-radius:12px;border:1px solid var(--border);padding:8px 12px;font-weight:700}
+    .btn:hover{background:rgba(255,255,255,.08)}
+    .btn.ok{border-color:rgba(16,185,129,.35)}
+    .btn.warn{border-color:rgba(245,158,11,.35)}
+    .btn.err{border-color:rgba(239,68,68,.36)}
+    footer{font-size:13px;color:var(--muted);text-align:center}
+    .legend{display:flex;gap:8px;flex-wrap:wrap}
+    .legend span{display:inline-flex;align-items:center;gap:6px}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .small{font-size:12.5px;color:var(--muted)}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <main class="card" role="main">
-      <header class="brand" aria-label="Hotel-Dashboard">
+    <header>
+      <div class="brand">
         <img class="logo" src="/HD-Logo.png" alt="HD">
         <img class="word" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel-Dashboard">
-      </header>
-
-      <div class="top-actions">
-        <a class="link" href="/dashboard" aria-label="Zum Dashboard">
-          <button class="btn" type="button">Zum Dashboard</button>
-        </a>
-        <a class="link" href="/logout" aria-label="Abmelden">
-          <button class="btn" type="button">Logout</button>
-        </a>
       </div>
+      <div class="meta">
+        <span id="stamp">–</span> · <span class="small">Auto-Refresh 5s</span>
+      </div>
+    </header>
 
-      <div class="hr"></div>
-
-      <section class="grid">
-        <div class="panel">
-          <h2>Startseite</h2>
-          <p class="muted">Willkommen im Hotel-Dashboard. Diese Seite ist geschützt (Login erforderlich).</p>
-          <p class="muted">Oben rechts läuft der 5-Minuten Session-Timer.</p>
+    <main class="grid" id="grid">
+      <!-- App / Reverse Proxy -->
+      <section class="card" id="card-app">
+        <h3>Applikation & Proxy</h3>
+        <div class="rows">
+          <div class="stat"><span>App Health <span class="small mono">GET /health</span></span><span id="s-health" class="badge b-info">prüfe…</span></div>
+          <div class="stat"><span>Root erreichbar <span class="small mono">GET /</span></span><span id="s-root" class="badge b-info">prüfe…</span></div>
+          <div class="stat"><span>Login-Seite <span class="small mono">GET /login.html</span></span><span id="s-login" class="badge b-info">prüfe…</span></div>
+          <div class="stat"><span>Reset-Seite <span class="small mono">GET /reset.html</span></span><span id="s-reset" class="badge b-info">prüfe…</span></div>
         </div>
-        <div class="panel">
-          <h2>Nächste Schritte</h2>
-          <p class="muted">Hier können später Kacheln/Links zu Modulen erscheinen (z.&nbsp;B. Reservierungen, Gäste, Reports).</p>
+        <div class="rows">
+          <div class="kv"><span>Domain</span><code id="kv-domain"></code></div>
+          <div class="kv"><span>Proxied zu Node</span><code>80/443 → Node</code></div>
+          <div class="kv"><span>Erwartete Health</span><code>200 OK</code></div>
+        </div>
+        <div class="actions">
+          <!-- Diese Buttons funktionieren sofort, falls du passende Server-Routen hast; sonst zeigen sie eine Warnung -->
+          <button class="btn warn" data-action="/admin/reload">Neu laden</button>
+          <button class="btn err"  data-action="/admin/restart">Restart</button>
         </div>
       </section>
+
+      <!-- Statisches Asset / Branding -->
+      <section class="card">
+        <h3>Assets</h3>
+        <div class="rows">
+          <div class="stat"><span>Logo geladen <span class="small mono">HEAD /HD-Logo.png</span></span><span id="s-logo" class="badge b-info">prüfe…</span></div>
+          <div class="stat"><span>Hintergrund <span class="small mono">HEAD /hotel-dashboard-bg.jpg</span></span><span id="s-bg" class="badge b-info">prüfe…</span></div>
+          <div class="stat"><span>Wordmark <span class="small mono">HEAD /Hotel-Dashboard-Schriftzug.png</span></span><span id="s-word" class="badge b-info">prüfe…</span></div>
+        </div>
+        <div class="rows">
+          <div class="kv"><span>Cache</span><code>CDN/Browser</code></div>
+          <div class="kv"><span>Erwartete Health</span><code>200 OK</code></div>
+        </div>
+      </section>
+
+      <!-- Reset-Flow – API Oberflächenprüfung (ohne sensible Operationen) -->
+      <section class="card">
+        <h3>Reset-Flow (Oberfläche)</h3>
+        <div class="rows">
+          <div class="stat"><span>Route vorhanden <span class="small mono">GET /reset/validate?email=x&token=y</span></span><span id="s-validate" class="badge b-info">prüfe…</span></div>
+          <div class="stat"><span>Confirm erreichbar <span class="small mono">OPTIONS /reset/confirm</span></span><span id="s-confirm" class="badge b-info">prüfe…</span></div>
+        </div>
+        <div class="rows">
+          <div class="kv"><span>Hinweis</span><span class="small">Wir prüfen nur Statuscodes/Erreichbarkeit – kein echtes Zurücksetzen.</span></div>
+        </div>
+      </section>
+
+      <!-- Backend-Agent (optional) -->
+      <section class="card" id="card-agent">
+        <h3>Server-Agent & Services</h3>
+        <div class="rows">
+          <div class="stat"><span>Backend-Agent <span class="small mono">GET /admin/status</span></span><span id="s-agent" class="badge b-warn">nicht verbunden</span></div>
+        </div>
+        <div class="rows" id="agentRows"></div>
+        <div class="actions">
+          <button class="btn ok"   data-action="/admin/git/pull">Git Pull</button>
+          <button class="btn ok"   data-action="/admin/git/push">Git Push</button>
+          <button class="btn warn" data-action="/admin/services/restart?name=node">Node neu starten</button>
+          <button class="btn warn" data-action="/admin/services/restart?name=proxy">Proxy neu starten</button>
+        </div>
+        <p class="small">Tipp: Implementiere auf dem Server <code>/admin/status</code> (JSON), damit hier Ports/Prozesse/Versionen live erscheinen.</p>
+      </section>
     </main>
+
+    <footer>
+      <div class="legend">
+        <span><span class="badge b-ok">OK</span> alles grün</span>
+        <span><span class="badge b-warn">WARN</span> teilweise ok</span>
+        <span><span class="badge b-err">FEHLER</span> Handlungsbedarf</span>
+      </div>
+      <div class="small">© <span id="y"></span> Hotel-Dashboard · Admin-Ansicht</div>
+    </footer>
   </div>
 
-  <!-- Session-Countdown oben rechts -->
-  <script src="/session-timer.js" defer></script>
+  <script>
+    const $ = s => document.querySelector(s);
+    const stamp = $("#stamp");
+    const y = $("#y"); y.textContent = new Date().getFullYear();
+    $("#kv-domain").textContent = location.origin;
+
+    const setBadge = (el, ok, warn=false, txtOk="OK", txtErr="FEHLER")=>{
+      el.className = "badge " + (ok ? "b-ok" : (warn ? "b-warn" : "b-err"));
+      el.textContent = ok ? txtOk : (warn ? "WARN" : txtErr);
+    };
+
+    // einfache Fetch-Helper
+    const head = url => fetch(url, {method:"HEAD", cache:"no-store"});
+    const get  = url => fetch(url, {method:"GET",  cache:"no-store"});
+    const opts = url => fetch(url, {method:"OPTIONS", cache:"no-store"});
+
+    async function checkAll(){
+      const ts = new Date();
+      stamp.textContent = ts.toLocaleString();
+
+      // Applikation / Proxy
+      try {
+        const r1 = await get("/health");           setBadge($("#s-health"), r1.ok);
+      } catch {                                    setBadge($("#s-health"), false); }
+      try {
+        const r2 = await get("/");                 setBadge($("#s-root"), r2.ok);
+      } catch {                                    setBadge($("#s-root"), false); }
+      try {
+        const r3 = await get("/login.html");       setBadge($("#s-login"), r3.ok);
+      } catch {                                    setBadge($("#s-login"), false); }
+      try {
+        const r4 = await get("/reset.html");       setBadge($("#s-reset"), r4.ok);
+      } catch {                                    setBadge($("#s-reset"), false); }
+
+      // Assets
+      try { const a = await head("/HD-Logo.png");                      setBadge($("#s-logo"), a.ok); } catch { setBadge($("#s-logo"), false); }
+      try { const b = await head("/hotel-dashboard-bg.jpg");           setBadge($("#s-bg"),   b.ok); } catch { setBadge($("#s-bg"),   false); }
+      try { const c = await head("/Hotel-Dashboard-Schriftzug.png");   setBadge($("#s-word"), c.ok); } catch { setBadge($("#s-word"), false); }
+
+      // Reset-Flow Oberflächen-Checks
+      try {
+        const v = await get("/reset/validate?email=x&token=y");
+        // valide Anfrage sollte 400/422 liefern (weil Fake-Token) → Route existiert = grün
+        setBadge($("#s-validate"), (v.status===400||v.status===422||v.status===200), v.status===404, (v.status===200?"OK (200)":"OK"), "404");
+      } catch { setBadge($("#s-validate"), false); }
+
+      try {
+        const c = await opts("/reset/confirm");
+        setBadge($("#s-confirm"), (c.ok||c.status===204||c.status===200));
+      } catch { setBadge($("#s-confirm"), false); }
+
+      // Optionaler Server-Agent
+      try {
+        const res = await get("/admin/status");
+        if (!res.ok) throw new Error("status not ok");
+        const data = await res.json();
+        setBadge($("#s-agent"), true);
+        renderAgent(data);
+      } catch {
+        setBadge($("#s-agent"), false);
+        $("#agentRows").innerHTML = "";
+      }
+    }
+
+    function renderAgent(data){
+      // Erwartete Struktur (Beispiel):
+      // {
+      //   node: {port:3000, pid:1234, uptime:"1h12m", ok:true},
+      //   proxy:{kind:"nginx", ok:true, version:"1.24.0"},
+      //   git:{branch:"main", last:"2025-09-12 10:21", ok:true},
+      //   services:[
+      //     {name:"git-auto-push", ok:true, detail:"running (pid 222)"},
+      //     {name:"smtp", ok:false, detail:"ECONN"}
+      //   ]
+      // }
+      const rows = [];
+      if (data.node){
+        rows.push(builKVs("Node", [
+          ["Port", String(data.node.port ?? "?")],
+          ["PID", String(data.node.pid ?? "?")],
+          ["Uptime", String(data.node.uptime ?? "?")],
+          ["Status", statu(data.node.ok)]
+        ]));
+      }
+      if (data.proxy){
+        rows.push(builKVs("Proxy", [
+          ["Art", String(data.proxy.kind ?? "?")],
+          ["Version", String(data.proxy.version ?? "?")],
+          ["Status", statu(data.proxy.ok)]
+        ]));
+      }
+      if (data.git){
+        rows.push(builKVs("Git", [
+          ["Branch", String(data.git.branch ?? "?")],
+          ["Letzter Commit", String(data.git.last ?? "?")],
+          ["Status", statu(data.git.ok)]
+        ]));
+      }
+      if (Array.isArray(data.services)){
+        data.services.forEach(s=>{
+          rows.push(builKVs(s.name || "Service", [
+            ["Status", statu(s.ok)],
+            ["Info", String(s.detail ?? "–")]
+          ]));
+        });
+      }
+      $("#agentRows").innerHTML = rows.join("");
+    }
+    function builKVs(title, arr){
+      const kvs = arr.map(([k,v])=>`<div class="kv"><span>${k}</span><code>${v}</code></div>`).join("");
+      return `<div class="rows"><h3>${title}</h3>${kvs}</div>`;
+    }
+    function statu(ok){ return ok? "OK" : "FEHLER"; }
+
+    // Action-Buttons (rufen optionale Server-Routen auf)
+    document.addEventListener("click", async (e)=>{
+      const btn = e.target.closest("[data-action]");
+      if(!btn) return;
+      const url = btn.getAttribute("data-action");
+      btn.disabled = true;
+      const orig = btn.textContent;
+      btn.textContent = "…";
+      try{
+        const res = await fetch(url, {method:"POST"});
+        if(res.ok){ btn.textContent = "OK ✓"; setTimeout(()=>btn.textContent=orig, 1200); }
+        else { btn.textContent = "Fehler"; setTimeout(()=>btn.textContent=orig, 1600); alert("Server-Aktion fehlgeschlagen: " + res.status); }
+      }catch(err){
+        btn.textContent = "nicht verfügbar";
+        setTimeout(()=>btn.textContent=orig, 1800);
+        alert("Aktion nicht implementiert. Bitte Server-Route bereitstellen: POST "+url);
+      }finally{
+        btn.disabled = false;
+      }
+    });
+
+    // Start
+    checkAll();
+    setInterval(checkAll, 5000);
+  </script>
 </body>
 </html>
