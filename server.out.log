@@ -6,3 +6,4 @@ tokens    : /home/steven/hotel_dashboard/data/auth/reset.db.json
 audit log : /home/steven/hotel_dashboard/data/auth/reset_audit.log
 session idle(ms): 300000
 [login] password mismatch for admin@hotel-dashboard.de
+[login] password mismatch for admin@hotel-dashboard.de
