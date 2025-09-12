@@ -2,12 +2,12 @@
 require('dotenv').config({ quiet: true });
 
 /**
- * Hotel-Dashboard · server.js (vollständig, stabil, ohne Ibelsa)
- * - Struktur und Pfade bleiben unverändert (public/, data/, data/auth/)
- * - Root leitet zuverlässig auf /login
- * - Login/Session/Guards schützen /index und /dashboard (kein Direktaufruf ohne Session)
- * - Reset-Flow (Token anfordern, validieren, bestätigen) kompatibel zu users.json (pbkdf2)
- * - Port-Default ist 3000 (wie gewünscht). Per .env PORT überschreibbar.
+ * Hotel-Dashboard · server.js (stabil, ohne Ibelsa)
+ * - Struktur und Pfade unverändert (public/, data/, data/auth/)
+ * - Root → /login
+ * - Login/Session/Guards schützen /index und /dashboard
+ * - Reset-Flow kompatibel (pbkdf2:sha256:310000)
+ * - Port-Default: 3000 (per .env PORT überschreibbar)
  */
 
 const express = require('express');
@@ -19,9 +19,9 @@ const session = require('express-session');
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
 
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
 // Pfade (beibehalten)
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
 const ROOT       = path.resolve(__dirname);
 const publicDir  = path.join(ROOT, 'public');
 const dataDir    = path.join(ROOT, 'data');
@@ -30,7 +30,7 @@ const usersPath  = path.join(dataDir, 'users.json');
 const tokensPath = path.join(authDir, 'reset.db.json');
 const auditLog   = path.join(authDir, 'reset_audit.log');
 
-// Ordner/Dateien sicherstellen (ohne Strukturänderung)
+// Ordner/Dateien sicherstellen
 for (const d of [publicDir, dataDir, authDir]) { try { fs.mkdirSync(d, { recursive: true }); } catch {} }
 function loadJSON(p, def){ try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return def; } }
 function saveJSON(p, obj){ fs.writeFileSync(p, JSON.stringify(obj, null, 2), 'utf8'); }
@@ -39,9 +39,9 @@ function saveJSON(p, obj){ fs.writeFileSync(p, JSON.stringify(obj, null, 2), 'ut
   const T = loadJSON(tokensPath,{ tokens: [] }); if (!Array.isArray(T.tokens)) T.tokens = []; saveJSON(tokensPath, T);
 })();
 
-// ───────────────────────────────────────────────────────────────────────────────
-// Passwort-Utils (kompatibel zu pbkdf2:sha256:310000 in users.json)
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
+// Passwort-Utils (pbkdf2:sha256:310000)
+// ───────────────────────────────────────────────────────────────
 function verifyPassword(password, user){
   if (!user?.passHash || !user?.passSalt) return false;
   const [ , digest='sha256', it='310000' ] = String(user.passAlgo||'').split(':');
@@ -52,21 +52,22 @@ function validatePasswordPolicy(p){
   return Boolean(p && p.length >= 10 && /[A-Z]/.test(p) && /[a-z]/.test(p) && (/\d/.test(p) || /[^A-Za-z0-9]/.test(p)));
 }
 
-// Login-Normalisierung (tolerant gegenüber „name.atdomain“ usw.)
+// Login-Normalisierung (robust für „Info“, „info@…“, „name.atdomain“)
 function normalizeLoginInput(raw) {
-  const name = String(raw || '').trim();
-  const lower = name.toLowerCase();
-  const cands = new Set([lower]);
+  const name0 = String(raw || '').trim();
+  const fixedAt = name0.replace(/\[(?:at|AT)\]|(?:\s+at\s+)|(?:\.at)/g, '@'); // "name.atdomain" → "name@domain"
+  const lower = fixedAt.toLowerCase();
+  const set = new Set();
 
-  // "name.atdomain.tld" → "name@domain.tld"
-  if (!lower.includes('@') && lower.includes('.at')) {
-    cands.add(lower.replace('.at', '@'));
-  }
-  // Lokalteile erlauben: "name" matcht "name@…"
+  // 1) wie eingegeben (bereinigt)
+  set.add(lower);
+
+  // 2) nur lokaler Teil
   const local = lower.split('@')[0];
-  if (local) cands.add(local);
+  if (local) set.add(local);
 
-  return Array.from(cands);
+  // 3) Wenn jemand nur "info" tippt, gleiche Kandidaten behalten
+  return Array.from(set);
 }
 function findUserByCandidates(candidates, usersDoc){
   const list = (usersDoc && Array.isArray(usersDoc.users)) ? usersDoc.users : [];
@@ -78,9 +79,9 @@ function findUserByCandidates(candidates, usersDoc){
   });
 }
 
-// ───────────────────────────────────────────────────────────────────────────────
-// Basics (Body/Session) — keine Strukturänderung
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
+// Basics (Body/Session)
+// ───────────────────────────────────────────────────────────────
 app.set('trust proxy', 1);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -94,9 +95,9 @@ app.use(session({
   cookie: { httpOnly:true, sameSite:'lax', secure:false, maxAge: IDLE_MS }
 }));
 
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
 // Offene Pfade & Assets
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
 const assetRE = /\.(?:png|jpe?g|gif|svg|ico|webp|css|js|map|woff2?)$/i;
 const OPEN_PATHS = new Set([
   '/', '/health',
@@ -122,41 +123,41 @@ app.use((req, res, next) => {
   next();
 });
 
-// Cache-Control Helper für geschützte Antworten
+// Cache-Control Helper
 function setNoStore(res){
   res.setHeader('Cache-Control','no-store, no-cache, must-revalidate, proxy-revalidate');
   res.setHeader('Pragma','no-cache'); res.setHeader('Expires','0'); res.setHeader('Surrogate-Control','no-store');
 }
 
-// Guards: blockiert alles außer OPEN_PATHS/Assets, schützt .html
+// Guards: schützt alles außer OPEN_PATHS/Assets und verhindert Direktaufrufe .html
 app.use((req, res, next) => {
-  if (assetRE.test(req.path)) return next();        // Assets immer durchlassen
-  if (OPEN_PATHS.has(req.path)) return next();      // offene Pfade durchlassen
+  if (assetRE.test(req.path)) return next();
+  if (OPEN_PATHS.has(req.path)) return next();
   if (req.path.endsWith('.html') && !/^\/(login|reset)\.html$/i.test(req.path)){
-    return res.redirect('/login');                  // .html nur Login/Reset öffentlich
+    return res.redirect('/login');
   }
   if (req.session && req.session.user){ setNoStore(res); return next(); }
   return res.redirect('/login');
 });
 
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
 // Root/Health
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
 app.get ('/',       (_req, res) => res.redirect('/login'));
 app.get ('/health', (_req, res) => res.type('text').send('OK'));
 app.head('/health', (_req, res) => res.sendStatus(200));
 
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
 // Seiten (öffentlich: Login/Reset)
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
 app.get ('/login',  (_req, res) => res.sendFile('login.html',  { root: publicDir }));
 app.get ('/reset',  (_req, res) => res.sendFile('reset.html',  { root: publicDir }));
 app.head('/login',  (_req, res) => res.sendStatus(200));
 app.head('/reset',  (_req, res) => res.sendStatus(200));
 
-// ───────────────────────────────────────────────────────────────────────────────
-// Reset-Flow (Token anfordern/prüfen/bestätigen) – minimal & kompatibel
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
+// Reset-Flow (kompatibel)
+// ───────────────────────────────────────────────────────────────
 app.post('/reset', (req, res) => {
   const email = String(req.body.email||'').trim().toLowerCase();
   if (!email) return res.status(400).type('text').send('E-Mail fehlt');
@@ -167,12 +168,10 @@ app.post('/reset', (req, res) => {
 
   const db = loadJSON(tokensPath, { tokens: [] });
   db.tokens = Array.isArray(db.tokens) ? db.tokens : [];
-  // alte Tokens der Mail invalidieren
   db.tokens = db.tokens.map(t => t.email===email ? { ...t, used:true } : t);
   db.tokens.push({ email, token, createdAt: now, expiresAt: exp, used:false });
   saveJSON(tokensPath, db);
 
-  // Hinweis: Mailversand ist außerhalb/optional. Hier nur Erfolg zurück.
   return res.status(200).json({ ok:true, message:'token_created' });
 });
 
@@ -203,14 +202,12 @@ app.post('/reset/confirm', (req, res) => {
     return res.status(422).type('text').send('Passwort zu schwach');
   }
 
-  // Token prüfen & verbrauchen
   const db  = loadJSON(tokensPath, { tokens: [] });
   const now = Date.now();
   const idx = (db.tokens||[]).findIndex(t => t.email===email && t.token===token && !t.used && t.expiresAt>now);
   if (idx === -1) return res.status(403).type('text').send('Token ungültig/abgelaufen');
   db.tokens[idx].used = true; saveJSON(tokensPath, db);
 
-  // User setzen/aktualisieren (pbkdf2)
   const ud = loadJSON(usersPath, { users: [] });
   const uIdx = ud.users.findIndex(u => (u.email||'').toLowerCase() === email);
   const salt = crypto.randomBytes(16).toString('hex');
@@ -228,18 +225,23 @@ app.post('/reset/confirm', (req, res) => {
   return res.type('text').send('Passwort gesetzt');
 });
 
-// ───────────────────────────────────────────────────────────────────────────────
-// Login / Logout / After-Login
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
+// Login / Logout / After-Login (robust, mit Logs)
+// ───────────────────────────────────────────────────────────────
 app.post('/login', (req, res) => {
-  // akzeptiere sowohl "username" als auch "email" vom Formular
   const rawName  = req.body.username ?? req.body.email;
   const password = String(req.body.password || '');
-  const candidates = normalizeLoginInput(rawName);
 
-  // 1) users.json
+  const candidates = normalizeLoginInput(rawName);
   const ud = loadJSON(usersPath, { users: [] });
   const user = findUserByCandidates(candidates, ud);
+
+  // Debug-Logs ohne Passwörter (nur Grund)
+  if (!user) {
+    console.warn('[login] user not found for', candidates);
+  } else if (!verifyPassword(password, user)) {
+    console.warn('[login] password mismatch for', (user.email || user.username));
+  }
 
   if (user && verifyPassword(password, user)) {
     req.session.user = user.email || user.username;
@@ -247,7 +249,7 @@ app.post('/login', (req, res) => {
     return res.redirect('/after-login');
   }
 
-  // 2) .env-Fallbacks (ADMIN/DASH)
+  // .env-Fallbacks (ADMIN/DASH)
   const { DASH_USER='', DASH_PASS='', ADMIN_USER='', ADMIN_PASS='' } = process.env;
   const lowered = (candidates[0] || '').toLowerCase();
   const envMatch =
@@ -260,7 +262,6 @@ app.post('/login', (req, res) => {
     return res.redirect('/after-login');
   }
 
-  // Fehlversuch → zurück zum Login
   return res.redirect('/login?err=1');
 });
 
@@ -283,9 +284,9 @@ app.get('/after-login', (req, res) => {
   setNoStore(res); return res.redirect('/dashboard');
 });
 
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
 // Geschützte Seiten
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
 function requireAuth(req, res, next){
   if (req.session && req.session.user){ setNoStore(res); return next(); }
   return res.redirect('/login');
@@ -293,15 +294,15 @@ function requireAuth(req, res, next){
 app.get('/index',     requireAuth, (_req, res) => res.sendFile('index.html',     { root: publicDir }));
 app.get('/dashboard', requireAuth, (_req, res) => res.sendFile('dashboard.html', { root: publicDir }));
 
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
 // Static (ohne index-Autoload) & 404
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
 app.use(express.static(publicDir, { index: false, extensions: ['html'] }));
 app.use((_req, res) => res.status(404).sendFile('login.html', { root: publicDir }));
 
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
 // Start
-// ───────────────────────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log('Hotel-Dashboard läuft auf Port', PORT);
   console.log('ROOT      :', ROOT);
