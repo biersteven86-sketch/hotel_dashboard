@@ -130,3 +130,304 @@ $ npx -v || true
 10.8.2
 
 $ pm2 ls || true
+┌────┬────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name               │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 1  │ git-auto-push      │ default     │ 1.0.0   │ fork    │ 0        │ 0      │ 127… │ errored   │ 0%       │ 0b       │ steven   │ disabled │
+│ 2  │ hotel-dashboard    │ default     │ 1.0.0   │ fork    │ 131724   │ 0s     │ 994… │ online    │ 100%     │ 50.3mb   │ steven   │ disabled │
+└────┴────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+Module
+┌────┬──────────────────────────────┬───────────────┬──────────┬──────────┬──────┬──────────┬──────────┬──────────┐
+│ id │ module                       │ version       │ pid      │ status   │ ↺    │ cpu      │ mem      │ user     │
+├────┼──────────────────────────────┼───────────────┼──────────┼──────────┼──────┼──────────┼──────────┼──────────┤
+│ 0  │ pm2-logrotate                │ 2.7.0         │ 1382     │ online   │ 0    │ 0%       │ 75.4mb   │ steven   │
+└────┴──────────────────────────────┴───────────────┴──────────┴──────────┴──────┴──────────┴──────────┴──────────┘
+
+$ python3 --version || true
+Python 3.11.2
+
+$ pip3 --version || true
+pip 23.0.1 from /usr/lib/python3/dist-packages/pip (python 3.11)
+
+$ git --version || true
+git version 2.39.5
+
+$ curl --version | head -n 1 || true
+curl 7.88.1 (aarch64-unknown-linux-gnu) libcurl/7.88.1 OpenSSL/3.0.17 zlib/1.2.13 brotli/1.0.9 zstd/1.5.4 libidn2/2.3.3 libpsl/0.21.2 (+libidn2/2.3.3) libssh2/1.10.0 nghttp2/1.52.0 librtmp/2.3 OpenLDAP/2.5.13
+
+$ openssl version || true
+OpenSSL 3.0.17 1 Jul 2025 (Library: OpenSSL 3.0.17 1 Jul 2025)
+
+$ ssh -V 2>&1 | head -n 1 || true
+OpenSSH_9.2p1 Debian-2+deb12u7, OpenSSL 3.0.17 1 Jul 2025
+
+────────────────────────────────────────────────────────
+PAKETE · APT / SNAP
+────────────────────────────────────────────────────────
+
+$ dpkg -l | grep -E 'nginx|apache|node|npm|pm2|curl|git|openssl|ssh|python' || true
+ii  apache2                              2.4.62-1~deb12u2                        arm64        Apache HTTP Server
+ii  apache2-bin                          2.4.62-1~deb12u2                        arm64        Apache HTTP Server (modules and other binary files)
+ii  apache2-data                         2.4.62-1~deb12u2                        all          Apache HTTP Server (common files)
+ii  apache2-utils                        2.4.62-1~deb12u2                        arm64        Apache HTTP Server (utility programs for web servers)
+ii  curl                                 7.88.1-10+deb12u12                      arm64        command line tool for transferring data with URL syntax
+ii  git                                  1:2.39.5-0+deb12u2                      arm64        fast, scalable, distributed revision control system
+ii  git-man                              1:2.39.5-0+deb12u2                      all          fast, scalable, distributed revision control system (manual pages)
+ii  kms++-utils                          0~git20250807.1813ada-1~bookworm        arm64        C++ library for kernel mode setting - utilities
+ii  libcdio-cdda2:arm64                  10.2+2.0.1-1                            arm64        library to read and control digital audio CDs
+ii  libcdio-paranoia2:arm64              10.2+2.0.1-1                            arm64        library to read digital audio CDs with error correction
+ii  libcurl3-gnutls:arm64                7.88.1-10+deb12u12                      arm64        easy-to-use client-side URL transfer library (GnuTLS flavour)
+ii  libcurl4:arm64                       7.88.1-10+deb12u12                      arm64        easy-to-use client-side URL transfer library (OpenSSL flavour)
+ii  libdc1394-25:arm64                   2.2.6-4                                 arm64        high level programming interface for IEEE 1394 digital cameras
+ii  libdv4:arm64                         1.0.0-15                                arm64        software library for DV format digital video (runtime lib)
+ii  libgphoto2-6:arm64                   2.5.30-1                                arm64        gphoto2 digital camera library
+ii  libgphoto2-port12:arm64              2.5.30-1                                arm64        gphoto2 digital camera port library
+ii  libgpm2:arm64                        1.20.7-10+b1                            arm64        General Purpose Mouse - shared library
+ii  libjxr-tools                         1.2~git20170615.f752187-5               arm64        JPEG-XR lib - command line apps
+ii  libjxr0:arm64                        1.2~git20170615.f752187-5               arm64        JPEG-XR lib - libraries
+ii  libkms++0:arm64                      0~git20250807.1813ada-1~bookworm        arm64        C++ library for kernel mode setting
+ii  libldacbt-abr2:arm64                 2.0.2.3+git20200429+ed310a0-4           arm64        LDAC Bluetooth ABR library (shared library)
+ii  libldacbt-enc2:arm64                 2.0.2.3+git20200429+ed310a0-4           arm64        LDAC Bluetooth encoder library (shared library)
+ii  libluajit-5.1-2:arm64                2.1.0~beta3+git20220320+dfsg-4.1        arm64        Just in time compiler for Lua - library version
+ii  libluajit-5.1-common                 2.1.0~beta3+git20220320+dfsg-4.1        all          Just in time compiler for Lua - common files
+ii  libneatvnc0:arm64                    0.9.5~github~bpo12                      arm64        Fast and neat VNC server library (shared library)
+ii  libpam-chksshpwd:arm64               1.5.2-6+rpt2+deb12u1                    arm64        PAM module to enable SSH password checking support
+ii  libpython3-dev:arm64                 3.11.2-1+b1                             arm64        header files and a static library for Python (default)
+ii  libpython3-stdlib:arm64              3.11.2-1+b1                             arm64        interactive high-level object-oriented language (default python3 version)
+ii  libpython3.11:arm64                  3.11.2-6+deb12u6                        arm64        Shared Python runtime library (version 3.11)
+ii  libpython3.11-dev:arm64              3.11.2-6+deb12u6                        arm64        Header files and a static library for Python (v3.11)
+ii  libpython3.11-minimal:arm64          3.11.2-6+deb12u6                        arm64        Minimal subset of the Python language (version 3.11)
+ii  libpython3.11-stdlib:arm64           3.11.2-6+deb12u6                        arm64        Interactive high-level object-oriented language (standard library, version 3.11)
+ii  librtmp1:arm64                       2.4+20151223.gitfa8646d.1-2+b2          arm64        toolkit for RTMP streams (shared library)
+ii  libsord-0-0:arm64                    0.16.14+git221008-1                     arm64        library for storing RDF data in memory
+ii  libspatialaudio0:arm64               0.3.0+git20180730+dfsg1-2+b1            arm64        library for ambisonic encoding and decoding (runtime files)
+ii  libssh-gcrypt-4:arm64                0.10.6-0+deb12u1                        arm64        tiny C SSH library (gcrypt flavor)
+ii  libssh2-1:arm64                      1.10.0-3+b1                             arm64        SSH2 client-side library
+ii  libwebp7:arm64                       1.2.4-0.2+deb12u1                       arm64        Lossy compression of digital photographic images
+ii  libwebpdemux2:arm64                  1.2.4-0.2+deb12u1                       arm64        Lossy compression of digital photographic images.
+ii  libwebpmux3:arm64                    1.2.4-0.2+deb12u1                       arm64        Lossy compression of digital photographic images
+ii  libx264-164:arm64                    2:0.164.3095+gitbaee400-3               arm64        x264 video coding library
+ii  libyuv0:arm64                        0.0~git20230123.b2528b0-1               arm64        Library for YUV scaling (shared library)
+ii  luajit                               2.1.0~beta3+git20220320+dfsg-4.1        arm64        Just in time compiler for Lua programming language version 5.1
+ii  nginx                                1.22.1-9+deb12u2                        arm64        small, powerful, scalable web/proxy server
+ii  nginx-common                         1.22.1-9+deb12u2                        all          small, powerful, scalable web/proxy server - common files
+ii  nodejs                               22.18.0-1nodesource1                    arm64        Node.js event-based server-side javascript engine
+ii  obconf                               1:2.0.4+git20150213-2+rpt4              arm64        preferences manager for Openbox window manager
+ii  openssh-client                       1:9.2p1-2+deb12u7                       arm64        secure shell (SSH) client, for secure access to remote machines
+ii  openssh-server                       1:9.2p1-2+deb12u7                       arm64        secure shell (SSH) server, for secure access from remote machines
+ii  openssh-sftp-server                  1:9.2p1-2+deb12u7                       arm64        secure shell (SSH) sftp server module, for SFTP access from remote machines
+ii  openssl                              3.0.17-1~deb12u2+rpt1                   arm64        Secure Sockets Layer toolkit - cryptographic utility
+ii  pprompt                              0.23                                    arm64        ssh password check
+ii  python-apt-common                    2.6.0                                   all          Python interface to libapt-pkg (locales)
+ii  python-babel-localedata              2.10.3-1                                all          tools for internationalizing Python applications - locale data files
+ii  python-is-python3                    3.11.2-1+deb12u1                        all          symlinks /usr/bin/python to python3
+ii  python3                              3.11.2-1+b1                             arm64        interactive high-level object-oriented language (default python3 version)
+ii  python3-acme                         2.1.0-1                                 all          ACME protocol library for Python 3
+ii  python3-apt                          2.6.0                                   arm64        Python 3 interface to libapt-pkg
+ii  python3-asgiref                      3.6.0-1                                 all          ASGI in-memory channel layer (Python3 version)
+ii  python3-astroid                      2.14.2-1                                all          rebuild a new abstract syntax tree from Python's AST (Python3)
+ii  python3-asttokens                    2.2.1-1                                 all          annotate Python asbtract syntax trees with code references (Python 3)
+ii  python3-attr                         22.2.0-1                                all          Attributes without boilerplate (Python 3)
+ii  python3-augeas                       0.5.0-1.1                               all          Python3 bindings for Augeas
+ii  python3-av                           12.3.0-2+rpt1                           arm64        pythonic bindings for FFmpeg's libraries
+ii  python3-babel                        2.10.3-1                                all          tools for internationalizing Python applications - Python 3.x
+ii  python3-blinker                      1.5-1                                   all          Fast, simple object-to-object and broadcast signaling (Python3)
+ii  python3-bs4                          4.11.2-2                                all          error-tolerant HTML parser for Python 3
+ii  python3-cairo:arm64                  1.20.1-5+b1                             arm64        Python3 bindings for the Cairo vector graphics library
+ii  python3-certbot                      2.1.0-4                                 all          main library for certbot
+ii  python3-certbot-apache               2.1.0-2                                 all          Apache plugin for Certbot
+ii  python3-certbot-nginx                2.1.0-2                                 all          Nginx plugin for Certbot
+ii  python3-certifi                      2022.9.24-1                             all          root certificates for validating SSL certs and verifying TLS hosts (python3)
+ii  python3-cffi-backend:arm64           1.15.1-5+b1                             arm64        Foreign Function Interface for Python 3 calling C code - runtime
+ii  python3-chardet                      5.1.0+dfsg-2                            all          Universal Character Encoding Detector (Python3)
+ii  python3-charset-normalizer           3.0.1-2                                 all          charset, encoding and language detection (Python 3)
+ii  python3-click                        8.1.3-2                                 all          Wrapper around optparse for command line utilities - Python 3.x
+ii  python3-colorama                     0.4.6-2                                 all          Cross-platform colored terminal text in Python - Python 3.x
+ii  python3-colorzero                    2.0-2                                   all          Construct, convert, and manipulate colors in a Pythonic manner.
+ii  python3-configargparse               1.5.3-1                                 all          replacement for argparse with config files and environment variables (Python 3)
+ii  python3-configobj                    5.0.8-1                                 all          simple but powerful config file reader and writer for Python 3
+ii  python3-cryptography                 38.0.4-3+deb12u1                        arm64        Python library exposing cryptographic recipes and primitives (Python 3)
+ii  python3-cups:arm64                   2.0.1-5+b4                              arm64        Python3 bindings for CUPS
+ii  python3-cupshelpers                  1.5.18-1                                all          Python utility modules around the CUPS printing system
+ii  python3-dbus                         1.3.2-4+b1                              arm64        simple interprocess messaging system (Python 3 interface)
+ii  python3-debconf                      1.5.82                                  all          interact with debconf from Python 3
+ii  python3-dev                          3.11.2-1+b1                             arm64        header files and a static library for Python (default)
+ii  python3-dill                         0.3.6-1                                 all          Serialize all of Python 3 (almost)
+ii  python3-distro                       1.8.0-1                                 all          Linux OS platform information API
+ii  python3-distutils                    3.11.2-3                                all          distutils package for Python 3.x
+ii  python3-docutils                     0.19+dfsg-6                             all          text processing system for reStructuredText (implemented in Python 3)
+ii  python3-dotenv                       0.21.0-1                                all          Get and set values in the .env file in local and production servers
+ii  python3-flask                        2.2.2-3                                 all          micro web framework based on Werkzeug and Jinja2 - Python 3.x
+ii  python3-gi                           3.42.2-3+b1                             arm64        Python 3 bindings for gobject-introspection libraries
+ii  python3-gpg                          1.18.0-3+b1                             arm64        Python interface to the GPGME GnuPG encryption library (Python 3)
+ii  python3-gpiozero                     2.0.1-0+rpt1                            all          Simple API for controlling devices attached to a Pi's GPIO pins
+ii  python3-html5lib                     1.1-3                                   all          HTML parser/tokenizer based on the WHATWG HTML5 specification
+ii  python3-icu                          2.10.2-1+b3                             arm64        Python 3 extension wrapping the ICU C++ API
+ii  python3-idna                         3.3-1+deb12u1                           all          Python IDNA2008 (RFC 5891) handling (Python 3)
+ii  python3-importlib-metadata           4.12.0-1                                all          library to access the metadata for a Python package - Python 3.x
+ii  python3-isort                        5.6.4-1                                 all          library for sorting Python imports (Python 3)
+ii  python3-itsdangerous                 2.1.2-3                                 all          Various helpers to pass trusted data to untrusted environment - Python 3.x
+ii  python3-jedi                         0.18.2-1                                all          autocompletion tool for Python 3
+ii  python3-jinja2                       3.1.2-1+deb12u2                         all          small but fast and easy to use stand-alone template engine
+ii  python3-josepy                       1.13.0-1                                all          JOSE implementation for Python 3.x
+ii  python3-json-pointer                 2.3-2                                   all          resolve JSON pointers - Python 3.x
+ii  python3-jsonschema                   4.10.3-1                                all          An(other) implementation of JSON Schema (Draft 3, 4, 6, 7)
+ii  python3-jwt                          2.6.0-1                                 all          Python 3 implementation of JSON Web Token
+ii  python3-kms++                        0~git20250807.1813ada-1~bookworm        arm64        C++ library for kernel mode setting - python3 bindings
+ii  python3-lazy-object-proxy            1.9.0-1+b1                              arm64        Python 3 fast and thorough lazy object proxy
+ii  python3-ldb                          2:2.6.2+samba4.17.12+dfsg-0+deb12u2     arm64        Python 3 bindings for LDB
+ii  python3-lgpio                        0.2.2-1~rpt1                            arm64        Control GPIO pins via gpiochip devices - python3 bindings
+ii  python3-lib2to3                      3.11.2-3                                all          Interactive high-level object-oriented language (lib2to3)
+ii  python3-libarchive-c                 2.9-0.1                                 all          Python3 interface to libarchive
+ii  python3-libcamera:arm64              0.5.1+rpt20250722-1                     arm64        complex camera support library (Python bindings)
+ii  python3-libevdev                     0.5-3                                   all          Python 3 wrapper for libevdev
+ii  python3-libgpiod:arm64               1.6.3-1+b3                              arm64        Python bindings for libgpiod (Python 3)
+ii  python3-logilab-common               1.9.8-1                                 all          useful miscellaneous modules used by Logilab projects (Python3)
+ii  python3-lxml:arm64                   4.9.2-1+b1                              arm64        pythonic binding for the libxml2 and libxslt libraries
+ii  python3-markupsafe                   2.1.2-1+b1                              arm64        HTML/XHTML/XML string library
+ii  python3-mccabe                       0.7.0-1                                 all          Python code complexity checker (Python 3)
+ii  python3-minimal                      3.11.2-1+b1                             arm64        minimal subset of the Python language (default python3 version)
+ii  python3-more-itertools               8.10.0-2                                all          library with routines for operating on iterables, beyond itertools (Python 3)
+ii  python3-mypy                         1.0.1-1                                 arm64        public modules for mypy (Python 3)
+ii  python3-mypy-extensions              0.4.3-4                                 all          Experimental type system extensions for mypy typechecker (Python 3)
+ii  python3-numpy                        1:1.24.2-1+deb12u1                      arm64        Fast array facility to the Python 3 language
+ii  python3-oauthlib                     3.2.2-1                                 all          generic, spec-compliant implementation of OAuth for Python3
+ii  python3-olefile                      0.46-3                                  all          Python module to read/write MS OLE2 files
+ii  python3-opengl                       3.1.6+dfsg-3                            all          Python bindings to OpenGL (Python 3)
+ii  python3-openssl                      23.0.0-1                                all          Python 3 wrapper around the OpenSSL library
+ii  python3-parsedatetime                2.6-3                                   all          Python 3 module to parse human-readable date/time expressions
+ii  python3-parso                        0.8.3-1                                 all          Python parser that supports error recovery - Python 3.X
+ii  python3-pexpect                      4.8.0-4                                 all          Python 3 module for automating interactive applications
+ii  python3-pgzero                       1.2.post4+dfsg-2                        all          Zero-boilerplate games programming framework based on Pygame (Python 3)
+ii  python3-picamera2                    0.3.30-1                                all          Libcamera based python library
+ii  python3-pidng                        4.0.9+git20250603.8427835-1             arm64        Create Adobe DNG RAW files using Python (Python 3)
+ii  python3-piexif                       1.1.3-2                                 all          pure-Python EXIF manipulation library
+ii  python3-pigpio                       1.79-1+rpt1                             all          Python module which talks to the pigpio daemon (Python 3)
+ii  python3-pil:arm64                    9.4.0-1.1+deb12u1                       arm64        Python Imaging Library (Python3)
+ii  python3-pip                          23.0.1+dfsg-1+rpt1                      all          Python package installer
+ii  python3-pip-whl                      23.0.1+dfsg-1+rpt1                      all          Python package installer (pip wheel)
+ii  python3-pkg-resources                66.1.1-1+deb12u1                        all          Package Discovery and Resource Access using pkg_resources
+ii  python3-platformdirs                 2.6.0-1                                 all          determining appropriate platform-specific directories (Python 3)
+ii  python3-prctl                        1.8.1-1+b2                              arm64        Python interface to the prctl() syscall (Python 3)
+ii  python3-psutil                       5.9.4-1+b1                              arm64        module providing convenience functions for managing processes (Python3)
+ii  python3-ptyprocess                   0.7.0-5                                 all          Run a subprocess in a pseudo terminal from Python 3
+ii  python3-pycryptodome                 3.11.0+dfsg1-4                          arm64        cryptographic Python library (Python 3)
+ii  python3-pygame                       2.1.2+dfsg-5+b1                         arm64        SDL bindings for games development (Python 3)
+ii  python3-pygments                     2.14.0+dfsg-1                           all          syntax highlighting package written in Python 3
+ii  python3-pyinotify                    0.9.6-2                                 all          simple Linux inotify Python bindings
+ii  python3-pyparsing                    3.0.9-1                                 all          alternative to creating and executing simple grammars - Python 3.x
+ii  python3-pyqt5                        5.15.9+dfsg-1                           arm64        Python 3 bindings for Qt5
+ii  python3-pyqt5.sip                    12.11.1-1                               arm64        runtime module for Python extensions using SIP
+ii  python3-pyrsistent:arm64             0.18.1-1+b3                             arm64        persistent/functional/immutable data structures for Python
+ii  python3-pyudev                       0.24.0-1                                all          Python3 bindings for libudev
+ii  python3-renderpm:arm64               3.6.12-1+deb12u1                        arm64        python low level render interface
+ii  python3-reportlab                    3.6.12-1+deb12u1                        all          ReportLab library to create PDF documents using Python3
+ii  python3-reportlab-accel:arm64        3.6.12-1+deb12u1                        arm64        C coded extension accelerator for the ReportLab Toolkit
+ii  python3-requests                     2.28.1+dfsg-1                           all          elegant and simple HTTP library for Python3, built for human beings
+ii  python3-requests-oauthlib            1.3.0+ds-1                              all          module providing OAuthlib auth support for requests (Python 3)
+ii  python3-responses                    0.18.0-1                                all          Utility library for mocking out the requests Python 3 library
+ii  python3-rfc3339                      1.1-4                                   all          parser and generator of RFC 3339-compliant timestamps (Python 3)
+ii  python3-rfc3987                      1.3.8-2                                 all          Parsing and validation of URIs (RFC 3986) and IRIs (RFC 3987)
+ii  python3-roman                        3.3-3                                   all          module for generating/analyzing Roman numerals for Python 3
+ii  python3-rpi-lgpio                    0.6-0~rpt1                              all          Compatibility shim for lgpio emulating the RPi.GPIO API
+ii  python3-rtimulib                     7.2.1-6+bookworm                        arm64        Versatile C++ and Python 9-dof, 10-dof and 11-dof IMU library (Python 3)
+ii  python3-samba                        2:4.17.12+dfsg-0+deb12u2                arm64        Python 3 bindings for Samba
+ii  python3-send2trash                   1.8.1~b0-2                              all          Python module for sending file to trash natively
+ii  python3-sense-hat                    2.6.0-1                                 all          Sense HAT python library (Python 3)
+ii  python3-serial                       3.5-1.1                                 all          pyserial - module encapsulating access for the serial port
+ii  python3-setuptools                   66.1.1-1+deb12u1                        all          Python3 Distutils Enhancements
+ii  python3-setuptools-whl               66.1.1-1+deb12u1                        all          Python Distutils Enhancements (wheel package)
+ii  python3-simplejpeg                   1.8.1-1                                 arm64        Simple package for fast JPEG encoding and decoding
+ii  python3-simplejson                   3.18.3-1                                arm64        simple, fast, extensible JSON encoder/decoder for Python 3.x
+ii  python3-six                          1.16.0-4                                all          Python 2 and 3 compatibility library
+ii  python3-smbc                         1.0.23-2+b4                             arm64        Python 3 bindings for the Samba client library
+ii  python3-smbus:arm64                  4.3-2+b3                                arm64        Python 3 bindings for Linux SMBus access through i2c-dev
+ii  python3-smbus2                       0.4.2-1                                 arm64        another pure Python implementation of the python-smbus package
+ii  python3-soupsieve                    2.3.2-1                                 all          modern CSS selector implementation for BeautifulSoup (Python 3)
+ii  python3-spidev                       20200602~200721-1+bookworm              arm64        Bindings for Linux SPI access through spidev (Python 3)
+ii  python3-systemd                      235-1+b2                                arm64        Python 3 bindings for systemd
+ii  python3-talloc:arm64                 2.4.0-f2                                arm64        hierarchical pool based memory allocator - Python3 bindings
+ii  python3-tdb                          1.4.8-2                                 arm64        Python3 bindings for TDB
+ii  python3-tk:arm64                     3.11.2-3                                arm64        Tkinter - Writing Tk applications with Python 3.x
+ii  python3-toml                         0.10.2-1                                all          library for Tom's Obvious, Minimal Language - Python 3.x
+ii  python3-tomlkit                      0.11.7-1                                all          style-preserving TOML library for Python
+ii  python3-tqdm                         4.64.1-1                                all          fast, extensible progress bar for Python 3 and CLI tool
+ii  python3-twython                      3.8.2+dfsg-2                            all          Pure Python3 wrapper for the Twitter API
+ii  python3-typeshed                     0.0~git20221107.4f381af-1               all          collection of library stubs for Python, with static types
+ii  python3-typing-extensions            4.4.0-1                                 all          Backported and Experimental Type Hints for Python
+ii  python3-tz                           2022.7.1-4                              all          Python3 version of the Olson timezone database
+ii  python3-uritemplate                  4.1.1-2                                 all          implementation of RFC6570 - Python 3.x
+ii  python3-urllib3                      1.26.12-1+deb12u1                       all          HTTP library with thread-safe connection pooling for Python3
+ii  python3-v4l2                         0.3.5-1                                 all          Python bindings for the v4l2 userspace api
+ii  python3-venv                         3.11.2-1+b1                             arm64        venv module for python3 (default python3 version)
+ii  python3-videodev2                    0.0.4-1                                 all          Converts Video4Linux2 (V4L2) C header files to Python ctypes bindings
+ii  python3-webcolors                    1.11.1-1                                all          python3 library of color names and value formats
+ii  python3-webencodings                 0.5.1-5                                 all          Python implementation of the WHATWG Encoding standard
+ii  python3-werkzeug                     2.2.2-3+deb12u1                         all          collection of utilities for WSGI applications (Python 3.x)
+ii  python3-wheel                        0.38.4-2                                all          built-package format for Python
+ii  python3-wrapt                        1.14.1-2+b2                             arm64        decorators, wrappers and monkey patching. - Python 3.x
+ii  python3-zipp                         1.0.0-6                                 all          pathlib-compatible Zipfile object wrapper - Python 3.x
+ii  python3.11                           3.11.2-6+deb12u6                        arm64        Interactive high-level object-oriented language (version 3.11)
+ii  python3.11-dev                       3.11.2-6+deb12u6                        arm64        Header files and a static library for Python (v3.11)
+ii  python3.11-minimal                   3.11.2-6+deb12u6                        arm64        Minimal subset of the Python language (version 3.11)
+ii  python3.11-venv                      3.11.2-6+deb12u6                        arm64        Interactive high-level object-oriented language (pyvenv binary, version 3.11)
+ii  qt5-gtk2-platformtheme:arm64         5.0.0+git23.g335dbec-4+rpt2             arm64        Qt 5 extra widget styles - GTK+ 2 Platform theme
+ii  qt5-style-plugin-cleanlooks:arm64    5.0.0+git23.g335dbec-4+rpt2             arm64        Qt 5 extra widget styles - Cleanlooks
+ii  qt5-style-plugin-motif:arm64         5.0.0+git23.g335dbec-4+rpt2             arm64        Qt 5 extra widget styles - Motif
+ii  qt5-style-plugin-plastique:arm64     5.0.0+git23.g335dbec-4+rpt2             arm64        Qt 5 extra widget styles - Plastique
+ii  qt5-style-plugins:arm64              5.0.0+git23.g335dbec-4+rpt2             arm64        Qt 5 extra widget styles
+ii  ssh                                  1:9.2p1-2+deb12u7                       all          secure shell client and server (metapackage)
+ii  ssh-import-id                        5.10-1                                  all          securely retrieve an SSH public key and install it locally
+ii  xsel                                 1.2.0+git9bfc13d.20180109-4             arm64        command-line tool to access X clipboard and selection buffers
+
+$ dpkg -l | head -n 50
+Gewünscht=Unbekannt/Installieren/R=Entfernen/P=Vollständig Löschen/Halten
+| Status=Nicht/Installiert/Config/U=Entpackt/halb konFiguriert/
+         Halb installiert/Trigger erWartet/Trigger anhängig
+|/ Fehler?=(kein)/R=Neuinstallation notwendig (Status, Fehler: GROSS=schlecht)
+||/ Name                                 Version                                 Architektur  Beschreibung
++++-====================================-=======================================-============-=============================================================================================
+ii  accountsservice                      22.08.8-6                               arm64        query and manipulate user account information
+ii  acl                                  2.3.1-3                                 arm64        access control list - utilities
+ii  adduser                              3.134                                   all          add and remove users and groups
+ii  adwaita-icon-theme                   43-1                                    all          default icon theme of GNOME
+ii  agnostics                            0.20                                    arm64        Raspberry Pi Diagnostics
+ii  alacarte                             3.44.2-1+rpt1                           all          easy GNOME menu editing tool
+ii  alsa-topology-conf                   1.2.5.1-2                               all          ALSA topology configuration files
+ii  alsa-ucm-conf                        1.2.8-1                                 all          ALSA Use Case Manager configuration files
+ii  alsa-utils                           1.2.8-1+rpt1                            arm64        Utilities for configuring and using ALSA
+ii  apache2                              2.4.62-1~deb12u2                        arm64        Apache HTTP Server
+ii  apache2-bin                          2.4.62-1~deb12u2                        arm64        Apache HTTP Server (modules and other binary files)
+ii  apache2-data                         2.4.62-1~deb12u2                        all          Apache HTTP Server (common files)
+ii  apache2-utils                        2.4.62-1~deb12u2                        arm64        Apache HTTP Server (utility programs for web servers)
+ii  apparmor                             3.0.8-3                                 arm64        user-space parser utility for AppArmor
+ii  apt                                  2.6.1                                   arm64        commandline package manager
+ii  apt-listchanges                      3.24                                    all          package change history notification tool
+ii  apt-transport-https                  2.6.1                                   all          transitional package for https support
+ii  apt-utils                            2.6.1                                   arm64        package management related utility programs
+ii  at-spi2-common                       2.50.0-1~bpo12+rpt1                     all          Assistive Technology Service Provider Interface (common files)
+ii  augeas-lenses                        1.14.0-1                                all          Set of lenses needed by libaugeas0 to parse config files
+ii  autotouch                            0.1                                     all          Automatic touch screen association for labwc
+ii  avahi-daemon                         0.8-10+deb12u1                          arm64        Avahi mDNS/DNS-SD daemon
+ii  base-files                           12.4+deb12u11                           arm64        Debian base system miscellaneous files
+ii  base-passwd                          3.6.1                                   arm64        Debian base system master password and group files
+ii  bash                                 5.2.15-2+b8                             arm64        GNU Bourne Again SHell
+ii  bash-completion                      1:2.11-6                                all          programmable completion for the bash shell
+ii  bc                                   1.07.1-3                                arm64        GNU bc arbitrary precision calculator language
+ii  bind9-dnsutils                       1:9.18.33-1~deb12u2                     arm64        Clients provided with BIND 9
+ii  bind9-host                           1:9.18.33-1~deb12u2                     arm64        DNS Lookup Utility
+ii  bind9-libs:arm64                     1:9.18.33-1~deb12u2                     arm64        Shared Libraries used by BIND 9
+ii  binutils                             2.40-2                                  arm64        GNU assembler, linker and binary utilities
+ii  binutils-aarch64-linux-gnu           2.40-2                                  arm64        GNU binary utilities, for aarch64-linux-gnu target
+ii  binutils-common:arm64                2.40-2                                  arm64        Common files for the GNU assembler, linker and binary utilities
+ii  blt                                  2.5.3+dfsg-4.1                          arm64        graphics extension library for Tcl/Tk - run-time
+ii  bluez                                5.66-1+rpt1+deb12u2                     arm64        Bluetooth tools and daemons
+ii  bluez-firmware                       1.2-9+rpt3                              all          Firmware for Bluetooth devices
+ii  bsdextrautils                        2.38.1-5+deb12u3                        arm64        extra utilities from 4.4BSD-Lite
+ii  bsdutils                             1:2.38.1-5+deb12u3                      arm64        basic utilities from 4.4BSD-Lite
+ii  bubblewrap                           0.8.0-2+deb12u1                         arm64        utility for unprivileged chroot and namespace manipulation
+ii  build-essential                      12.9                                    arm64        Informational list of build-essential packages
+ii  busybox                              1:1.35.0-4+b4                           arm64        Tiny utilities for small and embedded systems
+ii  bzip2                                1.0.8-5+b1                              arm64        high-quality block-sorting file compressor - utilities
+ii  ca-certificates                      20230311+deb12u1                        all          Common CA certificates
+ii  caddy                                2.10.0                                  arm64        Caddy - Powerful, enterprise-ready, open source web server with automatic HTTPS written in Go
