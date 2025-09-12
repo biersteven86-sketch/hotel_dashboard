@@ -1,16 +1,27 @@
 'use strict';
 require('dotenv').config({ quiet: true });
 
-const express   = require('express');
-const path      = require('path');
-const fs        = require('fs');
-const crypto    = require('crypto');
-const session   = require('express-session');
+/**
+ * Hotel-Dashboard · server.js (vollständig, stabil, ohne Ibelsa)
+ * - Struktur und Pfade bleiben unverändert (public/, data/, data/auth/)
+ * - Root leitet zuverlässig auf /login
+ * - Login/Session/Guards schützen /index und /dashboard (kein Direktaufruf ohne Session)
+ * - Reset-Flow (Token anfordern, validieren, bestätigen) kompatibel zu users.json (pbkdf2)
+ * - Port-Default ist 3000 (wie gewünscht). Per .env PORT überschreibbar.
+ */
 
-const app  = express();
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
+const crypto = require('crypto');
+const session = require('express-session');
+
+const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
 
-// ===== Pfade (unverändert zur Projektstruktur) =====
+// ───────────────────────────────────────────────────────────────────────────────
+// Pfade (beibehalten)
+// ───────────────────────────────────────────────────────────────────────────────
 const ROOT       = path.resolve(__dirname);
 const publicDir  = path.join(ROOT, 'public');
 const dataDir    = path.join(ROOT, 'data');
@@ -19,7 +30,7 @@ const usersPath  = path.join(dataDir, 'users.json');
 const tokensPath = path.join(authDir, 'reset.db.json');
 const auditLog   = path.join(authDir, 'reset_audit.log');
 
-// Dateien/Ordner sicherstellen (ohne Strukturänderung)
+// Ordner/Dateien sicherstellen (ohne Strukturänderung)
 for (const d of [publicDir, dataDir, authDir]) { try { fs.mkdirSync(d, { recursive: true }); } catch {} }
 function loadJSON(p, def){ try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return def; } }
 function saveJSON(p, obj){ fs.writeFileSync(p, JSON.stringify(obj, null, 2), 'utf8'); }
@@ -28,7 +39,9 @@ function saveJSON(p, obj){ fs.writeFileSync(p, JSON.stringify(obj, null, 2), 'ut
   const T = loadJSON(tokensPath,{ tokens: [] }); if (!Array.isArray(T.tokens)) T.tokens = []; saveJSON(tokensPath, T);
 })();
 
-// ===== Passwort-Utils (kompatibel zu users.json: pbkdf2:sha256:310000) =====
+// ───────────────────────────────────────────────────────────────────────────────
+// Passwort-Utils (kompatibel zu pbkdf2:sha256:310000 in users.json)
+// ───────────────────────────────────────────────────────────────────────────────
 function verifyPassword(password, user){
   if (!user?.passHash || !user?.passSalt) return false;
   const [ , digest='sha256', it='310000' ] = String(user.passAlgo||'').split(':');
@@ -39,7 +52,35 @@ function validatePasswordPolicy(p){
   return Boolean(p && p.length >= 10 && /[A-Z]/.test(p) && /[a-z]/.test(p) && (/\d/.test(p) || /[^A-Za-z0-9]/.test(p)));
 }
 
-// ===== Basics (Body/Session) — keine externe Strukturänderung =====
+// Login-Normalisierung (tolerant gegenüber „name.atdomain“ usw.)
+function normalizeLoginInput(raw) {
+  const name = String(raw || '').trim();
+  const lower = name.toLowerCase();
+  const cands = new Set([lower]);
+
+  // "name.atdomain.tld" → "name@domain.tld"
+  if (!lower.includes('@') && lower.includes('.at')) {
+    cands.add(lower.replace('.at', '@'));
+  }
+  // Lokalteile erlauben: "name" matcht "name@…"
+  const local = lower.split('@')[0];
+  if (local) cands.add(local);
+
+  return Array.from(cands);
+}
+function findUserByCandidates(candidates, usersDoc){
+  const list = (usersDoc && Array.isArray(usersDoc.users)) ? usersDoc.users : [];
+  return list.find(u => {
+    const uEmail = String(u.email || '').toLowerCase();
+    const uUser  = String(u.username || '').toLowerCase();
+    const uLocal = uEmail.split('@')[0];
+    return candidates.some(c => c === uEmail || c === uUser || c === uLocal);
+  });
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// Basics (Body/Session) — keine Strukturänderung
+// ───────────────────────────────────────────────────────────────────────────────
 app.set('trust proxy', 1);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -53,7 +94,9 @@ app.use(session({
   cookie: { httpOnly:true, sameSite:'lax', secure:false, maxAge: IDLE_MS }
 }));
 
-// ===== Public-Assets & offene Pfade =====
+// ───────────────────────────────────────────────────────────────────────────────
+// Offene Pfade & Assets
+// ───────────────────────────────────────────────────────────────────────────────
 const assetRE = /\.(?:png|jpe?g|gif|svg|ico|webp|css|js|map|woff2?)$/i;
 const OPEN_PATHS = new Set([
   '/', '/health',
@@ -62,7 +105,7 @@ const OPEN_PATHS = new Set([
   '/reset/validate', '/reset/confirm'
 ]);
 
-// ===== Aktivitäts-/Timeout-Tracker (unverändert nutzbar) =====
+// Aktivitäts-/Timeout-Tracker
 app.use((req, res, next) => {
   const now = Date.now();
   const passive = assetRE.test(req.path) || OPEN_PATHS.has(req.path);
@@ -79,11 +122,13 @@ app.use((req, res, next) => {
   next();
 });
 
-// ===== Guards: blockiert direkte Seitenzugriffe ohne Login =====
+// Cache-Control Helper für geschützte Antworten
 function setNoStore(res){
   res.setHeader('Cache-Control','no-store, no-cache, must-revalidate, proxy-revalidate');
   res.setHeader('Pragma','no-cache'); res.setHeader('Expires','0'); res.setHeader('Surrogate-Control','no-store');
 }
+
+// Guards: blockiert alles außer OPEN_PATHS/Assets, schützt .html
 app.use((req, res, next) => {
   if (assetRE.test(req.path)) return next();        // Assets immer durchlassen
   if (OPEN_PATHS.has(req.path)) return next();      // offene Pfade durchlassen
@@ -94,44 +139,53 @@ app.use((req, res, next) => {
   return res.redirect('/login');
 });
 
-// ===== Root → Login (gewünschte Reihenfolge) =====
-app.get('/', (_req, res) => res.redirect('/login'));
-
-// ===== Health =====
+// ───────────────────────────────────────────────────────────────────────────────
+// Root/Health
+// ───────────────────────────────────────────────────────────────────────────────
+app.get ('/',       (_req, res) => res.redirect('/login'));
 app.get ('/health', (_req, res) => res.type('text').send('OK'));
 app.head('/health', (_req, res) => res.sendStatus(200));
 
-// ===== Seiten ausliefern (Login/Reset öffentlich) =====
+// ───────────────────────────────────────────────────────────────────────────────
+// Seiten (öffentlich: Login/Reset)
+// ───────────────────────────────────────────────────────────────────────────────
 app.get ('/login',  (_req, res) => res.sendFile('login.html',  { root: publicDir }));
 app.get ('/reset',  (_req, res) => res.sendFile('reset.html',  { root: publicDir }));
+app.head('/login',  (_req, res) => res.sendStatus(200));
+app.head('/reset',  (_req, res) => res.sendStatus(200));
 
-// ===== Reset-Flow (kompatibel, minimal) =====
-app.get('/reset/validate', (req, res) => {
-  const token = String(req.query.token||'').trim();
-  const email = String(req.query.email||'').trim().toLowerCase();
-  if (!token || !email) return res.status(400).json({ ok:false, error:'missing_parameters' });
-  const db  = loadJSON(tokensPath, { tokens: [] });
-  const now = Date.now();
-  const ok  = (db.tokens||[]).some(t => t.email===email && t.token===token && !t.used && t.expiresAt>now);
-  if (!ok) return res.status(404).json({ ok:false, error:'invalid_or_expired' });
-  return res.json({ ok:true });
-});
-
+// ───────────────────────────────────────────────────────────────────────────────
+// Reset-Flow (Token anfordern/prüfen/bestätigen) – minimal & kompatibel
+// ───────────────────────────────────────────────────────────────────────────────
 app.post('/reset', (req, res) => {
   const email = String(req.body.email||'').trim().toLowerCase();
   if (!email) return res.status(400).type('text').send('E-Mail fehlt');
+
   const token = Math.random().toString(36).slice(2,10);
   const now   = Date.now();
   const exp   = now + 30*60*1000;
 
   const db = loadJSON(tokensPath, { tokens: [] });
   db.tokens = Array.isArray(db.tokens) ? db.tokens : [];
-  db.tokens = db.tokens.map(t => t.email===email ? { ...t, used:true } : t); // alte Tokens invalidieren
+  // alte Tokens der Mail invalidieren
+  db.tokens = db.tokens.map(t => t.email===email ? { ...t, used:true } : t);
   db.tokens.push({ email, token, createdAt: now, expiresAt: exp, used:false });
   saveJSON(tokensPath, db);
 
-  // E-Mail-Versand ist optional/extern konfiguriert → hier nur Erfolg melden
+  // Hinweis: Mailversand ist außerhalb/optional. Hier nur Erfolg zurück.
   return res.status(200).json({ ok:true, message:'token_created' });
+});
+
+app.get('/reset/validate', (req, res) => {
+  const token = String(req.query.token||'').trim();
+  const email = String(req.query.email||'').trim().toLowerCase();
+  if (!token || !email) return res.status(400).json({ ok:false, error:'missing_parameters' });
+
+  const db  = loadJSON(tokensPath, { tokens: [] });
+  const now = Date.now();
+  const ok  = (db.tokens||[]).some(t => t.email===email && t.token===token && !t.used && t.expiresAt>now);
+  if (!ok) return res.status(404).json({ ok:false, error:'invalid_or_expired' });
+  return res.json({ ok:true });
 });
 
 app.post('/reset/confirm', (req, res) => {
@@ -149,12 +203,14 @@ app.post('/reset/confirm', (req, res) => {
     return res.status(422).type('text').send('Passwort zu schwach');
   }
 
+  // Token prüfen & verbrauchen
   const db  = loadJSON(tokensPath, { tokens: [] });
   const now = Date.now();
   const idx = (db.tokens||[]).findIndex(t => t.email===email && t.token===token && !t.used && t.expiresAt>now);
   if (idx === -1) return res.status(403).type('text').send('Token ungültig/abgelaufen');
   db.tokens[idx].used = true; saveJSON(tokensPath, db);
 
+  // User setzen/aktualisieren (pbkdf2)
   const ud = loadJSON(usersPath, { users: [] });
   const uIdx = ud.users.findIndex(u => (u.email||'').toLowerCase() === email);
   const salt = crypto.randomBytes(16).toString('hex');
@@ -172,33 +228,40 @@ app.post('/reset/confirm', (req, res) => {
   return res.type('text').send('Passwort gesetzt');
 });
 
-// ===== Login / Logout / After-Login =====
+// ───────────────────────────────────────────────────────────────────────────────
+// Login / Logout / After-Login
+// ───────────────────────────────────────────────────────────────────────────────
 app.post('/login', (req, res) => {
-  const { username, password } = req.body || {};
-  const name = String(username || '').trim();
-  const pass = String(password || '');
+  // akzeptiere sowohl "username" als auch "email" vom Formular
+  const rawName  = req.body.username ?? req.body.email;
+  const password = String(req.body.password || '');
+  const candidates = normalizeLoginInput(rawName);
 
   // 1) users.json
   const ud = loadJSON(usersPath, { users: [] });
-  const nameLower = name.toLowerCase();
-  const user = ud.users.find(u =>
-    (u.email && u.email.toLowerCase()===nameLower) ||
-    (u.username && u.username.toLowerCase()===nameLower)
-  );
-  if (user && verifyPassword(pass, user)){
-    req.session.user = name;
+  const user = findUserByCandidates(candidates, ud);
+
+  if (user && verifyPassword(password, user)) {
+    req.session.user = user.email || user.username;
     req.session.lastActivity = Date.now();
     return res.redirect('/after-login');
   }
 
-  // 2) Fallback aus .env (ADMIN/DASH)
+  // 2) .env-Fallbacks (ADMIN/DASH)
   const { DASH_USER='', DASH_PASS='', ADMIN_USER='', ADMIN_PASS='' } = process.env;
-  const ok = (name===DASH_USER && pass===DASH_PASS) || (name===ADMIN_USER && pass===ADMIN_PASS);
-  if (!ok) return res.redirect('/login?err=1');
+  const lowered = (candidates[0] || '').toLowerCase();
+  const envMatch =
+    ((lowered === String(DASH_USER).toLowerCase()) && password === DASH_PASS) ||
+    ((lowered === String(ADMIN_USER).toLowerCase()) && password === ADMIN_PASS);
 
-  req.session.user = name;
-  req.session.lastActivity = Date.now();
-  return res.redirect('/after-login');
+  if (envMatch) {
+    req.session.user = candidates[0];
+    req.session.lastActivity = Date.now();
+    return res.redirect('/after-login');
+  }
+
+  // Fehlversuch → zurück zum Login
+  return res.redirect('/login?err=1');
 });
 
 app.get('/logout', (req, res) => {
@@ -211,12 +274,18 @@ app.get('/logout', (req, res) => {
 
 app.get('/after-login', (req, res) => {
   const u = (req.session && req.session.user) ? String(req.session.user) : '';
-  const adminUser = (process.env.ADMIN_USER || 'admin').toLowerCase();
-  if (u && u.toLowerCase() === adminUser){ setNoStore(res); return res.redirect('/index'); }
+  if (!u) return res.redirect('/login');
+
+  const adminUser = String(process.env.ADMIN_USER || 'admin').toLowerCase();
+  if (u.toLowerCase() === adminUser) {
+    setNoStore(res); return res.redirect('/index');
+  }
   setNoStore(res); return res.redirect('/dashboard');
 });
 
-// ===== Geschützte Seiten =====
+// ───────────────────────────────────────────────────────────────────────────────
+// Geschützte Seiten
+// ───────────────────────────────────────────────────────────────────────────────
 function requireAuth(req, res, next){
   if (req.session && req.session.user){ setNoStore(res); return next(); }
   return res.redirect('/login');
@@ -224,13 +293,21 @@ function requireAuth(req, res, next){
 app.get('/index',     requireAuth, (_req, res) => res.sendFile('index.html',     { root: publicDir }));
 app.get('/dashboard', requireAuth, (_req, res) => res.sendFile('dashboard.html', { root: publicDir }));
 
-// ===== Static erst zum Schluss, ohne index-Autoload =====
+// ───────────────────────────────────────────────────────────────────────────────
+// Static (ohne index-Autoload) & 404
+// ───────────────────────────────────────────────────────────────────────────────
 app.use(express.static(publicDir, { index: false, extensions: ['html'] }));
+app.use((_req, res) => res.status(404).sendFile('login.html', { root: publicDir }));
 
-// ===== 404 → Login =====
-app.use((_req,res)=> res.status(404).sendFile('login.html',{root: publicDir}));
-
-// ===== Start =====
+// ───────────────────────────────────────────────────────────────────────────────
+// Start
+// ───────────────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log('Hotel-Dashboard läuft auf Port', PORT);
+  console.log('ROOT      :', ROOT);
+  console.log('publicDir :', publicDir);
+  console.log('users.json:', usersPath);
+  console.log('tokens    :', tokensPath);
+  console.log('audit log :', auditLog);
+  console.log('session idle(ms):', IDLE_MS);
 });
