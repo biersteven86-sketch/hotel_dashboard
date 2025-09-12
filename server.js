@@ -1,4 +1,3 @@
-const buildAdminStatusRouter = require('./admin.status.route');
 'use strict';
 require('dotenv').config({ quiet: true });
 
@@ -16,6 +15,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const session = require('express-session');
+const buildAdminStatusRouter = require('./admin.status.route'); // <— sauber EINMAL einbinden
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
@@ -53,21 +53,15 @@ function validatePasswordPolicy(p){
   return Boolean(p && p.length >= 10 && /[A-Z]/.test(p) && /[a-z]/.test(p) && (/\d/.test(p) || /[^A-Za-z0-9]/.test(p)));
 }
 
-// Login-Normalisierung (robust für „Info“, „info@…“, „name.atdomain“)
+// Login-Normalisierung
 function normalizeLoginInput(raw) {
   const name0 = String(raw || '').trim();
-  const fixedAt = name0.replace(/\[(?:at|AT)\]|(?:\s+at\s+)|(?:\.at)/g, '@'); // "name.atdomain" → "name@domain"
+  const fixedAt = name0.replace(/\[(?:at|AT)\]|(?:\s+at\s+)|(?:\.at)/g, '@');
   const lower = fixedAt.toLowerCase();
   const set = new Set();
-
-  // 1) wie eingegeben (bereinigt)
   set.add(lower);
-
-  // 2) nur lokaler Teil
   const local = lower.split('@')[0];
   if (local) set.add(local);
-
-  // 3) Wenn jemand nur "info" tippt, gleiche Kandidaten behalten
   return Array.from(set);
 }
 function findUserByCandidates(candidates, usersDoc){
@@ -84,27 +78,11 @@ function findUserByCandidates(candidates, usersDoc){
 // Basics (Body/Session)
 // ───────────────────────────────────────────────────────────────
 app.set('trust proxy', 1);
-  // Admin-Status (liefert JSON für die Index-Checks)
-  try {
-    const __adminStatusRouter = buildAdminStatusRouter(app);
-    app.use('/admin/status', __adminStatusRouter);
-  } catch(e) { console.error('admin/status mount failed:', e && e.message); }
 
 app.use(express.urlencoded({ extended: true }));
-  // Admin-Status (liefert JSON für die Index-Checks)
-  try {
-    const __adminStatusRouter = buildAdminStatusRouter(app);
-    app.use('/admin/status', __adminStatusRouter);
-  } catch(e) { console.error('admin/status mount failed:', e && e.message); }
-
 app.use(express.json());
 
 const IDLE_MS = Number(process.env.SESSION_IDLE_MS || 5*60*1000);
-  // Admin-Status (liefert JSON für die Index-Checks)
-  try {
-    const __adminStatusRouter = buildAdminStatusRouter(app);
-    app.use('/admin/status', __adminStatusRouter);
-  } catch(e) { console.error('admin/status mount failed:', e && e.message); }
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'change-me',
@@ -122,16 +100,11 @@ const OPEN_PATHS = new Set([
   '/', '/health',
   '/login', '/login.html',
   '/reset', '/reset.html',
-  '/reset/validate', '/reset/confirm'
+  '/reset/validate', '/reset/confirm',
+  '/admin/status' // <— WICHTIG: Admin-Status ohne Login freigeben (sonst 302)
 ]);
 
 // Aktivitäts-/Timeout-Tracker
-  // Admin-Status (liefert JSON für die Index-Checks)
-  try {
-    const __adminStatusRouter = buildAdminStatusRouter(app);
-    app.use('/admin/status', __adminStatusRouter);
-  } catch(e) { console.error('admin/status mount failed:', e && e.message); }
-
 app.use((req, res, next) => {
   const now = Date.now();
   const passive = assetRE.test(req.path) || OPEN_PATHS.has(req.path);
@@ -155,12 +128,6 @@ function setNoStore(res){
 }
 
 // Guards: schützt alles außer OPEN_PATHS/Assets und verhindert Direktaufrufe .html
-  // Admin-Status (liefert JSON für die Index-Checks)
-  try {
-    const __adminStatusRouter = buildAdminStatusRouter(app);
-    app.use('/admin/status', __adminStatusRouter);
-  } catch(e) { console.error('admin/status mount failed:', e && e.message); }
-
 app.use((req, res, next) => {
   if (assetRE.test(req.path)) return next();
   if (OPEN_PATHS.has(req.path)) return next();
@@ -170,6 +137,13 @@ app.use((req, res, next) => {
   if (req.session && req.session.user){ setNoStore(res); return next(); }
   return res.redirect('/login');
 });
+
+// ───────────────────────────────────────────────────────────────
+// Admin-Status (JSON für Index-Checks) – EINMAL sauber mounten
+// ───────────────────────────────────────────────────────────────
+try {
+  app.use('/admin/status', buildAdminStatusRouter(app));
+} catch(e) { console.error('admin/status mount failed:', e && e.message); }
 
 // ───────────────────────────────────────────────────────────────
 // Root/Health
@@ -257,7 +231,7 @@ app.post('/reset/confirm', (req, res) => {
 });
 
 // ───────────────────────────────────────────────────────────────
-// Login / Logout / After-Login (robust, mit Logs)
+// Login / Logout / After-Login
 // ───────────────────────────────────────────────────────────────
 app.post('/login', (req, res) => {
   const rawName  = req.body.username ?? req.body.email;
@@ -267,20 +241,12 @@ app.post('/login', (req, res) => {
   const ud = loadJSON(usersPath, { users: [] });
   const user = findUserByCandidates(candidates, ud);
 
-  // Debug-Logs ohne Passwörter (nur Grund)
-  if (!user) {
-    console.warn('[login] user not found for', candidates);
-  } else if (!verifyPassword(password, user)) {
-    console.warn('[login] password mismatch for', (user.email || user.username));
-  }
-
   if (user && verifyPassword(password, user)) {
     req.session.user = user.email || user.username;
     req.session.lastActivity = Date.now();
     return res.redirect('/after-login');
   }
 
-  // .env-Fallbacks (ADMIN/DASH)
   const { DASH_USER='', DASH_PASS='', ADMIN_USER='', ADMIN_PASS='' } = process.env;
   const lowered = (candidates[0] || '').toLowerCase();
   const envMatch =
@@ -296,7 +262,15 @@ app.post('/login', (req, res) => {
   return res.redirect('/login?err=1');
 });
 
+// Logout: GET und POST unterstützen (Index-Formular nutzt POST)
 app.get('/logout', (req, res) => {
+  if (!req.session) return res.redirect('/login');
+  req.session.destroy(() => {
+    res.clearCookie('connect.sid', { httpOnly:true, sameSite:'lax', secure:false });
+    return res.redirect('/login');
+  });
+});
+app.post('/logout', (req, res) => {
   if (!req.session) return res.redirect('/login');
   req.session.destroy(() => {
     res.clearCookie('connect.sid', { httpOnly:true, sameSite:'lax', secure:false });
@@ -307,7 +281,6 @@ app.get('/logout', (req, res) => {
 app.get('/after-login', (req, res) => {
   const u = (req.session && req.session.user) ? String(req.session.user) : '';
   if (!u) return res.redirect('/login');
-
   const adminUser = String(process.env.ADMIN_USER || 'admin').toLowerCase();
   if (u.toLowerCase() === adminUser) {
     setNoStore(res); return res.redirect('/index');
@@ -328,30 +301,12 @@ app.get('/dashboard', requireAuth, (_req, res) => res.sendFile('dashboard.html',
 // ───────────────────────────────────────────────────────────────
 // Static (ohne index-Autoload) & 404
 // ───────────────────────────────────────────────────────────────
-  // Admin-Status (liefert JSON für die Index-Checks)
-  try {
-    const __adminStatusRouter = buildAdminStatusRouter(app);
-    app.use('/admin/status', __adminStatusRouter);
-  } catch(e) { console.error('admin/status mount failed:', e && e.message); }
-
 app.use(express.static(publicDir, { index: false, extensions: ['html'] }));
-  // Admin-Status (liefert JSON für die Index-Checks)
-  try {
-    const __adminStatusRouter = buildAdminStatusRouter(app);
-    app.use('/admin/status', __adminStatusRouter);
-  } catch(e) { console.error('admin/status mount failed:', e && e.message); }
-
 app.use((_req, res) => res.status(404).sendFile('login.html', { root: publicDir }));
 
 // ───────────────────────────────────────────────────────────────
 // Start
 // ───────────────────────────────────────────────────────────────
-  // Admin-Status (liefert JSON für die Index-Checks)
-  try {
-    const __adminStatusRouter = buildAdminStatusRouter(app);
-    app.use('/admin/status', __adminStatusRouter);
-  } catch(e) { console.error('admin/status mount failed:', e && e.message); }
-
 app.listen(PORT, () => {
   console.log('Hotel-Dashboard läuft auf Port', PORT);
   console.log('ROOT      :', ROOT);
