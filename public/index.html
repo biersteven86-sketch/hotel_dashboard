@@ -9,8 +9,7 @@
   <style>
     :root{
       --bg:#0b0f16; --fg:#e9eef7; --muted:#9aa6b2; --card:#121826; --line:#2a3243;
-      --ok:#16a34a; --warn:#f59e0b; --err:#ef4444; --info:#38bdf8; --chip:#1f2937;
-      --radius:14px;
+      --ok:#16a34a; --warn:#f59e0b; --err:#ef4444; --info:#38bdf8; --chip:#1f2937; --radius:14px;
     }
     @media (prefers-color-scheme: light){
       :root{ --bg:#f6f7fb; --fg:#111827; --muted:#6b7280; --card:#ffffff; --line:#e5e7eb; --chip:#f3f4f6; }
@@ -47,7 +46,6 @@
     .list{display:grid;gap:6px}
     .errtext{white-space:pre-wrap;color:#fecaca;font-size:12.5px}
     .muted{color:var(--muted)}
-    /* Pfad-Tabelle */
     .paths table{width:100%;border-collapse:collapse;font-size:13.5px}
     .paths th,.paths td{padding:6px 8px;text-align:left}
     .paths th{background:var(--line);color:var(--fg)}
@@ -74,7 +72,6 @@
     </header>
 
     <main class="grid">
-      <!-- HTTP Endpunkte -->
       <section class="card">
         <h3>HTTP-Basics</h3>
         <div class="row"><span>Health <span class="small">GET /health</span></span><span id="b-health" class="badge info">prüfe…</span></div>
@@ -83,25 +80,17 @@
         <div class="row"><span>Reset-Seite <span class="small">GET /reset</span></span><span id="b-reset" class="badge info">prüfe…</span></div>
         <div class="row"><span>Reset Validate <span class="small">GET /reset/validate?email=x&token=y</span></span><span id="b-validate" class="badge info">prüfe…</span></div>
         <div class="row"><span>Session-API <span class="small">GET /session/remaining</span></span><span id="b-session" class="badge info">prüfe…</span></div>
-        <details>
-          <summary>Details & Latenzen</summary>
-          <div id="http-details" class="list mono small">–</div>
-        </details>
+        <details><summary>Details & Latenzen</summary><div id="http-details" class="list mono small">–</div></details>
       </section>
 
-      <!-- Assets -->
       <section class="card">
         <h3>Assets</h3>
         <div class="row"><span>Logo <span class="small">HEAD /HD-Logo.png</span></span><span id="b-logo" class="badge info">prüfe…</span></div>
         <div class="row"><span>Wordmark <span class="small">HEAD /Hotel-Dashboard-Schriftzug.png</span></span><span id="b-word" class="badge info">prüfe…</span></div>
         <div class="row"><span>Background <span class="small">HEAD /hotel-dashboard-bg.jpg</span></span><span id="b-bg" class="badge info">prüfe…</span></div>
-        <details>
-          <summary>Fehlertexte</summary>
-          <div id="asset-errors" class="errtext">–</div>
-        </details>
+        <details><summary>Fehlertexte</summary><div id="asset-errors" class="errtext">–</div></details>
       </section>
 
-      <!-- Serverstatus (aus /admin/status, falls vorhanden) -->
       <section class="card">
         <h3>Server-Status</h3>
         <div class="kv"><span>Port</span><code id="s-port">–</code></div>
@@ -115,242 +104,122 @@
         <div id="status-note" class="small muted">Nutzt /admin/status, falls vorhanden.</div>
       </section>
 
-      <!-- Git -->
       <section class="card">
         <h3>Git</h3>
         <div class="kv"><span>Branch</span><code id="g-branch">–</code></div>
         <div class="kv"><span>Letzter Commit</span><code id="g-last">–</code></div>
-        <details>
-          <summary>Repository-Infos</summary>
-          <div class="list mono small" id="g-extra">–</div>
-        </details>
+        <details><summary>Repository-Infos</summary><div class="list mono small" id="g-extra">–</div></details>
       </section>
 
-      <!-- Dienste & Ports -->
       <section class="card x2">
         <h3>Dienste · Ports · Proxy</h3>
         <div class="list" id="svc">Lade…</div>
-        <details style="margin-top:8px">
-          <summary>Offene Ports (Ausschnitt)</summary>
-          <div class="list mono small" id="ports">–</div>
-        </details>
-        <details style="margin-top:8px">
-          <summary>Proxy-Reachability (Host-Header lokal)</summary>
-          <div class="list mono small" id="proxy">–</div>
-        </details>
+        <details style="margin-top:8px"><summary>Offene Ports (Ausschnitt)</summary><div class="list mono small" id="ports">–</div></details>
+        <details style="margin-top:8px"><summary>Proxy-Reachability (Host-Header lokal)</summary><div class="list mono small" id="proxy">–</div></details>
       </section>
 
-      <!-- Express-Routen -->
       <section class="card x2">
         <h3>Express-Routen</h3>
         <div class="list mono small" id="routes">–</div>
       </section>
 
-      <!-- Pfad-Status -->
       <section class="card x2 paths">
         <h3>Pfad-Status</h3>
-        <table id="pathTable">
-          <thead><tr><th>Pfad</th><th>Status</th></tr></thead>
-          <tbody></tbody>
-        </table>
+        <table id="pathTable"><thead><tr><th>Pfad</th><th>Status</th></tr></thead><tbody></tbody></table>
       </section>
     </main>
 
     <footer class="small">
-      <span class="badge ok">OK</span> grün ·
-      <span class="badge warn">WARN</span> gelb ·
-      <span class="badge err">FEHLER</span> rot
+      <span class="badge ok">OK</span> grün · <span class="badge warn">WARN</span> gelb · <span class="badge err">FEHLER</span> rot
     </footer>
   </div>
 
   <script>
     const $ = s => document.querySelector(s);
     const set = (sel, txt) => { const el=$(sel); if(el) el.textContent=txt; };
-    const badge = (sel, ok, warn=false, txt) => {
-      const el=$(sel); if(!el) return;
-      el.className = 'badge ' + (ok ? 'ok' : (warn ? 'warn' : 'err'));
-      el.textContent = txt || (ok ? 'OK' : (warn ? 'WARN' : 'FEHLER'));
-    };
+    const badge = (sel, ok, warn=false, txt) => { const el=$(sel); if(!el) return;
+      el.className='badge '+(ok?'ok':(warn?'warn':'err')); el.textContent=txt||(ok?'OK':(warn?'WARN':'FEHLER')); };
     const fmtMs = ms => (ms<1000? `${ms.toFixed(0)}ms` : `${(ms/1000).toFixed(2)}s`);
-    const head = async (url) => {
-      const t0=performance.now();
-      try{ const r=await fetch(url, { method:'HEAD', cache:'no-store' }); return { ok:r.ok, st:r.status, ms:performance.now()-t0, text:'' }; }
-      catch(e){ return { ok:false, st:0, ms:performance.now()-t0, text:String(e) }; }
-    };
-    const get = async (url, opts={}) => {
-      const t0=performance.now();
-      try{ const r=await fetch(url, Object.assign({ cache:'no-store' }, opts)); return { ok:r.ok, st:r.status, ms:performance.now()-t0, r, type:r.type }; }
-      catch(e){ return { ok:false, st:0, ms:performance.now()-t0, err:String(e), type:'error' }; }
-    };
+    const head = async (url) => { const t0=performance.now();
+      try{ const r=await fetch(url,{method:'HEAD',cache:'no-store'}); return {ok:r.ok,st:r.status,ms:performance.now()-t0}; }
+      catch(e){ return {ok:false,st:0,ms:performance.now()-t0}; } };
+    const get = async (url,opts={}) => { const t0=performance.now();
+      try{ const r=await fetch(url,Object.assign({cache:'no-store'},opts)); return {ok:r.ok,st:r.status,ms:performance.now()-t0,r,type:r.type}; }
+      catch(e){ return {ok:false,st:0,ms:performance.now()-t0,type:'error'}; } };
 
-    // Scroll stabil halten
-    let interval = 5000, timer=null, paused=false;
-    function schedule(){
-      clearInterval(timer); if(!paused) timer=setInterval(refresh, interval);
-      set('#refresh-iv', (interval/1000)+'s');
-    }
-    function setPause(p){
-      paused=p; $('#btn-pause').textContent = paused ? '▶︎ Fortsetzen' : '⏸︎ Pause';
-      schedule();
-    }
-    $('#btn-pause').addEventListener('click', ()=>setPause(!paused));
+    let interval=5000,timer=null,paused=false;
+    function schedule(){ clearInterval(timer); if(!paused) timer=setInterval(refresh,interval); set('#refresh-iv',(interval/1000)+'s'); }
+    function setPause(p){ paused=p; $('#btn-pause').textContent=paused?'▶︎ Fortsetzen':'⏸︎ Pause'; schedule(); }
+    $('#btn-pause').addEventListener('click',()=>setPause(!paused));
 
-    async function refresh(){
-      const y = window.scrollY;
-      await run();
-      // Scrollposition wiederherstellen
-      window.scrollTo({top:y, left:0, behavior:'instant'});
-    }
+    async function refresh(){ const y=window.scrollY; await run(); window.scrollTo({top:y,left:0,behavior:'instant'}); }
 
-    // Redirect-Erkennung: / mit redirect:'manual'
     async function checkRootRedirect(){
-      const r = await get('/', { redirect:'manual' });
-      // Browser geben bei opaqueredirect type 'opaqueredirect' zurück
-      if (r.type === 'opaqueredirect' || (r.st>=300 && r.st<400)) {
-        badge('#b-root', true, false, 'REDIR');
-        set('#redir-note', '/ Redirect-Status: REDIR');
-      } else {
-        badge('#b-root', r.ok, false, r.ok ? 'OK' : 'FEHLER');
-        set('#redir-note', '/ Redirect-Status: ' + (r.ok ? 'OK' : 'FEHLER'));
-      }
+      const r=await get('/',{redirect:'manual'});
+      if(r.type==='opaqueredirect'||(r.st>=300&&r.st<400)){ badge('#b-root',true,false,'REDIR'); set('#redir-note','/ Redirect-Status: REDIR'); }
+      else{ badge('#b-root',r.ok,false,r.ok?'OK':'FEHLER'); set('#redir-note','/ Redirect-Status: '+(r.ok?'OK':'FEHLER')); }
       return r;
     }
 
     async function updateHTTP(){
-      const httpRows = [];
-      // /health
-      {
-        const r=await get('/health'); badge('#b-health', r.ok); httpRows.push(`GET /health → ${r.st} · ${fmtMs(r.ms)}`);
-      }
-      // /
-      {
-        const rr=await checkRootRedirect();
-        httpRows.push(`GET / → ${rr.st||'(opaqueredirect)'} · ${fmtMs(rr.ms)} · type=${rr.type}`);
-      }
-      // /login
-      {
-        const r=await get('/login'); badge('#b-login', r.ok); httpRows.push(`GET /login → ${r.st} · ${fmtMs(r.ms)}`);
-      }
-      // /reset
-      {
-        const r=await get('/reset'); badge('#b-reset', r.ok || r.st===200 || r.st===204, r.st===404); httpRows.push(`GET /reset → ${r.st} · ${fmtMs(r.ms)}`);
-      }
-      // /reset/validate (Dummy-Parameter)
-      {
-        const r=await get('/reset/validate?email=a@b&token=123'); badge('#b-validate', [200,400,404,422].includes(r.st), r.st===404);
-        httpRows.push(`GET /reset/validate?... → ${r.st} · ${fmtMs(r.ms)}`);
-      }
-      // /session/remaining
-      {
-        const r=await get('/session/remaining'); badge('#b-session', r.ok || [200,401,403].includes(r.st));
-        httpRows.push(`GET /session/remaining → ${r.st} · ${fmtMs(r.ms)}`);
-      }
-      $('#http-details').textContent = httpRows.join('\n');
+      const rows=[];
+      let r=await get('/health'); badge('#b-health',r.ok); rows.push(`GET /health → ${r.st} · ${fmtMs(r.ms)}`);
+      r=await checkRootRedirect(); rows.push(`GET / → ${r.st||'(opaqueredirect)'} · ${fmtMs(r.ms)} · type=${r.type}`);
+      r=await get('/login'); badge('#b-login',r.ok); rows.push(`GET /login → ${r.st} · ${fmtMs(r.ms)}`);
+      r=await get('/reset'); badge('#b-reset', r.ok || r.st===200 || r.st===204, r.st===404); rows.push(`GET /reset → ${r.st} · ${fmtMs(r.ms)}`);
+      r=await get('/reset/validate?email=a@b&token=123'); badge('#b-validate',[200,400,401,403,404,422].includes(r.st), r.st===404); rows.push(`GET /reset/validate?... → ${r.st} · ${fmtMs(r.ms)}`);
+      r=await get('/session/remaining'); badge('#b-session', r.ok || [200,401,403].includes(r.st)); rows.push(`GET /session/remaining → ${r.st} · ${fmtMs(r.ms)}`);
+      $('#http-details').textContent=rows.join('\n');
     }
 
     async function updateAssets(){
-      const assetErr = [];
-      const logo = await head('/HD-Logo.png'); badge('#b-logo', logo.ok); if (!logo.ok) assetErr.push(`HD-Logo.png → ${logo.st} · ${fmtMs(logo.ms)}`);
-      const word = await head('/Hotel-Dashboard-Schriftzug.png'); badge('#b-word', word.ok); if (!word.ok) assetErr.push(`Hotel-Dashboard-Schriftzug.png → ${word.st} · ${fmtMs(word.ms)}`);
-      const bg   = await head('/hotel-dashboard-bg.jpg'); badge('#b-bg', bg.ok); if (!bg.ok) assetErr.push(`hotel-dashboard-bg.jpg → ${bg.st} · ${fmtMs(bg.ms)}`);
-      $('#asset-errors').textContent = assetErr.length? assetErr.join('\n') : 'keine';
+      const errs=[];
+      let a=await head('/HD-Logo.png'); badge('#b-logo',a.ok); if(!a.ok) errs.push(`HD-Logo.png → ${a.st} · ${fmtMs(a.ms)}`);
+      a=await head('/Hotel-Dashboard-Schriftzug.png'); badge('#b-word',a.ok); if(!a.ok) errs.push(`Hotel-Dashboard-Schriftzug.png → ${a.st} · ${fmtMs(a.ms)}`);
+      a=await head('/hotel-dashboard-bg.jpg'); badge('#b-bg',a.ok); if(!a.ok) errs.push(`hotel-dashboard-bg.jpg → ${a.st} · ${fmtMs(a.ms)}`);
+      $('#asset-errors').textContent=errs.length?errs.join('\n'):'keine';
     }
 
     async function updateAdminStatus(){
       try{
-        const r = await get('/admin/status');
-        if (!r.ok) throw new Error('!ok '+r.st);
-        const j = await r.r.json();
-
-        set('#s-port',   j?.node?.port ?? '–');
-        set('#s-pid',    j?.node?.pid ?? '–');
-        set('#s-uptime', j?.node?.uptime ?? '–');
-        set('#s-node',   j?.node?.version ?? '–');
-        set('#s-user',   j?.os?.user ?? '–');
-        set('#s-cwd',    j?.os?.cwd ?? '–');
-        set('#s-load',   Array.isArray(j?.os?.load) ? j.os.load.join(' / ') : '–');
-        set('#s-mem',    j?.os?.mem ?? '–');
-
-        set('#g-branch', j?.git?.branch ?? '–');
-        set('#g-last',   j?.git?.last ?? '–');
-        $('#g-extra').textContent = (j?.git?.info || ['–']).join('\n');
-
-        const svc = j?.services || [];
-        const box = $('#svc'); box.innerHTML='';
-        if (!svc.length) box.textContent='–';
-        svc.forEach(o=>{
-          const div=document.createElement('div'); div.className='row';
-          const left=document.createElement('span'); left.textContent=`${o.name}${o.detail? ' · '+o.detail:''}`;
-          const right=document.createElement('span'); right.className='badge ' + (o.ok?'ok':(o.warn?'warn':'err'));
-          right.textContent = o.ok ? 'OK' : (o.warn ? 'WARN' : 'FEHLER');
-          div.append(left,right); box.append(div);
-        });
-
-        $('#ports').textContent = (j?.net?.ports || ['–']).join('\n');
-        $('#proxy').textContent = (j?.proxy?.checks || ['–']).join('\n');
-        $('#routes').textContent = (j?.routes || ['–']).join('\n');
+        const r=await get('/admin/status'); if(!r.ok) throw 0; const j=await r.r.json();
+        set('#s-port',j?.node?.port??'–'); set('#s-pid',j?.node?.pid??'–'); set('#s-uptime',j?.node?.uptime??'–');
+        set('#s-node',j?.node?.version??'–'); set('#s-user',j?.os?.user??'–'); set('#s-cwd',j?.os?.cwd??'–');
+        set('#s-load',Array.isArray(j?.os?.load)?j.os.load.join(' / '):'–'); set('#s-mem',j?.os?.mem??'–');
+        set('#g-branch',j?.git?.branch??'–'); set('#g-last',j?.git?.last??'–'); $('#g-extra').textContent=(j?.git?.info||['–']).join('\n');
+        const box=$('#svc'); box.innerHTML=''; (j?.services||[]).forEach(o=>{ const div=document.createElement('div'); div.className='row';
+          const left=document.createElement('span'); left.textContent=`${o.name}${o.detail?' · '+o.detail:''}`;
+          const right=document.createElement('span'); right.className='badge '+(o.ok?'ok':(o.warn?'warn':'err')); right.textContent=o.ok?'OK':(o.warn?'WARN':'FEHLER');
+          div.append(left,right); box.append(div); });
+        $('#ports').textContent=(j?.net?.ports||['–']).join('\n'); $('#proxy').textContent=(j?.proxy?.checks||['–']).join('\n'); $('#routes').textContent=(j?.routes||['–']).join('\n');
       }catch(e){
-        // Wenn /admin/status fehlt: Felder leeren und Hinweis lassen
-        set('#s-port','–'); set('#s-pid','–'); set('#s-uptime','–'); set('#s-node','–');
-        set('#s-user','–'); set('#s-cwd','–'); set('#s-load','–'); set('#s-mem','–');
-        set('#g-branch','–'); set('#g-last','–'); $('#g-extra').textContent='–';
-        $('#svc').textContent='(kein /admin/status)';
-        $('#ports').textContent='–'; $('#proxy').textContent='–'; $('#routes').textContent='–';
+        set('#s-port','–'); set('#s-pid','–'); set('#s-uptime','–'); set('#s-node','–'); set('#s-user','–'); set('#s-cwd','–'); set('#s-load','–'); set('#s-mem','–');
+        set('#g-branch','–'); set('#g-last','–'); $('#g-extra').textContent='–'; $('#svc').textContent='(kein /admin/status)'; $('#ports').textContent='–'; $('#proxy').textContent='–'; $('#routes').textContent='–';
       }
     }
 
     async function updatePaths(){
-      const paths=[
-        "/health",
-        "/",
-        "/login",
-        "/reset",
-        "/reset/validate?email=x&token=y",
-        "/reset/confirm",
-        "/index",
-        "/dashboard"
-      ];
+      const paths=["/health","/","/login","/reset","/reset/validate?email=x&token=y","/reset/confirm","/index","/dashboard"];
       const tbody=document.querySelector("#pathTable tbody");
-      // nicht global scrollen – nur Tabellenzellen aktualisieren
-      const existing = Array.from(tbody.querySelectorAll('tr')).map(tr=>tr.firstChild.textContent);
       for(const p of paths){
-        let status="fail";
-        try{
-          const res=await fetch(p,{method:"GET",cache:"no-store"});
-          status = res.ok ? "ok" : "fail";
-        }catch(e){ status="fail"; }
-        let tr = Array.from(tbody.querySelectorAll('tr')).find(x=>x.firstChild.textContent===p);
-        if(!tr){
-          tr=document.createElement("tr");
-          tr.innerHTML=`<td>${p}</td><td class="${status}">${status==="ok"?"✔ OK":"✘ Fehler"}</td>`;
-          tbody.appendChild(tr);
-        }else{
-          const td=tr.lastChild;
-          td.className=status;
-          td.textContent = status==="ok" ? "✔ OK" : "✘ Fehler";
-        }
+        let st=0, ok=false;
+        try{ const r=await fetch(p,{method:"GET",cache:"no-store",redirect:"manual"}); st=r.status||0; ok=st!==0 && st!==404 && st<500; }
+        catch{ st=0; ok=false; }
+        let tr=[...tbody.querySelectorAll('tr')].find(x=>x.firstChild.textContent===p);
+        const cell=`<td class="${ok?'ok':'err'}">${ok?'✔ OK':'✘ Fehler'} <span class="small mono">(${st||'–'})</span></td>`;
+        if(!tr){ tr=document.createElement('tr'); tr.innerHTML=`<td>${p}</td>${cell}`; tbody.appendChild(tr); }
+        else{ tr.lastChild.outerHTML=cell; }
       }
-      // entferne Zeilen, die es nicht mehr gibt
-      Array.from(tbody.querySelectorAll('tr')).forEach(tr=>{
-        const p=tr.firstChild.textContent;
-        if(!paths.includes(p)) tr.remove();
-      });
     }
 
     async function run(){
-      set('#host', location.host); set('#origin', location.origin);
-      set('#now', new Date().toLocaleString());
-      await updateHTTP();
-      await updateAssets();
-      await updateAdminStatus();
-      await updatePaths();
+      set('#host',location.host); set('#origin',location.origin); set('#now',new Date().toLocaleString());
+      await updateHTTP(); await updateAssets(); await updateAdminStatus(); await updatePaths();
     }
 
-    // UI-Bedienung
-    $('#btn-refresh').addEventListener('click', refresh);
-    $('#btn-fast').addEventListener('click', ()=>{ interval=2000; schedule(); refresh(); });
-    $('#btn-slow').addEventListener('click', ()=>{ interval=10000; schedule(); });
-    // Start
+    $('#btn-refresh').addEventListener('click',refresh);
+    $('#btn-fast').addEventListener('click',()=>{interval=2000;schedule();refresh();});
+    $('#btn-slow').addEventListener('click',()=>{interval=10000;schedule();});
     schedule(); refresh();
   </script>
 </body>
