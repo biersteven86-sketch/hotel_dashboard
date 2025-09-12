@@ -1,4 +1,3 @@
-const buildAdminStatusRouter = require('./admin.status.route');
 'use strict';
 require('dotenv').config({ quiet: true });
 
@@ -84,28 +83,10 @@ function findUserByCandidates(candidates, usersDoc){
 // Basics (Body/Session)
 // ───────────────────────────────────────────────────────────────
 app.set('trust proxy', 1);
-  // Admin-Status (liefert JSON für die Index-Checks)
-  try {
-    const __adminStatusRouter = buildAdminStatusRouter(app);
-    app.use('/admin/status', __adminStatusRouter);
-  } catch(e) { console.error('admin/status mount failed:', e && e.message); }
-
 app.use(express.urlencoded({ extended: true }));
-  // Admin-Status (liefert JSON für die Index-Checks)
-  try {
-    const __adminStatusRouter = buildAdminStatusRouter(app);
-    app.use('/admin/status', __adminStatusRouter);
-  } catch(e) { console.error('admin/status mount failed:', e && e.message); }
-
 app.use(express.json());
 
 const IDLE_MS = Number(process.env.SESSION_IDLE_MS || 5*60*1000);
-  // Admin-Status (liefert JSON für die Index-Checks)
-  try {
-    const __adminStatusRouter = buildAdminStatusRouter(app);
-    app.use('/admin/status', __adminStatusRouter);
-  } catch(e) { console.error('admin/status mount failed:', e && e.message); }
-
 app.use(session({
   secret: process.env.SESSION_SECRET || 'change-me',
   resave: false,
@@ -126,12 +107,6 @@ const OPEN_PATHS = new Set([
 ]);
 
 // Aktivitäts-/Timeout-Tracker
-  // Admin-Status (liefert JSON für die Index-Checks)
-  try {
-    const __adminStatusRouter = buildAdminStatusRouter(app);
-    app.use('/admin/status', __adminStatusRouter);
-  } catch(e) { console.error('admin/status mount failed:', e && e.message); }
-
 app.use((req, res, next) => {
   const now = Date.now();
   const passive = assetRE.test(req.path) || OPEN_PATHS.has(req.path);
@@ -155,12 +130,6 @@ function setNoStore(res){
 }
 
 // Guards: schützt alles außer OPEN_PATHS/Assets und verhindert Direktaufrufe .html
-  // Admin-Status (liefert JSON für die Index-Checks)
-  try {
-    const __adminStatusRouter = buildAdminStatusRouter(app);
-    app.use('/admin/status', __adminStatusRouter);
-  } catch(e) { console.error('admin/status mount failed:', e && e.message); }
-
 app.use((req, res, next) => {
   if (assetRE.test(req.path)) return next();
   if (OPEN_PATHS.has(req.path)) return next();
@@ -328,30 +297,12 @@ app.get('/dashboard', requireAuth, (_req, res) => res.sendFile('dashboard.html',
 // ───────────────────────────────────────────────────────────────
 // Static (ohne index-Autoload) & 404
 // ───────────────────────────────────────────────────────────────
-  // Admin-Status (liefert JSON für die Index-Checks)
-  try {
-    const __adminStatusRouter = buildAdminStatusRouter(app);
-    app.use('/admin/status', __adminStatusRouter);
-  } catch(e) { console.error('admin/status mount failed:', e && e.message); }
-
 app.use(express.static(publicDir, { index: false, extensions: ['html'] }));
-  // Admin-Status (liefert JSON für die Index-Checks)
-  try {
-    const __adminStatusRouter = buildAdminStatusRouter(app);
-    app.use('/admin/status', __adminStatusRouter);
-  } catch(e) { console.error('admin/status mount failed:', e && e.message); }
-
 app.use((_req, res) => res.status(404).sendFile('login.html', { root: publicDir }));
 
 // ───────────────────────────────────────────────────────────────
 // Start
 // ───────────────────────────────────────────────────────────────
-  // Admin-Status (liefert JSON für die Index-Checks)
-  try {
-    const __adminStatusRouter = buildAdminStatusRouter(app);
-    app.use('/admin/status', __adminStatusRouter);
-  } catch(e) { console.error('admin/status mount failed:', e && e.message); }
-
 app.listen(PORT, () => {
   console.log('Hotel-Dashboard läuft auf Port', PORT);
   console.log('ROOT      :', ROOT);
