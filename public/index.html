@@ -20,7 +20,7 @@
     body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial}
     .wrap{min-height:100%;display:grid;grid-template-rows:auto 1fr auto;gap:16px;padding:clamp(14px,2.6vw,24px)}
     header,footer{display:flex;align-items:center;gap:12px}
-    header{justify-content:space-between}
+    header{justify-content:space-between;position:sticky;top:0;background:linear-gradient(to bottom,var(--bg) 70%,transparent);z-index:5;padding-bottom:6px}
     .stamp{color:var(--muted);font-size:13px}
     .actions{display:flex;gap:8px;flex-wrap:wrap}
     button{background:transparent;border:1px solid var(--line);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer}
@@ -59,13 +59,17 @@
     <header>
       <div>
         <h2 style="margin:0">Hotel-Dashboard · Server-Übersicht</h2>
-        <div class="stamp"><span id="now">–</span> · Auto-Refresh <code id="refresh-iv">5s</code></div>
+        <div class="stamp">
+          Host: <code id="host">–</code> · Origin: <code id="origin">–</code> ·
+          <span id="redir-note" class="small">/ Redirect-Status: –</span> ·
+          <span id="now">–</span> · Auto-Refresh <code id="refresh-iv">5s</code>
+        </div>
       </div>
       <div class="actions">
         <button id="btn-refresh">Jetzt aktualisieren</button>
         <button id="btn-fast">Schneller (2s)</button>
         <button id="btn-slow">Langsamer (10s)</button>
-        <button id="btn-cache">Cache leeren</button>
+        <button id="btn-pause">⏸︎ Pause</button>
       </div>
     </header>
 
@@ -74,7 +78,7 @@
       <section class="card">
         <h3>HTTP-Basics</h3>
         <div class="row"><span>Health <span class="small">GET /health</span></span><span id="b-health" class="badge info">prüfe…</span></div>
-        <div class="row"><span>Root <span class="small">GET /</span></span><span id="b-root" class="badge info">prüfe…</span></div>
+        <div class="row"><span>Root <span class="small">GET / (REDIR?)</span></span><span id="b-root" class="badge info">prüfe…</span></div>
         <div class="row"><span>Login-Seite <span class="small">GET /login</span></span><span id="b-login" class="badge info">prüfe…</span></div>
         <div class="row"><span>Reset-Seite <span class="small">GET /reset</span></span><span id="b-reset" class="badge info">prüfe…</span></div>
         <div class="row"><span>Reset Validate <span class="small">GET /reset/validate?email=x&token=y</span></span><span id="b-validate" class="badge info">prüfe…</span></div>
@@ -173,16 +177,43 @@
       try{ const r=await fetch(url, { method:'HEAD', cache:'no-store' }); return { ok:r.ok, st:r.status, ms:performance.now()-t0, text:'' }; }
       catch(e){ return { ok:false, st:0, ms:performance.now()-t0, text:String(e) }; }
     };
-    const get = async (url) => {
+    const get = async (url, opts={}) => {
       const t0=performance.now();
-      try{ const r=await fetch(url, { cache:'no-store' }); return { ok:r.ok, st:r.status, ms:performance.now()-t0, r }; }
-      catch(e){ return { ok:false, st:0, ms:performance.now()-t0, err:String(e) }; }
+      try{ const r=await fetch(url, Object.assign({ cache:'no-store' }, opts)); return { ok:r.ok, st:r.status, ms:performance.now()-t0, r, type:r.type }; }
+      catch(e){ return { ok:false, st:0, ms:performance.now()-t0, err:String(e), type:'error' }; }
     };
 
-    let interval = 5000, timer=null;
+    // Scroll stabil halten
+    let interval = 5000, timer=null, paused=false;
     function schedule(){
-      clearInterval(timer); timer=setInterval(run, interval);
+      clearInterval(timer); if(!paused) timer=setInterval(refresh, interval);
       set('#refresh-iv', (interval/1000)+'s');
+    }
+    function setPause(p){
+      paused=p; $('#btn-pause').textContent = paused ? '▶︎ Fortsetzen' : '⏸︎ Pause';
+      schedule();
+    }
+    $('#btn-pause').addEventListener('click', ()=>setPause(!paused));
+
+    async function refresh(){
+      const y = window.scrollY;
+      await run();
+      // Scrollposition wiederherstellen
+      window.scrollTo({top:y, left:0, behavior:'instant'});
+    }
+
+    // Redirect-Erkennung: / mit redirect:'manual'
+    async function checkRootRedirect(){
+      const r = await get('/', { redirect:'manual' });
+      // Browser geben bei opaqueredirect type 'opaqueredirect' zurück
+      if (r.type === 'opaqueredirect' || (r.st>=300 && r.st<400)) {
+        badge('#b-root', true, false, 'REDIR');
+        set('#redir-note', '/ Redirect-Status: REDIR');
+      } else {
+        badge('#b-root', r.ok, false, r.ok ? 'OK' : 'FEHLER');
+        set('#redir-note', '/ Redirect-Status: ' + (r.ok ? 'OK' : 'FEHLER'));
+      }
+      return r;
     }
 
     async function updateHTTP(){
@@ -193,8 +224,8 @@
       }
       // /
       {
-        const r=await get('/'); badge('#b-root', r.ok || (r.st>=300 && r.st<400), r.st===404, r.st>=300 && r.st<400 ? 'REDIR' : undefined);
-        httpRows.push(`GET / → ${r.st} · ${fmtMs(r.ms)}`);
+        const rr=await checkRootRedirect();
+        httpRows.push(`GET / → ${rr.st||'(opaqueredirect)'} · ${fmtMs(rr.ms)} · type=${rr.type}`);
       }
       // /login
       {
@@ -280,20 +311,34 @@
         "/dashboard"
       ];
       const tbody=document.querySelector("#pathTable tbody");
-      tbody.innerHTML="";
+      // nicht global scrollen – nur Tabellenzellen aktualisieren
+      const existing = Array.from(tbody.querySelectorAll('tr')).map(tr=>tr.firstChild.textContent);
       for(const p of paths){
         let status="fail";
         try{
           const res=await fetch(p,{method:"GET",cache:"no-store"});
           status = res.ok ? "ok" : "fail";
         }catch(e){ status="fail"; }
-        const tr=document.createElement("tr");
-        tr.innerHTML=`<td>${p}</td><td class="${status}">${status==="ok"?"✔ OK":"✘ Fehler"}</td>`;
-        tbody.appendChild(tr);
+        let tr = Array.from(tbody.querySelectorAll('tr')).find(x=>x.firstChild.textContent===p);
+        if(!tr){
+          tr=document.createElement("tr");
+          tr.innerHTML=`<td>${p}</td><td class="${status}">${status==="ok"?"✔ OK":"✘ Fehler"}</td>`;
+          tbody.appendChild(tr);
+        }else{
+          const td=tr.lastChild;
+          td.className=status;
+          td.textContent = status==="ok" ? "✔ OK" : "✘ Fehler";
+        }
       }
+      // entferne Zeilen, die es nicht mehr gibt
+      Array.from(tbody.querySelectorAll('tr')).forEach(tr=>{
+        const p=tr.firstChild.textContent;
+        if(!paths.includes(p)) tr.remove();
+      });
     }
 
     async function run(){
+      set('#host', location.host); set('#origin', location.origin);
       set('#now', new Date().toLocaleString());
       await updateHTTP();
       await updateAssets();
@@ -302,13 +347,11 @@
     }
 
     // UI-Bedienung
-    $('#btn-refresh').addEventListener('click', run);
-    $('#btn-fast').addEventListener('click', ()=>{ interval=2000; schedule(); run(); });
+    $('#btn-refresh').addEventListener('click', refresh);
+    $('#btn-fast').addEventListener('click', ()=>{ interval=2000; schedule(); refresh(); });
     $('#btn-slow').addEventListener('click', ()=>{ interval=10000; schedule(); });
-    $('#btn-cache').addEventListener('click', ()=>{ run(); });
-
     // Start
-    run(); schedule();
+    schedule(); refresh();
   </script>
 </body>
 </html>
