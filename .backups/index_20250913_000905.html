@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hotel-Dashboard · Übersicht</title>
+  <meta name="color-scheme" content="light dark">
+
+  <!-- Assets -->
+  <link rel="preload" as="image" href="/Hotel-Dashboard-hintergrund.jpg">
+  <link rel="preload" as="image" href="/HD-Logo.png">
+  <link rel="preload" as="image" href="/Hotel-Dashboard-Schriftzug.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --page:#06080c;
+      --text:#eef2f8;
+      --muted:#cfd6de;
+      --accent:#b71c1c;
+      --accent-2:#7f0000;
+      --panel-r:103; --panel-g:103; --panel-b:103;
+      --panel-alpha:.50;
+      --panel-border:rgba(255,255,255,.10);
+      --card-w:1200px;
+      --radius:22px;
+    }
+
+    * { box-sizing:border-box; }
+    html,body { height:100%; margin:0; }
+
+    body {
+      font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, sans-serif;
+      font-size:16px;
+      background:var(--page) url("/Hotel-Dashboard-hintergrund.jpg") center/cover fixed no-repeat;
+      color:var(--text);
+      display:flex; flex-direction:column;
+    }
+
+    header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 22px;
+      background:rgba(var(--panel-r),var(--panel-g),var(--panel-b),.65);
+      border-bottom:1px solid var(--panel-border);
+      backdrop-filter:blur(6px);
+    }
+    header .brand { display:flex; align-items:center; gap:14px; }
+    header .brand img.logo { height:42px; }
+    header .brand img.wordmark { height:22px; }
+
+    nav {
+      display:flex; gap:12px; padding:10px 22px;
+      background:rgba(var(--panel-r),var(--panel-g),var(--panel-b),.45);
+      border-bottom:1px solid var(--panel-border);
+    }
+    nav a {
+      color:var(--text); text-decoration:none; font-weight:600;
+      padding:8px 14px; border-radius:10px;
+      transition:background .15s;
+    }
+    nav a:hover { background:rgba(255,255,255,.08); }
+
+    main {
+      flex:1;
+      padding:22px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      gap:20px;
+    }
+    .card {
+      background:rgba(var(--panel-r),var(--panel-g),var(--panel-b),var(--panel-alpha));
+      border:1px solid var(--panel-border);
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:0 8px 24px rgba(0,0,0,.35);
+      backdrop-filter:blur(6px);
+    }
+    .card h2 { margin:0 0 12px; font-size:18px; }
+    .status-ok { color:#10b981; font-weight:600; }
+    .status-err { color:#ef4444; font-weight:600; }
+    .muted { color:var(--muted); font-size:14px; }
+
+    footer {
+      padding:10px 20px; text-align:center;
+      font-size:13px; color:var(--muted);
+      background:rgba(var(--panel-r),var(--panel-g),var(--panel-b),.55);
+      border-top:1px solid var(--panel-border);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img class="logo" src="/HD-Logo.png" alt="Hotel-Dashboard Logo">
+      <img class="wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel-Dashboard">
+    </div>
+    <div><a href="/login" style="color:#fff;text-decoration:none;font-weight:600;">Abmelden</a></div>
+  </header>
+
+  <nav>
+    <a href="/index.html">Übersicht</a>
+    <a href="/login.html">Login</a>
+    <a href="/reset.html">Passwort-Reset</a>
+    <a href="/health">Server-Status</a>
+    <a href="https://git.hotel-dashboard.de" target="_blank">Git</a>
+  </nav>
+
+  <main>
+    <section class="card">
+      <h2>Serverstatus</h2>
+      <p id="serverStatus" class="muted">Lade…</p>
+    </section>
+
+    <section class="card">
+      <h2>Express-Routen</h2>
+      <ul id="routeList" class="muted"></ul>
+    </section>
+
+    <section class="card">
+      <h2>Git-Status</h2>
+      <p id="gitStatus" class="muted">Lade…</p>
+    </section>
+
+    <section class="card">
+      <h2>Benutzer</h2>
+      <p id="userCount" class="muted">Lade…</p>
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2025 Hotel-Dashboard · Alle Rechte vorbehalten
+  </footer>
+
+  <script>
+    async function loadStatus() {
+      try {
+        const health = await fetch('/health').then(r => r.ok ? r.json() : null);
+        if (health) {
+          document.getElementById('serverStatus').textContent =
+            health.status === 'ok' ? '✅ Online' : '❌ Fehler';
+          document.getElementById('serverStatus').className =
+            health.status === 'ok' ? 'status-ok' : 'status-err';
+        }
+
+        const routes = await fetch('/routes').then(r => r.ok ? r.json() : []);
+        const routeList = document.getElementById('routeList');
+        routeList.innerHTML = '';
+        routes.forEach(rt => {
+          const li = document.createElement('li');
+          li.textContent = rt;
+          routeList.appendChild(li);
+        });
+
+        const git = await fetch('/git/status').then(r => r.ok ? r.text() : 'Nicht verfügbar');
+        document.getElementById('gitStatus').textContent = git;
+
+        const users = await fetch('/users/count').then(r => r.ok ? r.json() : {count:0});
+        document.getElementById('userCount').textContent = users.count + ' Benutzer registriert';
+
+      } catch(err) {
+        console.error(err);
+      }
+    }
+    loadStatus();
+    setInterval(loadStatus, 15000);
+  </script>
+</body>
+</html>
