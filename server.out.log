@@ -1,3 +1,8 @@
 nohup: Eingabe wird ignoriert
-[dotenv@17.2.2] injecting env (21) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
-Hotel-Dashboard listening on 3000
+Hotel-Dashboard läuft auf Port 3000
+ROOT      : /home/steven/hotel_dashboard
+publicDir : /home/steven/hotel_dashboard/public
+users.json: /home/steven/hotel_dashboard/data/users.json
+tokens    : /home/steven/hotel_dashboard/data/auth/reset.db.json
+audit log : /home/steven/hotel_dashboard/data/auth/reset_audit.log
+session idle(ms): 300000
