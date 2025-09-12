@@ -3,182 +3,198 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin-Dashboard · Hotel-Dashboard</title>
+  <title>Hotel-Dashboard · Status</title>
   <meta name="color-scheme" content="light dark">
-  <link rel="preload" as="image" href="/hotel-dashboard-bg.jpg">
-  <link rel="preload" as="image" href="/HD-Logo.png">
-  <link rel="preload" as="image" href="/Hotel-Dashboard-Schriftzug.png">
   <style>
     :root{
-      --page:#06080c; --text:#eef2f8; --muted:#cfd6de;
-      --ok:#10b981; --warn:#f59e0b; --err:#ef4444; --info:#38bdf8;
-      --panel:rgba(255,255,255,.10); --panel2:rgba(255,255,255,.06);
-      --border:rgba(255,255,255,.14); --radius:18px; --card-w:360px;
+      --bg:#0b0f16; --fg:#e9eef7; --muted:#9aa6b2; --card:#121826; --line:#2a3243;
+      --ok:#16a34a; --warn:#f59e0b; --err:#ef4444; --info:#38bdf8;
+      --chip:#1f2937; --radius:14px;
     }
     @media (prefers-color-scheme: light){
-      :root{ --page:#f6f7fb; --text:#0f172a; --muted:#5b6574; --panel:rgba(0,0,0,.06); --panel2:rgba(0,0,0,.03); --border:rgba(0,0,0,.08); }
+      :root{ --bg:#f6f7fb; --fg:#111827; --muted:#6b7280; --card:#ffffff; --line:#e5e7eb; --chip:#f3f4f6; }
     }
     *{box-sizing:border-box} html,body{height:100%}
-    body{
-      margin:0;background:var(--page) url("/hotel-dashboard-bg.jpg") center/cover fixed no-repeat;
-      color:var(--text); font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Apple Color Emoji","Segoe UI Emoji";
-    }
-    .wrap{min-height:100%;display:grid;grid-template-rows:auto 1fr auto;gap:18px;padding:clamp(16px,3vw,26px)}
-    header{
-      display:flex;align-items:center;gap:14px;padding:10px 12px;border:1px solid var(--border);
-      border-radius:16px;background:var(--panel);backdrop-filter:blur(6px) saturate(120%);
-    }
-    header .brand{display:flex;align-items:center;gap:12px}
-    header .brand img.logo{width:48px;height:48px;object-fit:contain}
-    header .brand img.word{height:20px;object-fit:contain}
-    header .meta{margin-left:auto;font-size:14px;color:var(--muted)}
-    .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(var(--card-w),1fr))}
-    .card{
-      border:1px solid var(--border); border-radius:var(--radius);
-      background:var(--panel2); backdrop-filter:blur(6px); padding:14px; display:grid; gap:10px;
-    }
-    .card h3{margin:0;font-size:16px;display:flex;align-items:center;gap:10px}
-    .stat{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;border:1px dashed var(--border);background:rgba(255,255,255,.04);font-size:14px}
-    .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-weight:700}
-    .b-ok{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.35)}
-    .b-warn{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.35)}
-    .b-err{background:rgba(239,68,68,.16);color:#ef4444;border:1px solid rgba(239,68,68,.36)}
-    .b-info{background:rgba(56,189,248,.16);color:#38bdf8;border:1px solid rgba(56,189,248,.36)}
-    .rows{display:grid;gap:8px}
-    .kv{display:flex;align-items:center;justify-content:space-between;font-size:13.5px;color:var(--muted)}
-    .kv code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:rgba(0,0,0,.18);padding:2px 6px;border-radius:8px}
-    .actions{display:flex;gap:10px;flex-wrap:wrap}
-    .btn{all:unset;cursor:pointer;border-radius:12px;border:1px solid var(--border);padding:8px 12px;font-weight:700}
-    .btn:hover{background:rgba(255,255,255,.08)} .btn.ok{border-color:rgba(16,185,129,.35)} .btn.warn{border-color:rgba(245,158,11,.35)} .btn.err{border-color:rgba(239,68,68,.36)}
-    footer{font-size:13px;color:var(--muted);text-align:center}
-    .legend{display:flex;gap:8px;flex-wrap:wrap}
-    .legend span{display:inline-flex;align-items:center;gap:6px}
-    .small{font-size:12.5px;color:var(--muted)}
+    body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    .wrap{min-height:100%;display:grid;grid-template-rows:auto 1fr auto;gap:16px;padding:clamp(14px,2.5vw,22px)}
+    header,footer{display:flex;align-items:center;gap:10px}
+    header{justify-content:space-between}
+    .stamp{color:var(--muted);font-size:13px}
+    .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:grid;gap:10px}
+    .card h3{margin:0 0 6px;font-size:16px}
+    .row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px dashed var(--line);border-radius:10px;background:rgba(255,255,255,.02)}
+    .kv{display:flex;align-items:center;justify-content:space-between;border-bottom:1px dashed var(--line);padding:6px 0;font-size:13.5px}
+    .kv:last-child{border-bottom:0}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--chip);padding:2px 6px;border-radius:8px}
+    .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-weight:700;border:1px solid var(--line)}
+    .ok{color:#fff;background:rgba(22,163,74,.25);border-color:rgba(22,163,74,.5)}
+    .warn{color:#000;background:rgba(245,158,11,.35);border-color:rgba(245,158,11,.6)}
+    .err{ color:#fff;background:rgba(239,68,68,.35); border-color:rgba(239,68,68,.6)}
+    .info{color:#fff;background:rgba(56,189,248,.25);border-color:rgba(56,189,248,.5)}
+    .small{color:var(--muted);font-size:12.5px}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    details{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:8px}
+    details>summary{cursor:pointer;font-weight:600;margin:4px 0}
+    .list{display:grid;gap:6px}
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <div class="brand"><img class="logo" src="/HD-Logo.png" alt="HD"><img class="word" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel-Dashboard"></div>
-      <div class="meta"><span id="stamp">–</span> · <span class="small">Auto-Refresh 5s</span></div>
+      <h2 style="margin:0">Hotel-Dashboard · Serverstatus</h2>
+      <div class="stamp"><span id="now">–</span> · Auto-Refresh 5s</div>
     </header>
 
     <main class="grid">
       <section class="card">
-        <h3>Applikation & Proxy</h3>
-        <div class="rows">
-          <div class="stat"><span>Health <span class="small">GET /health</span></span><span id="s-health" class="badge b-info">prüfe…</span></div>
-          <div class="stat"><span>Root <span class="small">GET /</span></span><span id="s-root" class="badge b-info">prüfe…</span></div>
-          <div class="stat"><span>Login-Seite <span class="small">GET /login.html</span></span><span id="s-login" class="badge b-info">prüfe…</span></div>
-          <div class="stat"><span>Reset-Seite <span class="small">GET /reset.html</span></span><span id="s-reset" class="badge b-info">prüfe…</span></div>
-        </div>
-        <div class="actions">
-          <button class="btn warn" data-action="/admin/git/pull">Git Pull</button>
-          <button class="btn ok"   data-action="/admin/git/push">Git Push</button>
-          <button class="btn warn" data-action="/admin/services/restart?name=git-auto-push">Watcher neu starten</button>
-        </div>
+        <h3>HTTP-Basics</h3>
+        <div class="row"><span>Health <span class="small">GET /health</span></span><span id="b-health" class="badge info">prüfe…</span></div>
+        <div class="row"><span>Login <span class="small">GET /login</span></span><span id="b-login" class="badge info">prüfe…</span></div>
+        <div class="row"><span>Reset-Seite <span class="small">GET /reset</span></span><span id="b-reset" class="badge info">prüfe…</span></div>
+        <div class="row"><span>Reset Validate <span class="small">GET /reset/validate?email=x&token=y</span></span><span id="b-validate" class="badge info">prüfe…</span></div>
+        <div class="row"><span>Session-API <span class="small">GET /session/remaining</span></span><span id="b-session" class="badge info">prüfe…</span></div>
+        <div class="row"><span>Root <span class="small">GET /</span></span><span id="b-root" class="badge info">prüfe…</span></div>
       </section>
 
       <section class="card">
         <h3>Assets</h3>
-        <div class="rows">
-          <div class="stat"><span>Logo <span class="small">HEAD /HD-Logo.png</span></span><span id="s-logo" class="badge b-info">prüfe…</span></div>
-          <div class="stat"><span>Hintergrund <span class="small">HEAD /hotel-dashboard-bg.jpg</span></span><span id="s-bg" class="badge b-info">prüfe…</span></div>
-          <div class="stat"><span>Wordmark <span class="small">HEAD /Hotel-Dashboard-Schriftzug.png</span></span><span id="s-word" class="badge b-info">prüfe…</span></div>
-        </div>
-      </section>
-
-      <section class="card">
-        <h3>Reset-Flow (Oberfläche)</h3>
-        <div class="rows">
-          <div class="stat"><span>Validate-Route <span class="small">GET /reset/validate?email=x&token=y</span></span><span id="s-validate" class="badge b-info">prüfe…</span></div>
-          <div class="stat"><span>Confirm erreichbar <span class="small">OPTIONS /reset/confirm</span></span><span id="s-confirm" class="badge b-info">prüfe…</span></div>
-        </div>
+        <div class="row"><span>Logo <span class="small">HEAD /HD-Logo.png</span></span><span id="b-logo" class="badge info">prüfe…</span></div>
+        <div class="row"><span>Wordmark <span class="small">HEAD /Hotel-Dashboard-Schriftzug.png</span></span><span id="b-word" class="badge info">prüfe…</span></div>
+        <div class="row"><span>Background <span class="small">HEAD /hotel-dashboard-bg.jpg</span></span><span id="b-bg" class="badge info">prüfe…</span></div>
       </section>
 
       <section class="card">
         <h3>Server-Status</h3>
-        <div class="rows" id="agentRows"><div class="small">Warte auf <code>/admin/status</code> …</div></div>
+        <div class="kv"><span>Port</span><code id="s-port">–</code></div>
+        <div class="kv"><span>PID</span><code id="s-pid">–</code></div>
+        <div class="kv"><span>Uptime</span><code id="s-uptime">–</code></div>
+        <div class="kv"><span>Node</span><code id="s-node">–</code></div>
+        <div class="kv"><span>CPU-Load (1/5/15)</span><code id="s-load">–</code></div>
+        <div class="kv"><span>RAM used</span><code id="s-mem">–</code></div>
+        <div class="kv"><span>Benutzer</span><code id="s-user">–</code></div>
+        <div class="kv"><span>Arbeitsverzeichnis</span><code id="s-cwd">–</code></div>
+      </section>
+
+      <section class="card">
+        <h3>Git</h3>
+        <div class="kv"><span>Branch</span><code id="g-branch">–</code></div>
+        <div class="kv"><span>Letzter Commit</span><code id="g-last">–</code></div>
+        <details>
+          <summary>Repository-Infos</summary>
+          <div class="list mono small" id="g-extra">–</div>
+        </details>
+      </section>
+
+      <section class="card">
+        <h3>Dienste & Ports</h3>
+        <div class="list" id="svc">Lade…</div>
+        <details>
+          <summary>Offene Ports (Ausschnitt)</summary>
+          <div class="list mono small" id="ports">–</div>
+        </details>
+        <details>
+          <summary>Proxy-Reachability</summary>
+          <div class="list mono small" id="proxy">–</div>
+        </details>
+      </section>
+
+      <section class="card">
+        <h3>Express-Routen</h3>
+        <div class="list mono small" id="routes">–</div>
       </section>
     </main>
 
-    <footer>
-      <div class="legend">
-        <span><span class="badge b-ok">OK</span> grün</span>
-        <span><span class="badge b-warn">WARN</span> gelb</span>
-        <span><span class="badge b-err">FEHLER</span> rot</span>
-      </div>
-      <div class="small">© <span id="y"></span> Hotel-Dashboard</div>
+    <footer class="small">
+      <span class="badge ok">OK</span> grün ·
+      <span class="badge warn">WARN</span> gelb ·
+      <span class="badge err">FEHLER</span> rot
     </footer>
   </div>
 
   <script>
     const $ = s => document.querySelector(s);
-    const setBadge = (el, ok, warn=false, txtOk="OK", txtErr="FEHLER")=>{
-      el.className = "badge " + (ok ? "b-ok" : (warn ? "b-warn" : "b-err"));
-      el.textContent = ok ? txtOk : (warn ? "WARN" : txtErr);
+    const set = (id, txt) => { const el=$(id); if(el) el.textContent=txt; };
+    const badge = (id, ok, warn=false) => {
+      const el=$(id); if(!el) return;
+      el.className = 'badge ' + (ok ? 'ok' : (warn ? 'warn' : 'err'));
+      el.textContent = ok ? 'OK' : (warn ? 'WARN' : 'FEHLER');
     };
-    const head = url => fetch(url, {method:"HEAD", cache:"no-store"});
-    const get  = url => fetch(url, {method:"GET",  cache:"no-store"});
-    const opts = url => fetch(url, {method:"OPTIONS", cache:"no-store"});
+    const head = url => fetch(url, { method:'HEAD', cache:'no-store' });
+    const get  = url => fetch(url, { method:'GET',  cache:'no-store' });
 
-    function kv(k,v){ return `<div class="kv"><span>${k}</span><code>${v}</code></div>`; }
+    async function run(){
+      set('#now', new Date().toLocaleString());
 
-    async function checkAll(){
-      $("#stamp").textContent = new Date().toLocaleString();
-      $("#y").textContent = new Date().getFullYear();
-
-      try{ setBadge($("#s-health"), (await get("/health")).ok); }catch{ setBadge($("#s-health"), false); }
-      try{ setBadge($("#s-root"),   (await get("/")).ok); }catch{ setBadge($("#s-root"), false); }
-      try{ setBadge($("#s-login"),  (await get("/login.html")).ok); }catch{ setBadge($("#s-login"), false); }
-      try{ setBadge($("#s-reset"),  (await get("/reset.html")).ok); }catch{ setBadge($("#s-reset"), false); }
-
-      try{ setBadge($("#s-logo"), (await head("/HD-Logo.png")).ok); }catch{ setBadge($("#s-logo"), false); }
-      try{ setBadge($("#s-bg"),   (await head("/hotel-dashboard-bg.jpg")).ok); }catch{ setBadge($("#s-bg"), false); }
-      try{ setBadge($("#s-word"), (await head("/Hotel-Dashboard-Schriftzug.png")).ok); }catch{ setBadge($("#s-word"), false); }
-
+      // HTTP-Basics
+      try{ badge('#b-health', (await get('/health')).ok); }catch{ badge('#b-health', false); }
+      try{ badge('#b-login',  (await get('/login')).ok); }catch{ badge('#b-login', false); }
+      try{ badge('#b-reset',  (await get('/reset')).ok); }catch{ badge('#b-reset', false); }
       try{
-        const r = await get("/reset/validate?email=x&token=y");
-        setBadge($("#s-validate"), (r.status===200||r.status===400||r.status===422), r.status===404, (r.status===200?"OK (200)":"OK"), "404");
-      }catch{ setBadge($("#s-validate"), false); }
+        const r = await get('/reset/validate?email=x&token=y');
+        badge('#b-validate', [200,400,404,422].includes(r.status), r.status===404);
+      }catch{ badge('#b-validate', false); }
+      try{ badge('#b-session', (await get('/session/remaining')).ok); }catch{ badge('#b-session', false); }
+      try{ badge('#b-root', (await get('/')).ok); }catch{ badge('#b-root', false); }
 
-      try{ setBadge($("#s-confirm"), (await opts("/reset/confirm")).ok); }catch{ setBadge($("#s-confirm"), false); }
+      // Assets
+      try{ badge('#b-logo', (await head('/HD-Logo.png')).ok); }catch{ badge('#b-logo', false); }
+      try{ badge('#b-word', (await head('/Hotel-Dashboard-Schriftzug.png')).ok); }catch{ badge('#b-word', false); }
+      try{ badge('#b-bg',   (await head('/hotel-dashboard-bg.jpg')).ok); }catch{ badge('#b-bg', false); }
 
-      // Admin Status (Ports, Dienste, Git, Uptime)
+      // Admin-Status
       try{
-        const s = await get("/admin/status");
-        if(!s.ok) throw new Error();
+        const s = await get('/admin/status');
+        if(!s.ok) throw new Error('status !ok');
         const j = await s.json();
-        const rows = [];
-        rows.push(kv("Node Port", j.node?.port ?? "–"));
-        rows.push(kv("Node PID",  j.node?.pid  ?? "–"));
-        rows.push(kv("Node Uptime", j.node?.uptime ?? "–"));
-        rows.push(kv("Proxy",     j.proxy?.kind ?? "–"));
-        rows.push(kv("Git Branch",j.git?.branch ?? "–"));
-        rows.push(kv("Letzter Commit", j.git?.last ?? "–"));
-        if (Array.isArray(j.services)) {
-          j.services.forEach(sv => rows.push(kv(`Service ${sv.name}`, `${sv.ok?'OK':'FEHLER'} · ${sv.detail||''}`)));
-        }
-        $("#agentRows").innerHTML = rows.join("");
-      }catch{
-        $("#agentRows").innerHTML = `<div class="small">Kein Agent aktiv. (Server liefert noch kein <code>/admin/status</code>.)</div>`;
+
+        set('#s-port',   j.node?.port ?? '–');
+        set('#s-pid',    j.node?.pid ?? '–');
+        set('#s-uptime', j.node?.uptime ?? '–');
+        set('#s-node',   j.node?.version ?? '–');
+        set('#s-user',   j.os?.user ?? '–');
+        set('#s-cwd',    j.os?.cwd ?? '–');
+        set('#s-load',   Array.isArray(j.os?.load) ? j.os.load.join(' / ') : '–');
+        set('#s-mem',    j.os?.mem ?? '–');
+
+        set('#g-branch', j.git?.branch ?? '–');
+        set('#g-last',   j.git?.last ?? '–');
+        $('#g-extra').textContent = (j.git?.info || ['–']).join('\n');
+
+        // Dienste
+        const svc = j.services || [];
+        const svcBox = $('#svc'); svcBox.innerHTML='';
+        if (svc.length===0) svcBox.textContent='–';
+        svc.forEach(o=>{
+          const div = document.createElement('div');
+          div.className='row';
+          const left = document.createElement('span');
+          left.textContent = `${o.name} · ${o.detail||''}`;
+          const right = document.createElement('span');
+          right.className = 'badge ' + (o.ok?'ok':(o.warn?'warn':'err'));
+          right.textContent = o.ok ? 'OK' : (o.warn?'WARN':'FEHLER');
+          div.appendChild(left); div.appendChild(right); svcBox.appendChild(div);
+        });
+
+        // Ports
+        $('#ports').textContent = (j.net?.ports || ['–']).join('\n');
+
+        // Proxy reachability
+        $('#proxy').textContent = (j.proxy?.checks || ['–']).join('\n');
+
+        // Routen
+        $('#routes').textContent = (j.routes || ['–']).join('\n');
+      }catch(e){
+        set('#s-port','–'); set('#s-pid','–'); set('#s-uptime','–');
+        set('#s-node','–'); set('#s-user','–'); set('#s-cwd','–');
+        set('#s-load','–'); set('#s-mem','–');
+        set('#g-branch','–'); set('#g-last','–');
+        $('#svc').textContent='(keine Daten)'; $('#ports').textContent='–';
+        $('#proxy').textContent='–'; $('#routes').textContent='–';
       }
     }
 
-    document.addEventListener("click", async (e)=>{
-      const btn = e.target.closest("[data-action]");
-      if(!btn) return;
-      const url = btn.getAttribute("data-action");
-      const orig = btn.textContent; btn.disabled=true; btn.textContent="…";
-      try{
-        const r = await fetch(url, {method:"POST"});
-        if(r.ok){ btn.textContent="OK ✓"; setTimeout(()=>btn.textContent=orig, 1000); checkAll(); }
-        else{ btn.textContent="Fehler"; alert("Aktion fehlgeschlagen: "+r.status); setTimeout(()=>btn.textContent=orig,1500); }
-      }catch(_){ btn.textContent="nicht verfügbar"; setTimeout(()=>btn.textContent=orig,1500); }
-      finally{ btn.disabled=false; }
-    });
-
-    checkAll(); setInterval(checkAll, 5000);
+    run(); setInterval(run, 5000);
   </script>
 </body>
 </html>
