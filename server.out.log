@@ -18,3 +18,4 @@ session idle(ms): 300000
 [login] password mismatch for info@myhome-rottweil.de
 [login] password mismatch for info@myhome-rottweil.de
 [login] password mismatch for admin@hotel-dashboard.de
+[login] user not found for [ '' ]
