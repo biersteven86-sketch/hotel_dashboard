@@ -17,10 +17,10 @@
       "firstname": "Steven",
       "lastname": "Bier",
       "passAlgo": "pbkdf2:sha256:310000",
-      "passSalt": "7f83e533545fa0091ecd61f2f57985b1",
-      "passHash": "e0c8a5e3e96764142b82a0c9fdca18ce1974bc9e3053d8e4c767480bf0fb9838",
-      "createdAt": "2025-09-12T20:52:03.804Z",
-      "updatedAt": "2025-09-12T20:52:03.804Z"
+      "passSalt": "5c149bf33ba289cd9f93cb3c86aa6ac6",
+      "passHash": "320040f670208b2f776086f23e9f13cc1f9e1ea98516ecaa32458361b38ddfde",
+      "createdAt": "2025-09-10T04:17:19.786Z",
+      "updatedAt": "2025-09-11T22:36:01.310Z"
     },
     {
       "email": "admin@hotel-dashboard.de",
