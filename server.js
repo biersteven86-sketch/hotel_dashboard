@@ -478,3 +478,45 @@ app.listen(PORT, () => {
   console.log('audit log :', auditLog);
   console.log('session idle(ms):', IDLE_MS);
 });
+// --- ADMIN STATUS (nur hinzufügen, nichts anderes ändern) ---
+const os = require('os');
+const { execSync } = require('child_process');
+
+function formatBytes(n){ const u=['B','KB','MB','GB','TB']; let i=0,f=n; while(f>1024&&i<u.length-1){f/=1024;i++;} return `${f.toFixed(1)} ${u[i]}`; }
+function listRoutes(app){
+  const out=[];
+  function walk(layer){
+    if(layer.route && layer.route.path){
+      const methods=Object.keys(layer.route.methods).map(m=>m.toUpperCase()).join(',');
+      out.push(`${methods.padEnd(7)} ${layer.route.path}`);
+    }else if(layer.name==='router' && layer.handle && layer.handle.stack){
+      layer.handle.stack.forEach(walk);
+    }else if(layer.handle && layer.handle.stack){
+      layer.handle.stack.forEach(walk);
+    }
+  }
+  if(app && app._router && app._router.stack) app._router.stack.forEach(walk);
+  return out.sort();
+}
+
+app.get('/admin/status', (req,res)=>{
+  try{
+    const memTotal=os.totalmem(), memFree=os.freemem();
+    const payload={
+      node:{ port:process.env.PORT||3000, pid:process.pid, version:process.version, uptime:`${Math.floor(process.uptime())}s` },
+      os:{ user:os.userInfo().username, cwd:process.cwd(), load:os.loadavg().map(v=>v.toFixed(2)), mem:`${formatBytes(memTotal-memFree)} / ${formatBytes(memTotal)}` },
+      git:{}, services:[], net:{ports:[]}, proxy:{checks:[]}, routes:listRoutes(req.app)
+    };
+    try{
+      payload.git.branch=execSync('git rev-parse --abbrev-ref HEAD',{stdio:['ignore','pipe','ignore']}).toString().trim();
+      payload.git.last=execSync('git log -1 --pretty="%h · %s · %ci"',{stdio:['ignore','pipe','ignore']}).toString().trim();
+      payload.git.info=execSync('git status -sb',{stdio:['ignore','pipe','ignore']}).toString().trim().split('\n');
+    }catch{ payload.git={branch:'-',last:'-',info:['(kein Git verfügbar)']}; }
+    try{
+      payload.net.ports=execSync('ss -ltnp | head -n 30',{stdio:['ignore','pipe','ignore']}).toString().split('\n').filter(Boolean);
+    }catch{ payload.net.ports=['(ss nicht verfügbar)']; }
+    payload.proxy.checks=['localhost:3000','127.0.0.1:3000'].map(h=>`Host: ${h} → GET /`);
+    payload.services=[ {name:'Node/Express',detail:`PID ${process.pid}`,ok:true} ];
+    res.json(payload);
+  }catch(e){ res.status(500).json({error:'status_failed',message:String(e)}); }
+});
