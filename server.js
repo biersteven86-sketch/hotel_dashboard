@@ -383,6 +383,88 @@ app.get('/admin/status', requireAuth, async (_req, res) => {
   }
 });
 
+// --- ADMIN STATUS (nur hinzufügen, nichts anderes ändern) ---
+const os = require('os');
+const { execSync } = require('child_process');
+
+function formatBytes(n){
+  const u=['B','KB','MB','GB','TB']; let i=0, f=n;
+  while(f>1024 && i<u.length-1){ f/=1024; i++; }
+  return `${f.toFixed(1)} ${u[i]}`;
+}
+function listRoutes(app){
+  const out = [];
+  function walker(layer, prefix=''){
+    if(layer.route && layer.route.path){
+      const methods = Object.keys(layer.route.methods).map(m=>m.toUpperCase()).join(',');
+      out.push(`${methods.padEnd(7)} ${prefix}${layer.route.path}`);
+    }else if(layer.name==='router' && layer.handle.stack){
+      const newPrefix = layer.regexp && layer.regexp.fast_slash ? prefix : (prefix || '');
+      layer.handle.stack.forEach(l=>walker(l, newPrefix));
+    }else if(layer.handle && layer.handle.stack){
+      layer.handle.stack.forEach(l=>walker(l, prefix));
+    }
+  }
+  if(app && app._router && app._router.stack) app._router.stack.forEach(l=>walker(l,''));
+  return out.sort();
+}
+
+app.get('/admin/status', async (req, res) => {
+  try{
+    // Node / OS
+    const memTotal = os.totalmem(), memFree = os.freemem();
+    const payload = {
+      node: {
+        port: process.env.PORT || 3000,
+        pid: process.pid,
+        version: process.version,
+        uptime: `${Math.floor(process.uptime())}s`,
+      },
+      os: {
+        user: os.userInfo().username,
+        cwd: process.cwd(),
+        load: os.loadavg().map(v=>v.toFixed(2)),
+        mem: `${formatBytes(memTotal - memFree)} / ${formatBytes(memTotal)}`,
+      },
+      git: {},
+      services: [],
+      net: { ports: [] },
+      proxy: { checks: [] },
+      routes: listRoutes(req.app),
+    };
+
+    // Git-Infos (best effort)
+    try{
+      const branch = execSync('git rev-parse --abbrev-ref HEAD',{stdio:['ignore','pipe','ignore']}).toString().trim();
+      const last   = execSync('git log -1 --pretty="%h · %s · %ci"',{stdio:['ignore','pipe','ignore']}).toString().trim();
+      const stat   = execSync('git status -sb',{stdio:['ignore','pipe','ignore']}).toString().trim().split('\n');
+      payload.git = { branch, last, info: stat };
+    }catch{ payload.git = { branch:'-', last:'-', info:['(kein Git verfügbar)'] }; }
+
+    // Offene Ports (Kurzansicht) – best effort
+    try{
+      const ssOut = execSync('ss -ltnp | head -n 30',{stdio:['ignore','pipe','ignore']}).toString().split('\n').filter(Boolean);
+      payload.net.ports = ssOut;
+    }catch{ payload.net.ports = ['(ss nicht verfügbar)']; }
+
+    // Proxy-Reachability mit verschiedenen Host-Headern (nur Anzeige)
+    const hosts = ['localhost:3000','127.0.0.1:3000'];
+    payload.proxy.checks = hosts.map(h => `Host: ${h} → GET /`);
+
+    // Dienste (Beispiele – passe bei Bedarf an)
+    payload.services = [
+      { name: 'Node/Express', detail: `PID ${process.pid}`, ok: true },
+      { name: 'Sessions', detail: 'Cookie/Session', ok: true, warn: false },
+      { name: 'Git Auto', detail: 'Webhook/Autopush (manuell prüfen)', ok: true, warn: true }
+    ];
+
+    res.json(payload);
+  }catch(e){
+    res.status(500).json({ error: 'status_failed', message: String(e) });
+  }
+});
+
+
 // ===== 404 =====
 app.use((_req,res)=> res.status(404).sendFile('login.html',{root: publicDir}));
 
