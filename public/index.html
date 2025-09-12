@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hotel-Dashboard · Index</title>
   <meta name="color-scheme" content="light dark">
+  <meta http-equiv="Cache-Control" content="no-store" />
   <style>
     :root{
       --bg:#0b0f16; --fg:#e9eef7; --muted:#9aa6b2; --card:#121826; --line:#2a3243;
@@ -17,7 +18,7 @@
     *{box-sizing:border-box}
     html,body{height:100%}
     body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial}
-    .wrap{min-height:100%;display:grid;grid-template-rows:auto 1fr auto;gap:16px;padding:clamp(14px,2.8vw,24px)}
+    .wrap{min-height:100%;display:grid;grid-template-rows:auto 1fr auto;gap:16px;padding:clamp(14px,2.6vw,24px)}
     header,footer{display:flex;align-items:center;gap:12px}
     header{justify-content:space-between}
     .stamp{color:var(--muted);font-size:13px}
@@ -26,6 +27,7 @@
     button:hover{background:rgba(255,255,255,.06)}
     .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
     .x2{grid-column:span 2}
+    .x3{grid-column:span 3}
     .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:grid;gap:10px}
     .card h3{margin:0 0 6px;font-size:16px;display:flex;align-items:center;gap:8px}
     .row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px dashed var(--line);border-radius:10px;background:rgba(255,255,255,.02);gap:12px}
@@ -45,6 +47,11 @@
     .list{display:grid;gap:6px}
     .errtext{white-space:pre-wrap;color:#fecaca;font-size:12.5px}
     .muted{color:var(--muted)}
+    /* Pfad-Tabelle */
+    .paths table{width:100%;border-collapse:collapse;font-size:13.5px}
+    .paths th,.paths td{padding:6px 8px;text-align:left}
+    .paths th{background:var(--line);color:var(--fg)}
+    .paths tr:nth-child(even){background:rgba(255,255,255,.04)}
   </style>
 </head>
 <body>
@@ -134,6 +141,15 @@
         <h3>Express-Routen</h3>
         <div class="list mono small" id="routes">–</div>
       </section>
+
+      <!-- Pfad-Status -->
+      <section class="card x2 paths">
+        <h3>Pfad-Status</h3>
+        <table id="pathTable">
+          <thead><tr><th>Pfad</th><th>Status</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </section>
     </main>
 
     <footer class="small">
@@ -169,9 +185,7 @@
       set('#refresh-iv', (interval/1000)+'s');
     }
 
-    async function run(){
-      set('#now', new Date().toLocaleString());
-      // HTTP Basics
+    async function updateHTTP(){
       const httpRows = [];
       // /health
       {
@@ -201,15 +215,17 @@
         httpRows.push(`GET /session/remaining → ${r.st} · ${fmtMs(r.ms)}`);
       }
       $('#http-details').textContent = httpRows.join('\n');
+    }
 
-      // Assets
+    async function updateAssets(){
       const assetErr = [];
       const logo = await head('/HD-Logo.png'); badge('#b-logo', logo.ok); if (!logo.ok) assetErr.push(`HD-Logo.png → ${logo.st} · ${fmtMs(logo.ms)}`);
       const word = await head('/Hotel-Dashboard-Schriftzug.png'); badge('#b-word', word.ok); if (!word.ok) assetErr.push(`Hotel-Dashboard-Schriftzug.png → ${word.st} · ${fmtMs(word.ms)}`);
       const bg   = await head('/hotel-dashboard-bg.jpg'); badge('#b-bg', bg.ok); if (!bg.ok) assetErr.push(`hotel-dashboard-bg.jpg → ${bg.st} · ${fmtMs(bg.ms)}`);
       $('#asset-errors').textContent = assetErr.length? assetErr.join('\n') : 'keine';
+    }
 
-      // /admin/status (optional)
+    async function updateAdminStatus(){
       try{
         const r = await get('/admin/status');
         if (!r.ok) throw new Error('!ok '+r.st);
@@ -228,7 +244,6 @@
         set('#g-last',   j?.git?.last ?? '–');
         $('#g-extra').textContent = (j?.git?.info || ['–']).join('\n');
 
-        // Dienste
         const svc = j?.services || [];
         const box = $('#svc'); box.innerHTML='';
         if (!svc.length) box.textContent='–';
@@ -240,7 +255,6 @@
           div.append(left,right); box.append(div);
         });
 
-        // Ports / Proxy / Routen
         $('#ports').textContent = (j?.net?.ports || ['–']).join('\n');
         $('#proxy').textContent = (j?.proxy?.checks || ['–']).join('\n');
         $('#routes').textContent = (j?.routes || ['–']).join('\n');
@@ -254,16 +268,44 @@
       }
     }
 
+    async function updatePaths(){
+      const paths=[
+        "/health",
+        "/",
+        "/login",
+        "/reset",
+        "/reset/validate?email=x&token=y",
+        "/reset/confirm",
+        "/index",
+        "/dashboard"
+      ];
+      const tbody=document.querySelector("#pathTable tbody");
+      tbody.innerHTML="";
+      for(const p of paths){
+        let status="fail";
+        try{
+          const res=await fetch(p,{method:"GET",cache:"no-store"});
+          status = res.ok ? "ok" : "fail";
+        }catch(e){ status="fail"; }
+        const tr=document.createElement("tr");
+        tr.innerHTML=`<td>${p}</td><td class="${status}">${status==="ok"?"✔ OK":"✘ Fehler"}</td>`;
+        tbody.appendChild(tr);
+      }
+    }
+
+    async function run(){
+      set('#now', new Date().toLocaleString());
+      await updateHTTP();
+      await updateAssets();
+      await updateAdminStatus();
+      await updatePaths();
+    }
+
     // UI-Bedienung
     $('#btn-refresh').addEventListener('click', run);
     $('#btn-fast').addEventListener('click', ()=>{ interval=2000; schedule(); run(); });
     $('#btn-slow').addEventListener('click', ()=>{ interval=10000; schedule(); });
-    $('#btn-cache').addEventListener('click', ()=>{
-      // minimaler „Cache leeren“-Effekt: Dummy-Param erzwingen
-      const s=document.createElement('style'); s.textContent='*{content-visibility:auto}'; document.head.appendChild(s);
-      run();
-      setTimeout(()=>s.remove(), 500);
-    });
+    $('#btn-cache').addEventListener('click', ()=>{ run(); });
 
     // Start
     run(); schedule();
