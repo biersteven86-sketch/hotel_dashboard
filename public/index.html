@@ -56,6 +56,7 @@
     .paths th{background:var(--line);color:var(--fg)}
     .paths tr:nth-child(even){background:rgba(255,255,255,.04)}
     .btn-row{display:flex;flex-wrap:wrap;gap:8px}
+    .log{background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:10px;padding:10px;white-space:pre-wrap;font-size:12.5px;max-height:240px;overflow:auto}
   </style>
 </head>
 <body>
@@ -76,6 +77,8 @@
         <button id="btn-fast">Schneller (2s)</button>
         <button id="btn-slow">Langsamer (10s)</button>
         <button id="btn-pause">⏸︎ Pause</button>
+        <!-- Direktzugriff Neustart -->
+        <button id="btn-restart-hotel">🔁 Hotel neu starten</button>
       </div>
     </header>
 
@@ -151,6 +154,25 @@
         <h3>Pfad-Status</h3>
         <table id="pathTable"><thead><tr><th>Pfad</th><th>Status</th></tr></thead><tbody></tbody></table>
       </section>
+
+      <!-- Admin-Aktionen -->
+      <section class="card x2">
+        <h3>Admin-Aktionen</h3>
+        <div class="row">
+          <span>Hotel-App neu starten <span class="small">/usr/local/bin/restart-hotel.sh</span></span>
+          <span><button id="btn-run-restart" class="btn">🔁 Ausführen</button></span>
+        </div>
+        <div class="row">
+          <span>Nginx neu starten <span class="small">POST /admin/restart {"service":"nginx"}</span></span>
+          <span><button id="btn-restart-nginx" class="btn">🔁 Nginx</button></span>
+        </div>
+        <div class="row">
+          <span>Apache neu starten <span class="small">POST /admin/restart {"service":"apache2"}</span></span>
+          <span><button id="btn-restart-apache" class="btn">🔁 Apache</button></span>
+        </div>
+        <details open><summary>Ausgabe</summary><div id="admin-log" class="log">–</div></details>
+        <div class="small muted">Hinweis: Diese Buttons erwarten serverseitige Routen/Rechte (CSRF/Auth). Hotel-App nutzt das eingerichtete Root-Skript. :contentReference[oaicite:2]{index=2}</div>
+      </section>
     </main>
 
     <footer class="small">
@@ -171,6 +193,15 @@
     const get = async (url,opts={}) => { const t0=performance.now();
       try{ const r=await fetch(url,Object.assign({cache:'no-store'},opts)); return {ok:r.ok,st:r.status,ms:performance.now()-t0,r,type:r.type}; }
       catch(e){ return {ok:false,st:0,ms:performance.now()-t0,type:'error'}; } };
+    const cookie = (name)=>document.cookie.split('; ').find(x=>x.startsWith(name+'='))?.split('=')[1];
+    const postJSON = async (url, body={})=>{
+      const headers = {'Content-Type':'application/json'};
+      const csrf = cookie('csrfToken'); if(csrf) headers['X-CSRF-Token']=csrf;
+      const r = await fetch(url,{method:'POST',headers,body:JSON.stringify(body),cache:'no-store'});
+      const text = await r.text(); // akzeptiert JSON oder Text
+      let j=null; try{ j=JSON.parse(text); }catch{}
+      return {ok:r.ok, st:r.status, text, json:j};
+    };
 
     // ===== Refresh-Interval / Scroll-Stabilität =====
     let interval=5000,timer=null,paused=false;
@@ -247,6 +278,33 @@
       }
     }
 
+    // ===== Admin Buttons =====
+    function logAppend(msg){ const el=$('#admin-log'); el.textContent=(el.textContent==='–'?'':el.textContent+'\n')+msg; el.scrollTop=el.scrollHeight; }
+
+    async function runRestartHotel(){
+      logAppend('> Starte: /usr/local/bin/restart-hotel.sh …');
+      try{
+        const r = await postJSON('/admin/restart', {script:'hotel'});
+        if(r.ok){
+          logAppend('✅ OK '+r.st+'\n'+(r.json?JSON.stringify(r.json,null,2):r.text));
+        }else{
+          logAppend('❌ FEHLER '+r.st+'\n'+(r.text||''));
+        }
+      }catch(e){ logAppend('❌ Ausnahme: '+(e&&e.message||e)); }
+    }
+
+    async function runRestartService(svc){
+      logAppend(`> Starte: service=${svc} …`);
+      try{
+        const r = await postJSON('/admin/restart', {service:svc});
+        if(r.ok){
+          logAppend('✅ OK '+r.st+'\n'+(r.json?JSON.stringify(r.json,null,2):r.text));
+        }else{
+          logAppend('❌ FEHLER '+r.st+'\n'+(r.text||''));
+        }
+      }catch(e){ logAppend('❌ Ausnahme: '+(e&&e.message||e)); }
+    }
+
     // ===== Run All =====
     async function run(){
       set('#host',location.host); set('#origin',location.origin); set('#now',new Date().toLocaleString());
@@ -255,6 +313,12 @@
 
     // Init
     schedule(); run();
+
+    // Button Handlers
+    $('#btn-restart-hotel').addEventListener('click', runRestartHotel);
+    $('#btn-run-restart').addEventListener('click', runRestartHotel);
+    $('#btn-restart-nginx').addEventListener('click', ()=>runRestartService('nginx'));
+    $('#btn-restart-apache').addEventListener('click', ()=>runRestartService('apache2'));
   </script>
 </body>
 </html>
