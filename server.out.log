@@ -1,4 +1,3 @@
-nohup: Eingabe wird ignoriert
 Hotel-Dashboard läuft auf Port 3000
 ROOT      : /home/steven/hotel_dashboard
 publicDir : /home/steven/hotel_dashboard/public
