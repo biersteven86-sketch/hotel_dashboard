@@ -3,224 +3,166 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hotel-Dashboard · Index</title>
+  <title>Hotel-Dashboard · Übersicht</title>
   <meta name="color-scheme" content="light dark">
-  <meta http-equiv="Cache-Control" content="no-store" />
+
+  <!-- Assets -->
+  <link rel="preload" as="image" href="/Hotel-Dashboard-hintergrund.jpg">
+  <link rel="preload" as="image" href="/HD-Logo.png">
+  <link rel="preload" as="image" href="/Hotel-Dashboard-Schriftzug.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
-    :root{
-      --bg:#0b0f16; --fg:#e9eef7; --muted:#9aa6b2; --card:#121826; --line:#2a3243;
-      --ok:#16a34a; --warn:#f59e0b; --err:#ef4444; --info:#38bdf8; --chip:#1f2937; --radius:14px;
+    :root {
+      --page:#06080c;
+      --text:#eef2f8;
+      --muted:#cfd6de;
+      --accent:#b71c1c;
+      --accent-2:#7f0000;
+      --panel-r:103; --panel-g:103; --panel-b:103;
+      --panel-alpha:.50;
+      --panel-border:rgba(255,255,255,.10);
+      --card-w:1200px;
+      --radius:22px;
     }
-    @media (prefers-color-scheme: light){
-      :root{ --bg:#f6f7fb; --fg:#111827; --muted:#6b7280; --card:#ffffff; --line:#e5e7eb; --chip:#f3f4f6; }
+
+    * { box-sizing:border-box; }
+    html,body { height:100%; margin:0; }
+
+    body {
+      font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, sans-serif;
+      font-size:16px;
+      background:var(--page) url("/Hotel-Dashboard-hintergrund.jpg") center/cover fixed no-repeat;
+      color:var(--text);
+      display:flex; flex-direction:column;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial}
-    .wrap{min-height:100%;display:grid;grid-template-rows:auto 1fr auto;gap:16px;padding:clamp(14px,2.6vw,24px)}
-    header,footer{display:flex;align-items:center;gap:12px}
-    header{justify-content:space-between;position:sticky;top:0;background:linear-gradient(to bottom,var(--bg) 70%,transparent);z-index:5;padding-bottom:6px}
-    .stamp{color:var(--muted);font-size:13px}
-    .actions{display:flex;gap:8px;flex-wrap:wrap}
-    button{background:transparent;border:1px solid var(--line);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer}
-    button:hover{background:rgba(255,255,255,.06)}
-    .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
-    .x2{grid-column:span 2}
-    .x3{grid-column:span 3}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:grid;gap:10px}
-    .card h3{margin:0 0 6px;font-size:16px;display:flex;align-items:center;gap:8px}
-    .row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px dashed var(--line);border-radius:10px;background:rgba(255,255,255,.02);gap:12px}
-    .row span.small{color:var(--muted);font-size:12.5px}
-    .kv{display:flex;align-items:center;justify-content:space-between;border-bottom:1px dashed var(--line);padding:6px 0;font-size:13.5px;gap:8px}
-    .kv:last-child{border-bottom:0}
-    code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--chip);padding:2px 6px;border-radius:8px}
-    .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-weight:700;border:1px solid var(--line);white-space:nowrap}
-    .ok{color:#fff;background:rgba(22,163,74,.25);border-color:rgba(22,163,74,.5)}
-    .warn{color:#000;background:rgba(245,158,11,.35);border-color:rgba(245,158,11,.6)}
-    .err{ color:#fff;background:rgba(239,68,68,.35); border-color:rgba(239,68,68,.6)}
-    .info{color:#fff;background:rgba(56,189,248,.25);border-color:rgba(56,189,248,.5)}
-    .small{color:var(--muted);font-size:12.5px}
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-    details{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:8px}
-    details>summary{cursor:pointer;font-weight:600;margin:4px 0}
-    .list{display:grid;gap:6px}
-    .errtext{white-space:pre-wrap;color:#fecaca;font-size:12.5px}
-    .muted{color:var(--muted)}
-    .paths table{width:100%;border-collapse:collapse;font-size:13.5px}
-    .paths th,.paths td{padding:6px 8px;text-align:left}
-    .paths th{background:var(--line);color:var(--fg)}
-    .paths tr:nth-child(even){background:rgba(255,255,255,.04)}
+
+    header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 22px;
+      background:rgba(var(--panel-r),var(--panel-g),var(--panel-b),.65);
+      border-bottom:1px solid var(--panel-border);
+      backdrop-filter:blur(6px);
+    }
+    header .brand { display:flex; align-items:center; gap:14px; }
+    header .brand img.logo { height:42px; }
+    header .brand img.wordmark { height:22px; }
+
+    nav {
+      display:flex; gap:12px; padding:10px 22px;
+      background:rgba(var(--panel-r),var(--panel-g),var(--panel-b),.45);
+      border-bottom:1px solid var(--panel-border);
+    }
+    nav a {
+      color:var(--text); text-decoration:none; font-weight:600;
+      padding:8px 14px; border-radius:10px;
+      transition:background .15s;
+    }
+    nav a:hover { background:rgba(255,255,255,.08); }
+
+    main {
+      flex:1;
+      padding:22px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      gap:20px;
+    }
+    .card {
+      background:rgba(var(--panel-r),var(--panel-g),var(--panel-b),var(--panel-alpha));
+      border:1px solid var(--panel-border);
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:0 8px 24px rgba(0,0,0,.35);
+      backdrop-filter:blur(6px);
+    }
+    .card h2 { margin:0 0 12px; font-size:18px; }
+    .status-ok { color:#10b981; font-weight:600; }
+    .status-err { color:#ef4444; font-weight:600; }
+    .muted { color:var(--muted); font-size:14px; }
+
+    footer {
+      padding:10px 20px; text-align:center;
+      font-size:13px; color:var(--muted);
+      background:rgba(var(--panel-r),var(--panel-g),var(--panel-b),.55);
+      border-top:1px solid var(--panel-border);
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div>
-        <h2 style="margin:0">Hotel-Dashboard · Server-Übersicht</h2>
-        <div class="stamp">
-          Host: <code id="host">–</code> · Origin: <code id="origin">–</code> ·
-          <span id="redir-note" class="small">/ Redirect-Status: –</span> ·
-          <span id="now">–</span> · Auto-Refresh <code id="refresh-iv">5s</code>
-        </div>
-      </div>
-      <div class="actions">
-        <button id="btn-refresh">Jetzt aktualisieren</button>
-        <button id="btn-fast">Schneller (2s)</button>
-        <button id="btn-slow">Langsamer (10s)</button>
-        <button id="btn-pause">⏸︎ Pause</button>
-      </div>
-    </header>
+  <header>
+    <div class="brand">
+      <img class="logo" src="/HD-Logo.png" alt="Hotel-Dashboard Logo">
+      <img class="wordmark" src="/Hotel-Dashboard-Schriftzug.png" alt="Hotel-Dashboard">
+    </div>
+    <div><a href="/login" style="color:#fff;text-decoration:none;font-weight:600;">Abmelden</a></div>
+  </header>
 
-    <main class="grid">
-      <section class="card">
-        <h3>HTTP-Basics</h3>
-        <div class="row"><span>Health <span class="small">GET /health</span></span><span id="b-health" class="badge info">prüfe…</span></div>
-        <div class="row"><span>Root <span class="small">GET / (REDIR?)</span></span><span id="b-root" class="badge info">prüfe…</span></div>
-        <div class="row"><span>Login-Seite <span class="small">GET /login</span></span><span id="b-login" class="badge info">prüfe…</span></div>
-        <div class="row"><span>Reset-Seite <span class="small">GET /reset</span></span><span id="b-reset" class="badge info">prüfe…</span></div>
-        <div class="row"><span>Reset Validate <span class="small">GET /reset/validate?email=x&token=y</span></span><span id="b-validate" class="badge info">prüfe…</span></div>
-        <div class="row"><span>Session-API <span class="small">GET /session/remaining</span></span><span id="b-session" class="badge info">prüfe…</span></div>
-        <details><summary>Details & Latenzen</summary><div id="http-details" class="list mono small">–</div></details>
-      </section>
+  <nav>
+    <a href="/index.html">Übersicht</a>
+    <a href="/login.html">Login</a>
+    <a href="/reset.html">Passwort-Reset</a>
+    <a href="/health">Server-Status</a>
+    <a href="https://git.hotel-dashboard.de" target="_blank">Git</a>
+  </nav>
 
-      <section class="card">
-        <h3>Assets</h3>
-        <div class="row"><span>Logo <span class="small">HEAD /HD-Logo.png</span></span><span id="b-logo" class="badge info">prüfe…</span></div>
-        <div class="row"><span>Wordmark <span class="small">HEAD /Hotel-Dashboard-Schriftzug.png</span></span><span id="b-word" class="badge info">prüfe…</span></div>
-        <div class="row"><span>Background <span class="small">HEAD /hotel-dashboard-bg.jpg</span></span><span id="b-bg" class="badge info">prüfe…</span></div>
-        <details><summary>Fehlertexte</summary><div id="asset-errors" class="errtext">–</div></details>
-      </section>
+  <main>
+    <section class="card">
+      <h2>Serverstatus</h2>
+      <p id="serverStatus" class="muted">Lade…</p>
+    </section>
 
-      <section class="card">
-        <h3>Server-Status</h3>
-        <div class="kv"><span>Port</span><code id="s-port">–</code></div>
-        <div class="kv"><span>PID</span><code id="s-pid">–</code></div>
-        <div class="kv"><span>Uptime</span><code id="s-uptime">–</code></div>
-        <div class="kv"><span>Node</span><code id="s-node">–</code></div>
-        <div class="kv"><span>CPU-Load (1/5/15)</span><code id="s-load">–</code></div>
-        <div class="kv"><span>RAM used</span><code id="s-mem">–</code></div>
-        <div class="kv"><span>Benutzer</span><code id="s-user">–</code></div>
-        <div class="kv"><span>Arbeitsverzeichnis</span><code id="s-cwd">–</code></div>
-        <div id="status-note" class="small muted">Nutzt /admin/status, falls vorhanden.</div>
-      </section>
+    <section class="card">
+      <h2>Express-Routen</h2>
+      <ul id="routeList" class="muted"></ul>
+    </section>
 
-      <section class="card">
-        <h3>Git</h3>
-        <div class="kv"><span>Branch</span><code id="g-branch">–</code></div>
-        <div class="kv"><span>Letzter Commit</span><code id="g-last">–</code></div>
-        <details><summary>Repository-Infos</summary><div class="list mono small" id="g-extra">–</div></details>
-      </section>
+    <section class="card">
+      <h2>Git-Status</h2>
+      <p id="gitStatus" class="muted">Lade…</p>
+    </section>
 
-      <section class="card x2">
-        <h3>Dienste · Ports · Proxy</h3>
-        <div class="list" id="svc">Lade…</div>
-        <details style="margin-top:8px"><summary>Offene Ports (Ausschnitt)</summary><div class="list mono small" id="ports">–</div></details>
-        <details style="margin-top:8px"><summary>Proxy-Reachability (Host-Header lokal)</summary><div class="list mono small" id="proxy">–</div></details>
-      </section>
+    <section class="card">
+      <h2>Benutzer</h2>
+      <p id="userCount" class="muted">Lade…</p>
+    </section>
+  </main>
 
-      <section class="card x2">
-        <h3>Express-Routen</h3>
-        <div class="list mono small" id="routes">–</div>
-      </section>
-
-      <section class="card x2 paths">
-        <h3>Pfad-Status</h3>
-        <table id="pathTable"><thead><tr><th>Pfad</th><th>Status</th></tr></thead><tbody></tbody></table>
-      </section>
-    </main>
-
-    <footer class="small">
-      <span class="badge ok">OK</span> grün · <span class="badge warn">WARN</span> gelb · <span class="badge err">FEHLER</span> rot
-    </footer>
-  </div>
+  <footer>
+    &copy; 2025 Hotel-Dashboard · Alle Rechte vorbehalten
+  </footer>
 
   <script>
-    const $ = s => document.querySelector(s);
-    const set = (sel, txt) => { const el=$(sel); if(el) el.textContent=txt; };
-    const badge = (sel, ok, warn=false, txt) => { const el=$(sel); if(!el) return;
-      el.className='badge '+(ok?'ok':(warn?'warn':'err')); el.textContent=txt||(ok?'OK':(warn?'WARN':'FEHLER')); };
-    const fmtMs = ms => (ms<1000? `${ms.toFixed(0)}ms` : `${(ms/1000).toFixed(2)}s`);
-    const head = async (url) => { const t0=performance.now();
-      try{ const r=await fetch(url,{method:'HEAD',cache:'no-store'}); return {ok:r.ok,st:r.status,ms:performance.now()-t0}; }
-      catch(e){ return {ok:false,st:0,ms:performance.now()-t0}; } };
-    const get = async (url,opts={}) => { const t0=performance.now();
-      try{ const r=await fetch(url,Object.assign({cache:'no-store'},opts)); return {ok:r.ok,st:r.status,ms:performance.now()-t0,r,type:r.type}; }
-      catch(e){ return {ok:false,st:0,ms:performance.now()-t0,type:'error'}; } };
+    async function loadStatus() {
+      try {
+        const health = await fetch('/health').then(r => r.ok ? r.json() : null);
+        if (health) {
+          document.getElementById('serverStatus').textContent =
+            health.status === 'ok' ? '✅ Online' : '❌ Fehler';
+          document.getElementById('serverStatus').className =
+            health.status === 'ok' ? 'status-ok' : 'status-err';
+        }
 
-    let interval=5000,timer=null,paused=false;
-    function schedule(){ clearInterval(timer); if(!paused) timer=setInterval(refresh,interval); set('#refresh-iv',(interval/1000)+'s'); }
-    function setPause(p){ paused=p; $('#btn-pause').textContent=paused?'▶︎ Fortsetzen':'⏸︎ Pause'; schedule(); }
-    $('#btn-pause').addEventListener('click',()=>setPause(!paused));
+        const routes = await fetch('/routes').then(r => r.ok ? r.json() : []);
+        const routeList = document.getElementById('routeList');
+        routeList.innerHTML = '';
+        routes.forEach(rt => {
+          const li = document.createElement('li');
+          li.textContent = rt;
+          routeList.appendChild(li);
+        });
 
-    async function refresh(){ const y=window.scrollY; await run(); window.scrollTo({top:y,left:0,behavior:'instant'}); }
+        const git = await fetch('/git/status').then(r => r.ok ? r.text() : 'Nicht verfügbar');
+        document.getElementById('gitStatus').textContent = git;
 
-    async function checkRootRedirect(){
-      const r=await get('/',{redirect:'manual'});
-      if(r.type==='opaqueredirect'||(r.st>=300&&r.st<400)){ badge('#b-root',true,false,'REDIR'); set('#redir-note','/ Redirect-Status: REDIR'); }
-      else{ badge('#b-root',r.ok,false,r.ok?'OK':'FEHLER'); set('#redir-note','/ Redirect-Status: '+(r.ok?'OK':'FEHLER')); }
-      return r;
-    }
+        const users = await fetch('/users/count').then(r => r.ok ? r.json() : {count:0});
+        document.getElementById('userCount').textContent = users.count + ' Benutzer registriert';
 
-    async function updateHTTP(){
-      const rows=[];
-      let r=await get('/health'); badge('#b-health',r.ok); rows.push(`GET /health → ${r.st} · ${fmtMs(r.ms)}`);
-      r=await checkRootRedirect(); rows.push(`GET / → ${r.st||'(opaqueredirect)'} · ${fmtMs(r.ms)} · type=${r.type}`);
-      r=await get('/login'); badge('#b-login',r.ok); rows.push(`GET /login → ${r.st} · ${fmtMs(r.ms)}`);
-      r=await get('/reset'); badge('#b-reset', r.ok || r.st===200 || r.st===204, r.st===404); rows.push(`GET /reset → ${r.st} · ${fmtMs(r.ms)}`);
-      r=await get('/reset/validate?email=a@b&token=123'); badge('#b-validate',[200,400,401,403,404,422].includes(r.st), r.st===404); rows.push(`GET /reset/validate?... → ${r.st} · ${fmtMs(r.ms)}`);
-      r=await get('/session/remaining'); badge('#b-session', r.ok || [200,401,403].includes(r.st)); rows.push(`GET /session/remaining → ${r.st} · ${fmtMs(r.ms)}`);
-      $('#http-details').textContent=rows.join('\n');
-    }
-
-    async function updateAssets(){
-      const errs=[];
-      let a=await head('/HD-Logo.png'); badge('#b-logo',a.ok); if(!a.ok) errs.push(`HD-Logo.png → ${a.st} · ${fmtMs(a.ms)}`);
-      a=await head('/Hotel-Dashboard-Schriftzug.png'); badge('#b-word',a.ok); if(!a.ok) errs.push(`Hotel-Dashboard-Schriftzug.png → ${a.st} · ${fmtMs(a.ms)}`);
-      a=await head('/hotel-dashboard-bg.jpg'); badge('#b-bg',a.ok); if(!a.ok) errs.push(`hotel-dashboard-bg.jpg → ${a.st} · ${fmtMs(a.ms)}`);
-      $('#asset-errors').textContent=errs.length?errs.join('\n'):'keine';
-    }
-
-    async function updateAdminStatus(){
-      try{
-        const r=await get('/admin/status'); if(!r.ok) throw 0; const j=await r.r.json();
-        set('#s-port',j?.node?.port??'–'); set('#s-pid',j?.node?.pid??'–'); set('#s-uptime',j?.node?.uptime??'–');
-        set('#s-node',j?.node?.version??'–'); set('#s-user',j?.os?.user??'–'); set('#s-cwd',j?.os?.cwd??'–');
-        set('#s-load',Array.isArray(j?.os?.load)?j.os.load.join(' / '):'–'); set('#s-mem',j?.os?.mem??'–');
-        set('#g-branch',j?.git?.branch??'–'); set('#g-last',j?.git?.last??'–'); $('#g-extra').textContent=(j?.git?.info||['–']).join('\n');
-        const box=$('#svc'); box.innerHTML=''; (j?.services||[]).forEach(o=>{ const div=document.createElement('div'); div.className='row';
-          const left=document.createElement('span'); left.textContent=`${o.name}${o.detail?' · '+o.detail:''}`;
-          const right=document.createElement('span'); right.className='badge '+(o.ok?'ok':(o.warn?'warn':'err')); right.textContent=o.ok?'OK':(o.warn?'WARN':'FEHLER');
-          div.append(left,right); box.append(div); });
-        $('#ports').textContent=(j?.net?.ports||['–']).join('\n'); $('#proxy').textContent=(j?.proxy?.checks||['–']).join('\n'); $('#routes').textContent=(j?.routes||['–']).join('\n');
-      }catch(e){
-        set('#s-port','–'); set('#s-pid','–'); set('#s-uptime','–'); set('#s-node','–'); set('#s-user','–'); set('#s-cwd','–'); set('#s-load','–'); set('#s-mem','–');
-        set('#g-branch','–'); set('#g-last','–'); $('#g-extra').textContent='–'; $('#svc').textContent='(kein /admin/status)'; $('#ports').textContent='–'; $('#proxy').textContent='–'; $('#routes').textContent='–';
+      } catch(err) {
+        console.error(err);
       }
     }
-
-    async function updatePaths(){
-      const paths=["/health","/","/login","/reset","/reset/validate?email=x&token=y","/reset/confirm","/index","/dashboard"];
-      const tbody=document.querySelector("#pathTable tbody");
-      for(const p of paths){
-        let st=0, ok=false;
-        try{ const r=await fetch(p,{method:"GET",cache:"no-store",redirect:"manual"}); st=r.status||0; ok=st!==0 && st!==404 && st<500; }
-        catch{ st=0; ok=false; }
-        let tr=[...tbody.querySelectorAll('tr')].find(x=>x.firstChild.textContent===p);
-        const cell=`<td class="${ok?'ok':'err'}">${ok?'✔ OK':'✘ Fehler'} <span class="small mono">(${st||'–'})</span></td>`;
-        if(!tr){ tr=document.createElement('tr'); tr.innerHTML=`<td>${p}</td>${cell}`; tbody.appendChild(tr); }
-        else{ tr.lastChild.outerHTML=cell; }
-      }
-    }
-
-    async function run(){
-      set('#host',location.host); set('#origin',location.origin); set('#now',new Date().toLocaleString());
-      await updateHTTP(); await updateAssets(); await updateAdminStatus(); await updatePaths();
-    }
-
-    $('#btn-refresh').addEventListener('click',refresh);
-    $('#btn-fast').addEventListener('click',()=>{interval=2000;schedule();refresh();});
-    $('#btn-slow').addEventListener('click',()=>{interval=10000;schedule();});
-    schedule(); refresh();
+    loadStatus();
+    setInterval(loadStatus, 15000);
   </script>
 </body>
 </html>
