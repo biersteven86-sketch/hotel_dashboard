@@ -101,7 +101,8 @@ const OPEN_PATHS = new Set([
   '/login', '/login.html',
   '/reset', '/reset.html',
   '/reset/validate', '/reset/confirm',
-  '/admin/status' // <— WICHTIG: Admin-Status ohne Login freigeben (sonst 302)
+  '/admin/status',           // <— Admin-Status ohne Login
+  '/session/remaining'       // <— NEU: für Index-Checks ohne Redirect
 ]);
 
 // Aktivitäts-/Timeout-Tracker
@@ -151,6 +152,19 @@ try {
 app.get ('/',       (_req, res) => res.redirect('/login'));
 app.get ('/health', (_req, res) => res.type('text').send('OK'));
 app.head('/health', (_req, res) => res.sendStatus(200));
+
+// ───────────────────────────────────────────────────────────────
+// Session-API (NEU): verbleibende Idle-Zeit
+// ───────────────────────────────────────────────────────────────
+app.get('/session/remaining', (req, res) => {
+  const now  = Date.now();
+  const last = Number(req.session?.lastActivity || 0);
+  if (!req.session || !req.session.user || !last) {
+    return res.status(401).json({ ok:false, remaining:0 });
+  }
+  const remaining = Math.max(0, IDLE_MS - (now - last));
+  return res.json({ ok:true, remaining });
+});
 
 // ───────────────────────────────────────────────────────────────
 // Seiten (öffentlich: Login/Reset)
